@@ -12,6 +12,8 @@ public class CharaScript : MonoBehaviour
 
     //HP
     public int hp = 100;
+    //攻撃力
+    public int damage = 1;
 
     //移動可能回数
     public int moveLimit = 1;
@@ -65,6 +67,15 @@ public class CharaScript : MonoBehaviour
     public virtual IEnumerator Move()
     {
         yield return null;
+    }
+
+    /// <summary>
+    /// 被弾処理
+    /// </summary>
+    /// <param name="amount">被ダメージ</param>
+    public void ReciveDamage(int amount)
+    {
+        
     }
 }
 

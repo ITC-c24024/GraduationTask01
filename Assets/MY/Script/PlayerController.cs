@@ -4,11 +4,13 @@ using UnityEngine;
 
 public class PlayerController : CharaScript
 {
-    [SerializeField] TurnManager gameController;
     [SerializeField] SquareScript squareSC;
 
     [SerializeField, Header("攻撃イメージ")]//仮
     GameObject attackImage;
+
+    //実行中判定
+    bool isRun = false;
 
     public struct Action 
     {
@@ -24,8 +26,6 @@ public class PlayerController : CharaScript
 
     //行動予定List
     List<Action> actionList = new List<Action>();
-    //行動可能回数
-    public int actionlimit = 5;
     //実行回数
     int executionNum = 0;
 
@@ -40,6 +40,7 @@ public class PlayerController : CharaScript
     void Awake()
     {
         playerPos = transform.position;
+        curPos = playerPos;
     }
 
     void Update()
@@ -54,8 +55,6 @@ public class PlayerController : CharaScript
     /// <param name="z">z軸入力</param>
     IEnumerator MovePlayer(int x, int z)
     {
-        
-
         isMove = true;
 
         //元の位置
@@ -67,7 +66,25 @@ public class PlayerController : CharaScript
             playerPos.z + z
             );
 
-        nextPos = targetPos;
+        //実行中なら行き先を予約
+        if (isRun)
+        {
+            Debug.Log("予約");
+            nextPos = targetPos;
+            gridManager.ReserveCell((int)nextPos.x, (int)nextPos.z, this);
+            //ノックバックするか判定
+            if (gridManager.CheckCellState((int)nextPos.x, (int)nextPos.z) != CellScript.CellState.player
+                || gridManager.CheckCellState((int)nextPos.x, (int)nextPos.z) != CellScript.CellState.enemy)
+            {
+                //ノックバックしないなら移動確定
+                gridManager.LeaveCell((int)curPos.x, (int)curPos.z);
+            }
+            //ノックバックするなら
+            else
+            {
+                //ノックバック処理
+            }
+        }
 
         float time = 0;
         float required = 0.1f;
@@ -85,6 +102,15 @@ public class PlayerController : CharaScript
         }
         playerPos = transform.position;
         curPos = playerPos;
+
+        //実行中なら現在地のマス状態を変更
+        if (isRun)
+        {
+            Debug.Log("マス更新");
+            gridManager.ChangeCellState((int)curPos.x, (int)curPos.z, CellScript.CellState.player, this);
+            //ひとつ前のマスを空にする
+            gridManager.ChangeCellState((int)nextPos.x, (int)nextPos.z, CellScript.CellState.empty, this);
+        }
 
         isMove = false;
     }
@@ -113,7 +139,7 @@ public class PlayerController : CharaScript
         //行動位置を保存
         startPos = playerPos;
 
-        for (int i = 0; i < actionlimit; i++)
+        for (int i = 0; i < actionLimit; i++)
         {        
             yield return new WaitForSeconds(0.2f);
             squareSC.SetImage(playerPos);
@@ -181,7 +207,6 @@ public class PlayerController : CharaScript
                 
                 yield return null;
             }
-            Debug.Log($"残り行動回数：{actionlimit - i}");
         }
         
         yield return new WaitForSeconds(0.2f);
@@ -192,7 +217,7 @@ public class PlayerController : CharaScript
         playerPos = startPos;
         transform.position = playerPos;
 
-        gameController.FinCoroutine();
+        turnManager.FinCoroutine();
     }
 
     /// <summary>
@@ -201,9 +226,9 @@ public class PlayerController : CharaScript
     /// <returns></returns>
     public IEnumerator ExecutionAct()
     {
-        Debug.Log("実行中");
+        isRun = true;
 
-        if (actionList[executionNum].a == 0) //攻撃
+        if (actionList[executionNum].a == 0) //移動
         {
             StartCoroutine(
                 MovePlayer(
@@ -212,7 +237,7 @@ public class PlayerController : CharaScript
                     )
                 );
         }
-        else //移動
+        else //攻撃
         {
             StartCoroutine(
                 Attack(
@@ -220,11 +245,12 @@ public class PlayerController : CharaScript
                     (int)actionList[executionNum].direction.y
                     )
                 );
-        }      
+        }
         executionNum++;
 
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(1.0f);
+        isRun = false;
 
-        gameController.FinCoroutine();
+        turnManager.FinCoroutine();
     }
 }

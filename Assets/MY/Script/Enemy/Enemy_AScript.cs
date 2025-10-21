@@ -27,10 +27,16 @@ public class Enemy_AScript : CharaScript
                 originPos.z + direction.y
                 );
 
-            nextPos = targetPos;
-
             //進めないとき移動終了
             if (!CanMove(targetPos)) break;
+
+            nextPos = targetPos;
+
+            //敵がいたらせき止められる
+            if (gridManager.CheckCellState((int)nextPos.x, (int)nextPos.z) == CellScript.CellState.enemy) break;
+
+            gridManager.ReserveCell((int)nextPos.x, (int)nextPos.z, this);
+            gridManager.LeaveCell((int)curPos.x, (int)curPos.z);
 
             float time = 0;
             float required = 0.1f / moveRule.Length;
@@ -48,6 +54,10 @@ public class Enemy_AScript : CharaScript
             }
             transform.position = targetPos;
             curPos = targetPos;
+
+            gridManager.ChangeCellState((int)curPos.x, (int)curPos.z, CellScript.CellState.enemy, this);
+            //ひとつ前のマスを空にする
+            gridManager.ChangeCellState((int)nextPos.x, (int)nextPos.z, CellScript.CellState.empty, this);
         }
     }
 }

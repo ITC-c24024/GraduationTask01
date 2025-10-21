@@ -120,10 +120,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   turnManager: {fileID: 0}
+  gridManager: {fileID: 0}
+  cellScript: {fileID: 0}
   rank: 1
   hp: 100
-  moveLimit: 1
+  damage: 1
+  actionLimit: 5
   moveRule:
+  - x: 0
+    z: 1
+  - x: 0
+    z: 1
   - x: 0
     z: 1
   curPos: {x: 0, y: 0, z: 0}

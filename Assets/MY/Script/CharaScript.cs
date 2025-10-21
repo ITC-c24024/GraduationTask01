@@ -6,6 +6,8 @@ using UnityEngine;
 public class CharaScript : MonoBehaviour
 {
     public TurnManager turnManager;
+    public GridManager gridManager;
+    public CellScript cellScript;
 
     //ÚG—Dæ“x
     public int rank;
@@ -15,8 +17,8 @@ public class CharaScript : MonoBehaviour
     //UŒ‚—Í
     public int damage = 1;
 
-    //ˆÚ“®‰Â”\‰ñ”
-    public int moveLimit = 1;
+    //s“®‰Â”\‰ñ”
+    public int actionLimit = 1;
     //ˆÚ“®–@‘¥
     public Direction[] moveRule;
 

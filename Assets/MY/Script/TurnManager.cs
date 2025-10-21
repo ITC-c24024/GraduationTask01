@@ -7,6 +7,11 @@ public class TurnManager : MonoBehaviour
     [SerializeField] PlayerController playerCon;
     //仮
     [SerializeField] CharaScript enemySC;
+    //仮
+    GridManager gridManager;
+    //仮
+    
+    [SerializeField] CellScript cellScript;
 
     //仮
     [SerializeField, Header("敵Prefab")]
@@ -18,6 +23,7 @@ public class TurnManager : MonoBehaviour
     void Start()
     {
         //仮
+        gridManager = gameObject.GetComponent<GridManager>();
         EnemySpown();
         StartCoroutine(TurnStart());
     }
@@ -33,6 +39,9 @@ public class TurnManager : MonoBehaviour
 
         enemySC = enemy.GetComponent<CharaScript>();
         enemySC.turnManager = this;
+        enemySC.gridManager = gridManager;
+        enemySC.cellScript = cellScript;
+
     }
 
     /// <summary>
@@ -55,14 +64,14 @@ public class TurnManager : MonoBehaviour
         while (runnning != null) yield return null;
 
         //実行ターン
-        for (int i = 0; i < playerCon.actionlimit; i++)
+        for (int i = 0; i < playerCon.actionLimit; i++)
         {
             //先行動敵
 
             //プレイヤー実行
             runnning = StartCoroutine(playerCon.ExecutionAct());
             //同時行動敵
-            if (i < enemySC.moveLimit) StartCoroutine(enemySC.Move());
+            if (i < enemySC.actionLimit) StartCoroutine(enemySC.Move());
 
             while (runnning != null) yield return null;
 

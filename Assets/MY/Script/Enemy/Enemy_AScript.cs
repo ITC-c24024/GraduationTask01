@@ -35,8 +35,6 @@ public class Enemy_AScript : CharaScript
             if (gridManager.CheckCellState((int)nextPos.z, (int)nextPos.x) == CellScript.CellState.enemy) break;
             //—\–ñ
             gridManager.ReserveCell((int)nextPos.z, (int)nextPos.x, this);
-            //—£‚ê‚é
-            //gridManager.LeaveCell((int)originPos.x, (int)originPos.z);
 
             float time = 0;
             float required = 0.1f / moveRule.Length;
@@ -55,9 +53,9 @@ public class Enemy_AScript : CharaScript
             transform.position = targetPos;
             curPos = targetPos;
 
-            gridManager.ChangeCellState((int)curPos.x, (int)curPos.z, CellScript.CellState.enemy, this);
+            gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.enemy, this);
             //‚Ð‚Æ‚Â‘O‚Ìƒ}ƒX‚ð‹ó‚É‚·‚é
-            gridManager.ChangeCellState((int)originPos.x, (int)originPos.z, CellScript.CellState.empty, this);
+            gridManager.LeaveCell((int)originPos.z, (int)originPos.x);
         }
     }
 }

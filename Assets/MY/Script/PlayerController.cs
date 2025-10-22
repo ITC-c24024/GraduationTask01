@@ -15,6 +15,9 @@ public class PlayerController : CharaScript
     //実行中判定
     bool isRun = false;
 
+    //ノックバック判定
+    bool isKnockBack = false;
+
     InputAction stickAction;
     InputAction selectAttack;
     InputAction selectMove;
@@ -70,7 +73,7 @@ public class PlayerController : CharaScript
         isMove = true;
 
         //元の位置
-        Vector3 originPos = playerPos;
+        Vector3 originPos = curPos;
         //移動先の位置
         Vector3 targetPos = new Vector3(
             playerPos.x + x,
@@ -87,8 +90,8 @@ public class PlayerController : CharaScript
             //ノックバックするか判定
             if (gridManager.CheckCellState((int)nextPos.z, (int)nextPos.x) == CellScript.CellState.enemy)
             {
-                //ノックバック処理
-                StartCoroutine(KnockBack());
+                //ノックバック予定            
+                isKnockBack = true;
             }
         }
 
@@ -110,13 +113,24 @@ public class PlayerController : CharaScript
         playerPos = transform.position;
         curPos = playerPos;
 
+        //ノックバック
+        if (isKnockBack)
+        {
+            transform.position = targetPos;
+            playerPos = transform.position;
+            curPos = transform.position;
+            StartCoroutine(KnockBack(new Vector2(0, -1)));
+
+            yield break;
+        }
+
         //実行中なら現在地のマス状態を変更
         if (isRun)
         {
             Debug.Log("マス更新");
             gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.player, this);
             //元居たマスを空にする
-            gridManager.ChangeCellState((int)originPos.z, (int)originPos.x, CellScript.CellState.empty, this);
+            gridManager.LeaveCell((int)originPos.z, (int)originPos.x);
         }
 
         isMove = false;
@@ -135,10 +149,41 @@ public class PlayerController : CharaScript
         attackImage.SetActive(false);
     }
 
-    IEnumerator KnockBack()
+    IEnumerator KnockBack(Vector2 direction)
     {
         Debug.Log("接触");
-        yield return null;
+
+        //元の位置
+        Vector3 originPos = playerPos;
+        //移動先の位置
+        Vector3 targetPos = new Vector3(
+            playerPos.x + direction.x,
+            playerPos.y,
+            playerPos.z + direction.y
+            );
+
+        float time = 0;
+        float required = 0.05f;
+        while (time < required)
+        {
+            time += Time.deltaTime;
+
+            //現在地を計算
+            Vector3 currentPos = Vector3.Lerp(originPos, targetPos, time / required);
+
+            //プレイヤーを移動
+            transform.position = currentPos;
+
+            yield return null;
+        }
+        transform.position = targetPos;
+        playerPos = transform.position;
+        curPos = playerPos;
+
+        //マス更新
+        gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.player, this);
+
+        isKnockBack = false;
     }
 
     /// <summary>
@@ -171,33 +216,53 @@ public class PlayerController : CharaScript
                 if (0.5 < stick.x && !isMove)
                 {
                     direction = new Vector2(0, 1);
-                    if (CanMove(new Vector3(curPos.x + direction.x, curPos.y, curPos.z + direction.y)))
+                    if (CanMove(new Vector3(playerPos.x + direction.x, playerPos.y, playerPos.z + direction.y)))
                     {
                         squareSC.SelectImage(playerPos, direction);
+                    }
+                    else
+                    {
+                        direction = Vector2.zero;
+                        squareSC.DeleteSelect();
                     }
                 }
                 else if (0.5 < stick.y && !isMove)
                 {
                     direction = new Vector2(-1, 0);
-                    if (CanMove(new Vector3(curPos.x + direction.x, curPos.y, curPos.z + direction.y)))
+                    if (CanMove(new Vector3(playerPos.x + direction.x, playerPos.y, playerPos.z + direction.y)))
                     {
                         squareSC.SelectImage(playerPos, direction);
+                    }
+                    else
+                    {
+                        direction = Vector2.zero;
+                        squareSC.DeleteSelect();
                     }
                 }
                 else if (stick.x < -0.5 && !isMove)
                 {
                     direction = new Vector2(0, -1);
-                    if (CanMove(new Vector3(curPos.x + direction.x, curPos.y, curPos.z + direction.y)))
+                    if (CanMove(new Vector3(playerPos.x + direction.x, playerPos.y, playerPos.z + direction.y)))
                     {
                         squareSC.SelectImage(playerPos, direction);
+                    }
+                    else
+                    {
+                        direction = Vector2.zero;
+                        squareSC.DeleteSelect();
                     }
                 }
                 else if (stick.y < -0.5 && !isMove)
                 {
                     direction = new Vector2(1, 0);
-                    if (CanMove(new Vector3(curPos.x + direction.x, curPos.y, curPos.z + direction.y)))
+                    if (CanMove(new Vector3(playerPos.x + direction.x, playerPos.y, playerPos.z + direction.y)))
                     {                      
                         squareSC.SelectImage(playerPos, direction);
+                    }
+                    else
+                    {
+                        direction = Vector2.zero;
+                        squareSC.DeleteSelect();
                     }
                 }
 

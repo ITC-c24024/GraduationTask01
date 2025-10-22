@@ -18,7 +18,11 @@ public class SquareScript : MonoBehaviour
         {
             squares[i].SetActive(false);
         }
+        DeleteSelect();
+    }
 
+    public void DeleteSelect()
+    {
         selectObj.SetActive(false);
     }
 

@@ -11,12 +11,11 @@ public class Enemy_AScript : CharaScript
     /// <returns></returns>
     public override IEnumerator Move()
     {
-        Vector3 playerPos = turnManager.GetPlayerPos();
+        Vector3[] playerPos = turnManager.GetPlayerPos();
         Vector3 startPos = transform.position;
 
         for (int i = 0; i < moveRule.Length; i++)
         {
-            Debug.Log("“GˆÚ“®");
             Vector2 direction = GetDirection(playerPos, startPos, i);
 
             Vector3 originPos = transform.position;
@@ -33,10 +32,11 @@ public class Enemy_AScript : CharaScript
             nextPos = targetPos;
 
             //“G‚ª‚¢‚½‚ç‚¹‚«Ž~‚ß‚ç‚ê‚é
-            if (gridManager.CheckCellState((int)nextPos.x, (int)nextPos.z) == CellScript.CellState.enemy) break;
-
-            gridManager.ReserveCell((int)nextPos.x, (int)nextPos.z, this);
-            gridManager.LeaveCell((int)curPos.x, (int)curPos.z);
+            if (gridManager.CheckCellState((int)nextPos.z, (int)nextPos.x) == CellScript.CellState.enemy) break;
+            //—\–ñ
+            gridManager.ReserveCell((int)nextPos.z, (int)nextPos.x, this);
+            //—£‚ê‚é
+            //gridManager.LeaveCell((int)originPos.x, (int)originPos.z);
 
             float time = 0;
             float required = 0.1f / moveRule.Length;
@@ -57,7 +57,7 @@ public class Enemy_AScript : CharaScript
 
             gridManager.ChangeCellState((int)curPos.x, (int)curPos.z, CellScript.CellState.enemy, this);
             //‚Ð‚Æ‚Â‘O‚Ìƒ}ƒX‚ð‹ó‚É‚·‚é
-            gridManager.ChangeCellState((int)nextPos.x, (int)nextPos.z, CellScript.CellState.empty, this);
+            gridManager.ChangeCellState((int)originPos.x, (int)originPos.z, CellScript.CellState.empty, this);
         }
     }
 }

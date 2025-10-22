@@ -44,12 +44,42 @@ public class CharaScript : MonoBehaviour
     }
 
     /// <summary>
-    /// プレイヤーの位置を調べ、進む方向を決める
+    /// 距離を計算
     /// </summary>
-    public Vector2 GetDirection(Vector3 playerPos, Vector3 startPos, int i)
+    /// <param name="targetPos">目標位置</param>
+    /// <param name="startPos">スタート位置</param>
+    /// <returns>結果の距離を返す</returns>
+    float GetDistance(Vector3 targetPos, Vector3 startPos)
     {
-        float diffX = playerPos.x - startPos.x;
-        float diffZ = playerPos.z - startPos.z;
+        float distance = Mathf.Sqrt(
+            Mathf.Pow(targetPos.x - startPos.x, 2) + Mathf.Pow(targetPos.z - startPos.z, 2)
+            );
+        return distance;
+    }
+
+    /// <summary>
+    /// プレイヤーの位置、距離を調べ、進む方向を決める
+    /// </summary>
+    public Vector2 GetDirection(Vector3[] playerPos, Vector3 startPos, int i)
+    {
+        //プレイヤーとの距離を計算
+        float diff_A = GetDistance(playerPos[0], startPos);
+        float diff_B = GetDistance(playerPos[1], startPos);
+
+        //近い方を追う位置とする
+        Vector3 targetPos;
+        if (diff_A <= diff_B)
+        {
+            targetPos = playerPos[0];
+        }
+        else
+        {
+            targetPos = playerPos[1];
+        }
+
+        //x座標、z座標の差を計算
+        float diffX = targetPos.x - startPos.x;
+        float diffZ = targetPos.z - startPos.z;
 
         //より離れてる軸に進む
         if (Mathf.Abs(diffX) <= Mathf.Abs(diffZ))

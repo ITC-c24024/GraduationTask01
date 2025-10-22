@@ -1,6 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
+
+[RequireComponent(typeof(PlayerInput))]
 
 public class PlayerController : CharaScript
 {
@@ -11,6 +14,10 @@ public class PlayerController : CharaScript
 
     //実行中判定
     bool isRun = false;
+
+    InputAction stickAction;
+    InputAction selectAttack;
+    InputAction selectMove;
 
     public struct Action 
     {
@@ -39,6 +46,11 @@ public class PlayerController : CharaScript
 
     void Awake()
     {
+        var actionMap = GetComponent<PlayerInput>().currentActionMap;
+        stickAction = actionMap["Move"];
+        selectMove = actionMap["SelectMove"];
+        selectAttack = actionMap["SelectAttack"];
+
         playerPos = transform.position;
         curPos = playerPos;
     }
@@ -53,7 +65,7 @@ public class PlayerController : CharaScript
     /// </summary>
     /// <param name="x">x軸入力</param>
     /// <param name="z">z軸入力</param>
-    IEnumerator MovePlayer(int x, int z)
+    public IEnumerator MovePlayer(int x, int z)
     {
         isMove = true;
 
@@ -71,18 +83,12 @@ public class PlayerController : CharaScript
         {
             Debug.Log("予約");
             nextPos = targetPos;
-            gridManager.ReserveCell((int)nextPos.x, (int)nextPos.z, this);
+            gridManager.ReserveCell((int)nextPos.z, (int)nextPos.x, this);
             //ノックバックするか判定
-            if (gridManager.CheckCellState((int)nextPos.x, (int)nextPos.z) != CellScript.CellState.player
-                || gridManager.CheckCellState((int)nextPos.x, (int)nextPos.z) != CellScript.CellState.enemy)
-            {
-                //ノックバックしないなら移動確定
-                gridManager.LeaveCell((int)curPos.x, (int)curPos.z);
-            }
-            //ノックバックするなら
-            else
+            if (gridManager.CheckCellState((int)nextPos.z, (int)nextPos.x) == CellScript.CellState.enemy)
             {
                 //ノックバック処理
+                StartCoroutine(KnockBack());
             }
         }
 
@@ -100,6 +106,7 @@ public class PlayerController : CharaScript
 
             yield return null;
         }
+        transform.position = targetPos;
         playerPos = transform.position;
         curPos = playerPos;
 
@@ -107,9 +114,9 @@ public class PlayerController : CharaScript
         if (isRun)
         {
             Debug.Log("マス更新");
-            gridManager.ChangeCellState((int)curPos.x, (int)curPos.z, CellScript.CellState.player, this);
-            //ひとつ前のマスを空にする
-            gridManager.ChangeCellState((int)nextPos.x, (int)nextPos.z, CellScript.CellState.empty, this);
+            gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.player, this);
+            //元居たマスを空にする
+            gridManager.ChangeCellState((int)originPos.z, (int)originPos.x, CellScript.CellState.empty, this);
         }
 
         isMove = false;
@@ -126,6 +133,12 @@ public class PlayerController : CharaScript
         attackImage.SetActive(true);
         yield return new WaitForSeconds(0.2f);
         attackImage.SetActive(false);
+    }
+
+    IEnumerator KnockBack()
+    {
+        Debug.Log("接触");
+        yield return null;
     }
 
     /// <summary>
@@ -149,33 +162,37 @@ public class PlayerController : CharaScript
             //入力を受けて行動予定Listに追加
             bool isInput = false;
             while (!isInput)
-            {    
+            {
+                Vector2 stick = stickAction.ReadValue<Vector2>();
+                bool move = selectMove.triggered;
+                bool attack = selectAttack.triggered;
+
                 //マス選択入力
-                if (Input.GetKeyDown(KeyCode.RightArrow) && !isMove)
+                if (0.5 < stick.x && !isMove)
                 {
                     direction = new Vector2(0, 1);
-                    if (CanMove(new Vector3(curPos.x + direction.x, curPos.y, curPos.z + direction.y))) 
-                    {                       
+                    if (CanMove(new Vector3(curPos.x + direction.x, curPos.y, curPos.z + direction.y)))
+                    {
                         squareSC.SelectImage(playerPos, direction);
                     }
                 }
-                else if (Input.GetKeyDown(KeyCode.UpArrow) && !isMove)
+                else if (0.5 < stick.y && !isMove)
                 {
                     direction = new Vector2(-1, 0);
                     if (CanMove(new Vector3(curPos.x + direction.x, curPos.y, curPos.z + direction.y)))
-                    {                       
+                    {
                         squareSC.SelectImage(playerPos, direction);
                     }
                 }
-                else if (Input.GetKeyDown(KeyCode.LeftArrow) && !isMove)
+                else if (stick.x < -0.5 && !isMove)
                 {
                     direction = new Vector2(0, -1);
                     if (CanMove(new Vector3(curPos.x + direction.x, curPos.y, curPos.z + direction.y)))
-                    {                      
+                    {
                         squareSC.SelectImage(playerPos, direction);
                     }
                 }
-                else if (Input.GetKeyDown(KeyCode.DownArrow) && !isMove)
+                else if (stick.y < -0.5 && !isMove)
                 {
                     direction = new Vector2(1, 0);
                     if (CanMove(new Vector3(curPos.x + direction.x, curPos.y, curPos.z + direction.y)))
@@ -185,39 +202,47 @@ public class PlayerController : CharaScript
                 }
 
                 //移動入力
-                if (Input.GetKeyDown(KeyCode.Return) && direction != Vector2.zero)
+                if (move && direction != Vector2.zero && !isInput)
                 {
                     StartCoroutine(MovePlayer((int)direction.x, (int)direction.y));
 
                     Action action = new Action(0, direction);
                     actionList.Add(action);
-
+                    
                     isInput = true;
                 }
                 //攻撃入力
-                else if (Input.GetKeyDown(KeyCode.Space) && direction != Vector2.zero)
+                else if (attack && direction != Vector2.zero && !isInput)
                 {
                     //攻撃処理呼ぶ
 
                     Action action = new Action(1, direction);
                     actionList.Add(action);
-
+                    
                     isInput = true;
                 }
-                
+
                 yield return null;
             }
+
+            Debug.Log($"残り行動回数:{actionLimit - i - 1}");
         }
         
         yield return new WaitForSeconds(0.2f);
         squareSC.DeleteSquare();
 
         yield return new WaitForSeconds(0.2f);
+        turnManager.FinCoroutine();
+    }
+
+    /// <summary>
+    /// 選択フェーズ終了後位置リセット
+    /// </summary>
+    public void PosReset()
+    {    
         //位置を戻す(仮)
         playerPos = startPos;
-        transform.position = playerPos;
-
-        turnManager.FinCoroutine();
+        transform.position = playerPos;       
     }
 
     /// <summary>
@@ -227,9 +252,11 @@ public class PlayerController : CharaScript
     public IEnumerator ExecutionAct()
     {
         isRun = true;
-
+        
         if (actionList[executionNum].a == 0) //移動
         {
+            //マスの関数を呼ぶ
+            
             StartCoroutine(
                 MovePlayer(
                     (int)actionList[executionNum].direction.x,
@@ -239,6 +266,8 @@ public class PlayerController : CharaScript
         }
         else //攻撃
         {
+            //マスの関数を呼ぶ
+
             StartCoroutine(
                 Attack(
                     (int)actionList[executionNum].direction.x,

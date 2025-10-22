@@ -4,12 +4,11 @@ using UnityEngine;
 
 public class TurnManager : MonoBehaviour
 {
-    [SerializeField] PlayerController playerCon;
+    [SerializeField] PlayerController[] playerCon;
     //仮
     [SerializeField] CharaScript enemySC;
     //仮
     GridManager gridManager;
-    //仮
     
     [SerializeField] CellScript cellScript;
 
@@ -17,8 +16,8 @@ public class TurnManager : MonoBehaviour
     [SerializeField, Header("敵Prefab")]
     GameObject enemyPrefab;
 
-    //実行中コルーチン
-    Coroutine runnning = null;
+    //実行中コルーチンの数
+    int runnning = 0;
 
     void Start()
     {
@@ -49,7 +48,7 @@ public class TurnManager : MonoBehaviour
     /// </summary>
     public void FinCoroutine()
     {
-        runnning = null;
+        runnning--;
     }
 
     /// <summary>
@@ -59,28 +58,42 @@ public class TurnManager : MonoBehaviour
     IEnumerator TurnStart()
     {
         //行動選択
-        runnning = StartCoroutine(playerCon.SelectAction());
+        StartCoroutine(playerCon[0].SelectAction());
+        runnning++;
+        StartCoroutine(playerCon[1].SelectAction());
+        runnning++;
 
-        while (runnning != null) yield return null;
+        while (runnning != 0) yield return null;
+
+        playerCon[0].PosReset();
+        playerCon[1].PosReset();
 
         //実行ターン
-        for (int i = 0; i < playerCon.actionLimit; i++)
+        for (int i = 0; i < playerCon[0].actionLimit; i++)
         {
             //先行動敵
 
             //プレイヤー実行
-            runnning = StartCoroutine(playerCon.ExecutionAct());
+            StartCoroutine(playerCon[0].ExecutionAct());
+            runnning++;
+            StartCoroutine(playerCon[1].ExecutionAct());
+            runnning++;
+
             //同時行動敵
             if (i < enemySC.actionLimit) StartCoroutine(enemySC.Move());
 
-            while (runnning != null) yield return null;
+            while (runnning != 0) yield return null;
 
             //後行動敵
         }
     }
 
-    public Vector3 GetPlayerPos()
+    public Vector3[] GetPlayerPos()
     {
-        return playerCon.playerPos;
+        Vector3[] playerPos = new Vector3[] { 
+            playerCon[0].playerPos, 
+            playerCon[1].playerPos 
+        };
+        return playerPos;
     }
 }

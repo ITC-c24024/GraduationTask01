@@ -125,7 +125,7 @@ MonoBehaviour:
   rank: 1
   hp: 100
   damage: 1
-  actionLimit: 5
+  actionLimit: 1
   moveRule:
   - x: 0
     z: 1

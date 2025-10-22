@@ -23,6 +23,7 @@ public class GridManager : MonoBehaviour
             {
                 var cellObj = Instantiate(cellPrefab, new Vector3(x, 0, y), Quaternion.identity);
                 cellSC[y, x] = cellObj.GetComponent<CellScript>();
+                cellSC[y, x].SetPosition(new Vector2Int(y, x));
             }
         }
     }
@@ -45,9 +46,9 @@ public class GridManager : MonoBehaviour
     /// <param name="x">x座標(横の列)</param>
     /// <param name="state">状態(empty=空,player=プレイヤー,enemy=敵,damageTile=ダメージ床)</param>
     /// <param name="unitSC">呼びだす側のユニットスクリプト</param>
-    public void ChangeCellState(int y, int x ,CellScript.CellState state,CharaScript unitSC)
+    public CellScript.TryEnterResult ChangeCellState(int y, int x ,CellScript.CellState state,CharaScript unitSC)
     {
-        cellSC[y, x].MoveCheck(state,unitSC);
+        return cellSC[y,x].TryEnter(state,unitSC);
     }
 
     /// <summary>
@@ -88,8 +89,9 @@ public class GridManager : MonoBehaviour
     /// </summary>
     /// <param name="y">y座標</param>
     /// <param name="x">x座標</param>
-    public void LeaveCell(int y, int x)
+    /// <param name="unitSC">ユニットのスクリプト</param>
+    public void LeaveCell(int y, int x, CharaScript unitSC)
     {
-        cellSC[y, x].Leave();
+        cellSC[y, x].Leave(unitSC);
     }
 }

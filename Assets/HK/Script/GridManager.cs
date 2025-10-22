@@ -17,12 +17,13 @@ public class GridManager : MonoBehaviour
         cellSC = new CellScript[width, height];//配列初期化
 
         //マップ生成＆各マススクリプト取得
-        for(int y = 0; y < height; y++)
+        for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
             {
                 var cellObj = Instantiate(cellPrefab, new Vector3(x, 0, y), Quaternion.identity);
                 cellSC[y, x] = cellObj.GetComponent<CellScript>();
+                cellSC[y, x].SetPosition(new Vector2Int(y, x));
             }
         }
     }
@@ -33,7 +34,7 @@ public class GridManager : MonoBehaviour
     /// <param name="y">y座標</param>
     /// <param name="x">x座標</param>
     /// <param name="unitSC">呼びだす側のユニットスクリプト</param>
-    public void ReserveCell(int y, int x,CharaScript unitSC)
+    public void ReserveCell(int y, int x, CharaScript unitSC)
     {
         cellSC[y, x].ReserveState(unitSC);
     }
@@ -45,9 +46,10 @@ public class GridManager : MonoBehaviour
     /// <param name="x">x座標(横の列)</param>
     /// <param name="state">状態(empty=空,player=プレイヤー,enemy=敵,damageTile=ダメージ床)</param>
     /// <param name="unitSC">呼びだす側のユニットスクリプト</param>
-    public void ChangeCellState(int y, int x ,CellScript.CellState state,CharaScript unitSC)
+    /// <param name="direction">エントリの方向(敵の場合のみ使用)</param>
+    public CellScript.TryEnterResult ChangeCellState(int y, int x, CellScript.CellState state, CharaScript unitSC, Vector2Int direction = default)
     {
-        cellSC[y, x].MoveCheck(state,unitSC);
+        return cellSC[y, x].TryEnter(state, unitSC);
     }
 
     /// <summary>
@@ -88,8 +90,9 @@ public class GridManager : MonoBehaviour
     /// </summary>
     /// <param name="y">y座標</param>
     /// <param name="x">x座標</param>
-    public void LeaveCell(int y, int x)
+    /// <param name="unitSC">ユニットのスクリプト</param>
+    public void LeaveCell(int y, int x, CharaScript unitSC)
     {
-        cellSC[y, x].Leave();
+        cellSC[y, x].Leave(unitSC);
     }
 }

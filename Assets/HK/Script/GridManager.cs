@@ -50,7 +50,7 @@ public class GridManager : MonoBehaviour
     /// <param name="direction">ƒGƒ“ƒgƒŠ‚Ì•ûŒü</param>
     public CellScript.TryEnterResult ChangeCellState(int y, int x, CellScript.CellState state, CharaScript unitSC, Vector2Int direction)
     {
-        return cellSC[y, x].TryEnter(state, unitSC);
+        return cellSC[y, x].TryEnter(state, unitSC,direction);
     }
 
     /// <summary>

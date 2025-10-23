@@ -222,7 +222,7 @@ public class CellScript : MonoBehaviour
         {
             foreach(var enemy in enemyList)
             {
-                enemy.ReciveDamage(damage);
+                enemy.ReciveDamage(damage,new Vector2(0,0));
             }
         }
     }

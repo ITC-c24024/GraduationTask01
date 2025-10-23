@@ -129,7 +129,7 @@ public class CellScript : MonoBehaviour
                     {
                         foreach(var player in playerList)
                         {
-                            player.ReciveDamage(damage);
+                            player.ReciveDamage(damage,new Vector2(0,0));
                         }
                     }
                 }

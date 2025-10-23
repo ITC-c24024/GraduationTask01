@@ -2,12 +2,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CharaScript : MonoBehaviour
 {
     public TurnManager turnManager;
     public GridManager gridManager;
     public CellScript cellScript;
+
+    public Slider hpSlider;
 
     //ÚG—Dæ“x
     public int rank;
@@ -28,6 +31,12 @@ public class CharaScript : MonoBehaviour
     public Vector3 curPos;
     //Ÿ‚Éi‚Ş—\’èˆÊ’u
     public Vector3 nextPos;
+
+    void Start()
+    {
+        hpSlider.maxValue = hp;
+        hpSlider.value = hp;
+    }
 
     /// <summary>
     /// i‚ß‚é‚©‚Ì”»’è

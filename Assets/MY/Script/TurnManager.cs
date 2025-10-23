@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TurnManager : MonoBehaviour
 {
@@ -15,6 +16,9 @@ public class TurnManager : MonoBehaviour
     //仮
     [SerializeField, Header("敵Prefab")]
     GameObject enemyPrefab;
+    [SerializeField, Header("敵のHPバー")]
+    Slider hpPrefab;
+    [SerializeField] Canvas canvas;
 
     //実行中コルーチンの数
     int runnning = 0;
@@ -36,11 +40,14 @@ public class TurnManager : MonoBehaviour
            enemyPrefab.transform.rotation
            );
 
+        Slider slider = Instantiate(hpPrefab);
+        slider.transform.SetParent(canvas.transform);
+
         enemySC = enemy.GetComponent<CharaScript>();
         enemySC.turnManager = this;
         enemySC.gridManager = gridManager;
         enemySC.cellScript = cellScript;
-
+        enemySC.hpSlider = slider;
     }
 
     /// <summary>
@@ -71,7 +78,7 @@ public class TurnManager : MonoBehaviour
         yield return new WaitForSeconds(1.0f);
 
         //実行ターン
-        for (int i = 0; i < playerCon[0].actionLimit; i++)
+        for (int i = 0; i < playerCon[0].actionLimit|| i < playerCon[1].actionLimit; i++)
         {
             //先行動敵
 
@@ -90,6 +97,9 @@ public class TurnManager : MonoBehaviour
             //後行動敵
             if (i < enemySC.actionLimit) StartCoroutine(enemySC.Move());
         }
+
+        //予約をすべて削除
+        gridManager.ResetReserveListAll();
     }
 
     public Vector3[] GetPlayerPos()

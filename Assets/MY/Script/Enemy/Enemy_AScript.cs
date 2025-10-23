@@ -53,9 +53,21 @@ public class Enemy_AScript : CharaScript
             transform.position = targetPos;
             curPos = targetPos;
 
-            gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.enemy, this,default);
+            gridManager.ChangeCellState(
+                (int)curPos.z, 
+                (int)curPos.x, 
+                CellScript.CellState.enemy, 
+                this, 
+                new Vector2Int((int)direction.x, (int)direction.y)
+                );
             //‚Ð‚Æ‚Â‘O‚Ìƒ}ƒX‚ð‹ó‚É‚·‚é
             gridManager.LeaveCell((int)originPos.z, (int)originPos.x,this);
         }
+    }
+
+    public override void ReciveDamage(int amount, Vector2 kbDir)
+    {
+        hp -= amount;
+        hpSlider.value = hp;
     }
 }

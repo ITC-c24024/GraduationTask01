@@ -122,10 +122,12 @@ MonoBehaviour:
   turnManager: {fileID: 0}
   gridManager: {fileID: 0}
   cellScript: {fileID: 0}
+  hpSlider: {fileID: 0}
   rank: 1
   hp: 100
-  damage: 1
-  actionLimit: 1
+  damage: 10
+  recieveDamage: 0
+  actionLimit: 3
   moveRule:
   - x: 0
     z: 1

@@ -28,7 +28,7 @@ public class CellScript : MonoBehaviour
     //グリッドマネージャースクリプト
     public GridManager gridManagerSC;
 
-    //マスの座標
+    [SerializeField,Header("マスの座標")]
     Vector2Int cellPos = new();
 
     [SerializeField, Header("マスの状態")]
@@ -125,12 +125,12 @@ public class CellScript : MonoBehaviour
                         }
                         result.canMove = true;
                     }
-                    else
+                }
+                else
+                {
+                    foreach (var player in playerList)
                     {
-                        foreach(var player in playerList)
-                        {
-                            player.ReciveDamage(damage,new Vector2(0,0));
-                        }
+                        player.ReciveDamage(damage, new Vector2(0, 0));
                     }
                 }
             }

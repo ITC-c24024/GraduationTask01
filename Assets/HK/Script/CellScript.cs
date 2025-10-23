@@ -71,7 +71,7 @@ public class CellScript : MonoBehaviour
     /// </summary>
     /// <param name="newState">状態(empty=空, player=プレイヤー, enemy=敵)</param>
     /// <param name="unitSC">呼びだす側のユニットスクリプト</param>
-    /// <param name="direction">ノックバック方向(敵の場合のみ使用)</param>
+    /// <param name="direction">エントリ方向</param>
     public TryEnterResult TryEnter(CellState newState, CharaScript unitSC, Vector2Int direction = default)
     {
         TryEnterResult result = new()
@@ -93,6 +93,7 @@ public class CellScript : MonoBehaviour
                     foreach (var enemy in enemyList)
                     {
                         result.damage += enemy.damage;
+                        result.knockbackDir = new Vector2Int(-direction.x, -direction.y);
                     }
                 }
                 else

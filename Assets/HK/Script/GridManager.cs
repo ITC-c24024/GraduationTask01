@@ -47,8 +47,8 @@ public class GridManager : MonoBehaviour
     /// <param name="x">x座標(横の列)</param>
     /// <param name="state">状態(empty=空,player=プレイヤー,enemy=敵,damageTile=ダメージ床)</param>
     /// <param name="unitSC">呼びだす側のユニットスクリプト</param>
-    /// <param name="direction">エントリの方向(敵の場合のみ使用)</param>
-    public CellScript.TryEnterResult ChangeCellState(int y, int x, CellScript.CellState state, CharaScript unitSC, Vector2Int direction = default)
+    /// <param name="direction">エントリの方向</param>
+    public CellScript.TryEnterResult ChangeCellState(int y, int x, CellScript.CellState state, CharaScript unitSC, Vector2Int direction)
     {
         return cellSC[y, x].TryEnter(state, unitSC);
     }

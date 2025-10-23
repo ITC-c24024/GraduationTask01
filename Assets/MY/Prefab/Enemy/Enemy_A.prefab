@@ -127,7 +127,7 @@ MonoBehaviour:
   hp: 100
   damage: 10
   recieveDamage: 0
-  actionLimit: 3
+  actionLimit: 5
   moveRule:
   - x: 0
     z: 1

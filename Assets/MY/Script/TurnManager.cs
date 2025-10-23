@@ -26,6 +26,7 @@ public class TurnManager : MonoBehaviour
     void Start()
     {
         //âº
+        Application.targetFrameRate = 30;
         gridManager = gameObject.GetComponent<GridManager>();
         EnemySpown();
         StartCoroutine(TurnStart());
@@ -72,15 +73,19 @@ public class TurnManager : MonoBehaviour
 
         while (runnning != 0) yield return null;
 
+        yield return new WaitForSeconds(0.5f);
+
         playerCon[0].PosReset();
         playerCon[1].PosReset();
 
         yield return new WaitForSeconds(1.0f);
 
         //é¿çsÉ^Å[Éì
-        for (int i = 0; i < playerCon[0].actionLimit|| i < playerCon[1].actionLimit; i++)
+        for (int i = 0; i < playerCon[0].actionLimit || i < playerCon[1].actionLimit; i++)
         {
             //êÊçsìÆìG
+
+            while (runnning != 0) yield return null;
 
             yield return new WaitForSeconds(0.5f);
 
@@ -95,11 +100,17 @@ public class TurnManager : MonoBehaviour
             yield return new WaitForSeconds(0.5f);
 
             //å„çsìÆìG
-            if (i < enemySC.actionLimit) StartCoroutine(enemySC.Move());
-        }
+            if (i < enemySC.actionLimit)
+            {
+                StartCoroutine(enemySC.Move());
+                runnning++;
+            }
 
-        //ó\ñÒÇÇ∑Ç◊ÇƒçÌèú
-        gridManager.ResetReserveListAll();
+            while (runnning != 0) yield return null;
+
+            //ó\ñÒÇÇ∑Ç◊ÇƒçÌèú
+            gridManager.ResetReserveListAll();
+        }
     }
 
     public Vector3[] GetPlayerPos()

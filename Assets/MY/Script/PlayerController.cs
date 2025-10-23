@@ -92,7 +92,7 @@ public class PlayerController : CharaScript
         }
 
         float time = 0;
-        float required = 0.1f;
+        float required = 0.5f;
         while (time < required)
         {
             time += Time.deltaTime;
@@ -112,9 +112,6 @@ public class PlayerController : CharaScript
         //ノックバック
         if (isKnockBack)
         {            
-            transform.position = targetPos;
-            playerPos = transform.position;
-            curPos = transform.position;
             ReciveDamage(recieveDamage, kbDirection);
 
             yield break;
@@ -126,10 +123,12 @@ public class PlayerController : CharaScript
             gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.player, this, default);
             //元居たマスを空にする
             gridManager.LeaveCell((int)originPos.z, (int)originPos.x,this);
+
+            turnManager.FinCoroutine();
         }
 
         isMove = false;
-        isRun = false;
+        isRun = false;  
     }
 
     //仮攻撃
@@ -143,6 +142,7 @@ public class PlayerController : CharaScript
         attackImage.SetActive(true);
         yield return new WaitForSeconds(0.2f);
         attackImage.SetActive(false);
+        turnManager.FinCoroutine();
     }
 
     //ダメージを受けてノックバックさせる
@@ -151,13 +151,11 @@ public class PlayerController : CharaScript
         hp -= amount;
         hpSlider.value = hp;
 
-        StartCoroutine(KnockBack(kbDir));
+        if (kbDir != Vector2.zero) StartCoroutine(KnockBack(kbDir));
     }
 
     IEnumerator KnockBack(Vector2 kbDir)
-    {
-        Debug.Log("ノックバック");
-        
+    {   
         //元の位置
         Vector3 originPos = playerPos;
         //移動先の位置
@@ -168,7 +166,7 @@ public class PlayerController : CharaScript
             );
 
         float time = 0;
-        float required = 0.02f;
+        float required = 0.15f;
         while (time < required)
         {
             time += Time.deltaTime;
@@ -185,14 +183,14 @@ public class PlayerController : CharaScript
         playerPos = transform.position;
         curPos = playerPos;
 
-        //kbDirection = Vector2.zero;
-
         //マス更新
         gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.player, this, default);
         gridManager.LeaveCell((int)nextPos.z, (int)nextPos.x, this);
 
         isKnockBack = false;
         isRun = false;
+
+        turnManager.FinCoroutine();
     }
 
     /// <summary>
@@ -208,7 +206,7 @@ public class PlayerController : CharaScript
 
         for (int i = 0; i < actionLimit; i++)
         {        
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(0.5f);
             squareSC.SetImage(playerPos);
 
             Vector2 direction = Vector2.zero;
@@ -302,10 +300,8 @@ public class PlayerController : CharaScript
             Debug.Log($"残り行動回数:{actionLimit - i - 1}");
         }
         
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(0.5f);
         squareSC.DeleteSquare();
-
-        yield return new WaitForSeconds(0.2f);
         turnManager.FinCoroutine();
     }
 
@@ -359,8 +355,6 @@ public class PlayerController : CharaScript
             StartCoroutine(Attack(x, z));
         }
         executionNum++;
-
-        turnManager.FinCoroutine();
 
         yield return null;
     }

@@ -16,6 +16,8 @@ public class CharaScript : MonoBehaviour
     public int hp = 100;
     //攻撃力
     public int damage = 1;
+    //被ダメージ
+    public int recieveDamage = 0;
 
     //行動可能回数
     public int actionLimit = 1;
@@ -105,7 +107,7 @@ public class CharaScript : MonoBehaviour
     /// 被弾処理
     /// </summary>
     /// <param name="amount">被ダメージ</param>
-    public virtual void ReciveDamage(int amount, Vector2 kbDir = default)
+    public virtual void ReciveDamage(int amount, Vector2 kbDir)
     {
         
     }

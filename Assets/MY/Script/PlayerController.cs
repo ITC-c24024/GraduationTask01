@@ -87,7 +87,6 @@ public class PlayerController : CharaScript
         //実行中なら行き先を予約
         if (isRun)
         {
-            Debug.Log("予約");
             nextPos = targetPos;
             gridManager.ReserveCell((int)nextPos.z, (int)nextPos.x, this);
             //ノックバックするか判定
@@ -122,7 +121,7 @@ public class PlayerController : CharaScript
             transform.position = targetPos;
             playerPos = transform.position;
             curPos = transform.position;
-            StartCoroutine(KnockBack());
+            ReciveDamage(recieveDamage, kbDirection);
 
             yield break;
         }
@@ -152,17 +151,22 @@ public class PlayerController : CharaScript
         attackImage.SetActive(false);
     }
 
-    IEnumerator KnockBack()
+    //ダメージを受けてノックバックさせる
+    public override void ReciveDamage(int amount, Vector2 kbDir)
     {
-        Debug.Log("接触");
-        Debug.Log(kbDirection);
+        hp -= amount;
+        StartCoroutine(KnockBack(kbDir));
+    }
+
+    IEnumerator KnockBack(Vector2 kbDir)
+    {
         //元の位置
         Vector3 originPos = playerPos;
         //移動先の位置
         Vector3 targetPos = new Vector3(
-            playerPos.x + kbDirection.x,
+            playerPos.x + kbDir.x,
             playerPos.y,
-            playerPos.z + kbDirection.y
+            playerPos.z + kbDir.y
             );
 
         float time = 0;
@@ -333,7 +337,7 @@ public class PlayerController : CharaScript
                 (int)playerPos.x + x,
                 CellScript.CellState.player,
                 this,
-                new Vector2Int(z, x)
+                new Vector2Int(x, z)
                 );
             //動けるなら普通に動く
             if(result.canMove) StartCoroutine(MovePlayer(x, z));
@@ -341,6 +345,7 @@ public class PlayerController : CharaScript
             {        
                 isKnockBack = true;
                 kbDirection = result.knockbackDir;
+                recieveDamage = result.damage;
                 StartCoroutine(MovePlayer(x, z));
             }
         }

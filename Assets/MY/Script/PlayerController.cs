@@ -18,6 +18,9 @@ public class PlayerController : CharaScript
     //ノックバック判定
     bool isKnockBack = false;
 
+    //ノックバック方向
+    Vector2 kbDirection;
+
     InputAction stickAction;
     InputAction selectAttack;
     InputAction selectMove;
@@ -119,7 +122,7 @@ public class PlayerController : CharaScript
             transform.position = targetPos;
             playerPos = transform.position;
             curPos = transform.position;
-            StartCoroutine(KnockBack(new Vector2(0, -1)));
+            StartCoroutine(KnockBack());
 
             yield break;
         }
@@ -130,7 +133,7 @@ public class PlayerController : CharaScript
             Debug.Log("マス更新");
             gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.player, this);
             //元居たマスを空にする
-            gridManager.LeaveCell((int)originPos.z, (int)originPos.x);
+            gridManager.LeaveCell((int)originPos.z, (int)originPos.x,this);
         }
 
         isMove = false;
@@ -149,7 +152,7 @@ public class PlayerController : CharaScript
         attackImage.SetActive(false);
     }
 
-    IEnumerator KnockBack(Vector2 direction)
+    IEnumerator KnockBack()
     {
         Debug.Log("接触");
 
@@ -157,9 +160,9 @@ public class PlayerController : CharaScript
         Vector3 originPos = playerPos;
         //移動先の位置
         Vector3 targetPos = new Vector3(
-            playerPos.x + direction.x,
+            playerPos.x + kbDirection.x,
             playerPos.y,
-            playerPos.z + direction.y
+            playerPos.z + kbDirection.y
             );
 
         float time = 0;
@@ -307,6 +310,7 @@ public class PlayerController : CharaScript
     {    
         //位置を戻す(仮)
         playerPos = startPos;
+        curPos = playerPos;
         transform.position = playerPos;       
     }
 
@@ -317,17 +321,28 @@ public class PlayerController : CharaScript
     public IEnumerator ExecutionAct()
     {
         isRun = true;
-        
+
+        int x = (int)actionList[executionNum].direction.x;
+        int z = (int)actionList[executionNum].direction.y;
+
         if (actionList[executionNum].a == 0) //移動
         {
-            //マスの関数を呼ぶ
-            
-            StartCoroutine(
-                MovePlayer(
-                    (int)actionList[executionNum].direction.x,
-                    (int)actionList[executionNum].direction.y
-                    )
+            //動きを確認
+            var result = gridManager.ChangeCellState(
+                (int)playerPos.z + z,
+                (int)playerPos.x + x,
+                CellScript.CellState.player,
+                this,
+                new Vector2Int(z, x)
                 );
+            //動けるなら普通に動く
+            if(result.canMove) StartCoroutine(MovePlayer(x, z));
+            else//ノックバックを予定して動く
+            {        
+                isKnockBack = true;
+                kbDirection = result.knockbackDir;
+                StartCoroutine(MovePlayer(x, z));
+            }
         }
         else //攻撃
         {
@@ -342,9 +357,10 @@ public class PlayerController : CharaScript
         }
         executionNum++;
 
-        yield return new WaitForSeconds(1.0f);
         isRun = false;
 
         turnManager.FinCoroutine();
+
+        yield return null;
     }
 }

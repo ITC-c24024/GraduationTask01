@@ -68,10 +68,14 @@ public class TurnManager : MonoBehaviour
         playerCon[0].PosReset();
         playerCon[1].PosReset();
 
+        yield return new WaitForSeconds(1.0f);
+
         //実行ターン
         for (int i = 0; i < playerCon[0].actionLimit; i++)
         {
             //先行動敵
+
+            yield return new WaitForSeconds(0.5f);
 
             //プレイヤー実行
             StartCoroutine(playerCon[0].ExecutionAct());
@@ -79,12 +83,12 @@ public class TurnManager : MonoBehaviour
             StartCoroutine(playerCon[1].ExecutionAct());
             runnning++;
 
-            //同時行動敵
-            if (i < enemySC.actionLimit) StartCoroutine(enemySC.Move());
-
             while (runnning != 0) yield return null;
 
+            yield return new WaitForSeconds(0.5f);
+
             //後行動敵
+            if (i < enemySC.actionLimit) StartCoroutine(enemySC.Move());
         }
     }
 

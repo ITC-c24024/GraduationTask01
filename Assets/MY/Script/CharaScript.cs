@@ -105,7 +105,7 @@ public class CharaScript : MonoBehaviour
     /// ”í’eˆ—
     /// </summary>
     /// <param name="amount">”íƒ_ƒ[ƒW</param>
-    public void ReciveDamage(int amount)
+    public virtual void ReciveDamage(int amount, Vector2 kbDir = default)
     {
         
     }

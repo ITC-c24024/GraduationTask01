@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class GridManager : MonoBehaviour
 {
-    int width = 8;
-    int height = 8;
+    public int width = 8;
+    public int height = 8;
 
     [SerializeField, Header("マスプレハブ")]
     GameObject cellPrefab;
@@ -24,6 +24,7 @@ public class GridManager : MonoBehaviour
                 var cellObj = Instantiate(cellPrefab, new Vector3(x, 0, y), Quaternion.identity);
                 cellSC[y, x] = cellObj.GetComponent<CellScript>();
                 cellSC[y, x].SetPosition(new Vector2Int(y, x));
+                cellSC[y, x].gridManagerSC = this;
             }
         }
     }

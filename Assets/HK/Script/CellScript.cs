@@ -25,6 +25,10 @@ public class CellScript : MonoBehaviour
         public Vector2Int knockbackDir;
     }
 
+    //グリッドマネージャースクリプト
+    public GridManager gridManagerSC;
+
+    //マスの座標
     Vector2Int cellPos = new();
 
     [SerializeField, Header("マスの状態")]
@@ -99,15 +103,30 @@ public class CellScript : MonoBehaviour
             //敵の場合(プレイヤーが居たら)
             else if (newState == CellState.enemy && state == CellState.player)
             {
-                //ノックバック方向のマスがあるか、空かどうかチェックの処理を追記必要
-                var ok = false;
-                if (ok)
-                {
-                    result.canMove = true;
-                    result.knockbackDir = direction;
-                }
+                int x = cellPos.x + direction.x;
+                int y = cellPos.y + direction.y;
+                int damage = unitSC.damage;
 
-                result.damage += unitSC.damage;
+                // ノックバック方向のマスがマップ内かチェック
+                bool inBounds = x >= 0 && x < gridManagerSC.width &&
+                                y >= 0 && y < gridManagerSC.height;
+
+                if (inBounds)
+                {
+                    var targetCell = gridManagerSC.CheckCellState(x, y);
+
+                    // そのマスが敵でなければノックバック可能
+                    if (targetCell != CellState.enemy)
+                    {
+                        foreach (var player in playerList)
+                        {
+                            player.ReciveDamage(damage, direction);
+                        }
+
+                        result.canMove = true;
+                        result.knockbackDir = direction;
+                    }
+                }
             }
         }
         //マスに他ユニットがいない場合

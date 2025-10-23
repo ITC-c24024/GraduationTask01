@@ -72,7 +72,7 @@ public class CellScript : MonoBehaviour
     /// <param name="newState">状態(empty=空, player=プレイヤー, enemy=敵)</param>
     /// <param name="unitSC">呼びだす側のユニットスクリプト</param>
     /// <param name="direction">エントリ方向</param>
-    public TryEnterResult TryEnter(CellState newState, CharaScript unitSC, Vector2Int direction = default)
+    public TryEnterResult TryEnter(CellState newState, CharaScript unitSC, Vector2Int direction)
     {
         TryEnterResult result = new()
         {
@@ -123,9 +123,14 @@ public class CellScript : MonoBehaviour
                         {
                             player.ReciveDamage(damage, direction);
                         }
-
                         result.canMove = true;
-                        result.knockbackDir = direction;
+                    }
+                    else
+                    {
+                        foreach(var player in playerList)
+                        {
+                            player.ReciveDamage(damage);
+                        }
                     }
                 }
             }
@@ -205,5 +210,20 @@ public class CellScript : MonoBehaviour
     public void ResetList()
     {
         reserveList.Clear();
+    }
+
+    /// <summary>
+    /// プレイヤー攻撃の受け付け用
+    /// </summary>
+    /// <param name="damage">ダメージ量</param>
+    public void ReciveAttack(int damage)//演出上後々bool返すことになるかも
+    {
+        if (state == CellState.enemy)
+        {
+            foreach(var enemy in enemyList)
+            {
+                enemy.ReciveDamage(damage);
+            }
+        }
     }
 }

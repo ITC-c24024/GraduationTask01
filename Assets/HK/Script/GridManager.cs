@@ -96,4 +96,15 @@ public class GridManager : MonoBehaviour
     {
         cellSC[y, x].Leave(unitSC);
     }
+
+    /// <summary>
+    /// 指定したマスに対して攻撃
+    /// </summary>
+    /// <param name="y">y座標</param>
+    /// <param name="x">x座標</param>
+    /// <param name="damage">ダメージ量</param>
+    public void SendDamage(int y,int x, int damage)
+    {
+        cellSC[y, x].ReciveAttack(damage);
+    }
 }

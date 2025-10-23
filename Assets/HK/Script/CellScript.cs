@@ -104,8 +104,8 @@ public class CellScript : MonoBehaviour
             //敵の場合(プレイヤーが居たら)
             else if (newState == CellState.enemy && state == CellState.player)
             {
-                int x = cellPos.x + direction.x;
-                int y = cellPos.y + direction.y;
+                int x = cellPos.x + direction.y;
+                int y = cellPos.y + direction.x;
                 int damage = unitSC.damage;
 
                 // ノックバック方向のマスがマップ内かチェック

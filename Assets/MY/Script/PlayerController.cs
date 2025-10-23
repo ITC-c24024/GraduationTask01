@@ -131,7 +131,7 @@ public class PlayerController : CharaScript
         if (isRun)
         {
             Debug.Log("マス更新");
-            gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.player, this);
+            gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.player, this, default);
             //元居たマスを空にする
             gridManager.LeaveCell((int)originPos.z, (int)originPos.x,this);
         }
@@ -155,7 +155,7 @@ public class PlayerController : CharaScript
     IEnumerator KnockBack()
     {
         Debug.Log("接触");
-
+        Debug.Log(kbDirection);
         //元の位置
         Vector3 originPos = playerPos;
         //移動先の位置
@@ -184,7 +184,7 @@ public class PlayerController : CharaScript
         curPos = playerPos;
 
         //マス更新
-        gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.player, this);
+        gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.player, this, default);
 
         isKnockBack = false;
     }

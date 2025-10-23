@@ -53,7 +53,7 @@ public class Enemy_AScript : CharaScript
             transform.position = targetPos;
             curPos = targetPos;
 
-            gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.enemy, this);
+            gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.enemy, this,default);
             //‚Ð‚Æ‚Â‘O‚Ìƒ}ƒX‚ð‹ó‚É‚·‚é
             gridManager.LeaveCell((int)originPos.z, (int)originPos.x,this);
         }

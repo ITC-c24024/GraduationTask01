@@ -14,7 +14,7 @@ public class Enemy_AScript : CharaScript
         Vector3[] playerPos = turnManager.GetPlayerPos();
         Vector3 startPos = transform.position;
 
-        //animator.SetTrigger("IsMove");
+        animator.SetTrigger("IsMove");
         for (int i = 0; i < moveRule.Length; i++)
         {
             Vector2 direction = GetDirection(playerPos, startPos, i);

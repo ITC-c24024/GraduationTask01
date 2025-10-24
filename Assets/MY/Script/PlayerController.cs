@@ -39,8 +39,6 @@ public class PlayerController : CharaScript
 
     //行動予定List
     List<Action> actionList = new List<Action>();
-    //実行回数
-    int executionNum = 0;
 
     //プレイヤーの位置
     public Vector3 playerPos;
@@ -318,14 +316,14 @@ public class PlayerController : CharaScript
     /// 行動を実行
     /// </summary>
     /// <returns></returns>
-    public IEnumerator ExecutionAct()
+    public IEnumerator ExecutionAct(int i)
     {
         isRun = true;
 
-        int x = (int)actionList[executionNum].direction.x;
-        int z = (int)actionList[executionNum].direction.y;
+        int x = (int)actionList[i].direction.x;
+        int z = (int)actionList[i].direction.y;
 
-        if (actionList[executionNum].a == 0) //移動
+        if (actionList[i].a == 0) //移動
         {
             //動きを確認
             var result = gridManager.ChangeCellState(
@@ -352,7 +350,6 @@ public class PlayerController : CharaScript
 
             StartCoroutine(Attack(x, z));
         }
-        executionNum++;
 
         yield return null;
     }

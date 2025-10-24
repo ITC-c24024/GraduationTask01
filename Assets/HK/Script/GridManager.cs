@@ -50,7 +50,7 @@ public class GridManager : MonoBehaviour
     /// <param name="direction">エントリの方向</param>
     public CellScript.TryEnterResult ChangeCellState(int y, int x, CellScript.CellState state, CharaScript unitSC, Vector2Int direction)
     {
-        return cellSC[y, x].TryEnter(state, unitSC,direction);
+        return cellSC[y, x].TryEnter(state, unitSC, direction);
     }
 
     /// <summary>
@@ -103,7 +103,7 @@ public class GridManager : MonoBehaviour
     /// <param name="y">y座標</param>
     /// <param name="x">x座標</param>
     /// <param name="damage">ダメージ量</param>
-    public void SendDamage(int y,int x, int damage)
+    public void SendDamage(int y, int x, int damage, Vector2Int direction = default)
     {
         cellSC[y, x].ReciveAttack(damage);
     }

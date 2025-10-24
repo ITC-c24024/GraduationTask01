@@ -205,7 +205,7 @@ public class CellScript : MonoBehaviour
     /// プレイヤー攻撃の受け付け用
     /// </summary>
     /// <param name="damage">ダメージ量</param>
-    public void ReciveAttack(int damage, bool isEnemy, Vector2Int direction = default)//演出上後々bool返すことになるかも
+    public void ReciveAttack(int damage, bool isEnemy, Vector2Int direction)//演出上後々bool返すことになるかも
     {
         if (!isEnemy && enemyList.Count > 0)
         {

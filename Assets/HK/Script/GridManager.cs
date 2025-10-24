@@ -103,8 +103,8 @@ public class GridManager : MonoBehaviour
     /// <param name="y">y座標</param>
     /// <param name="x">x座標</param>
     /// <param name="damage">ダメージ量</param>
-    public void SendDamage(int y, int x, int damage, Vector2Int direction = default)
+    public void SendDamage(int y, int x, int damage,bool isEnemy, Vector2Int direction = default)
     {
-        cellSC[y, x].ReciveAttack(damage);
+        cellSC[y, x].ReciveAttack(damage,isEnemy,direction);
     }
 }

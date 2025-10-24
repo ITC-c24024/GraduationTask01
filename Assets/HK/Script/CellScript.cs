@@ -28,7 +28,7 @@ public class CellScript : MonoBehaviour
     //グリッドマネージャースクリプト
     public GridManager gridManagerSC;
 
-    [SerializeField,Header("マスの座標")]
+    [SerializeField, Header("マスの座標")]
     Vector2Int cellPos = new();
 
     [SerializeField, Header("マスの状態")]
@@ -87,7 +87,7 @@ public class CellScript : MonoBehaviour
             //プレイヤーの場合
             if (newState == CellState.player)
             {
-                //敵ステートだったらノックバックさせる
+                //敵ステートだったらノックバック
                 if (state == CellState.enemy)
                 {
                     foreach (var enemy in enemyList)
@@ -119,18 +119,7 @@ public class CellScript : MonoBehaviour
                     // そのマスが敵でなければノックバック可能
                     if (targetCell != CellState.enemy)
                     {
-                        foreach (var player in playerList)
-                        {
-                            player.ReciveDamage(damage, direction);
-                        }
                         result.canMove = true;
-                    }
-                }
-                else
-                {
-                    foreach (var player in playerList)
-                    {
-                        player.ReciveDamage(damage, new Vector2(0, 0));
                     }
                 }
             }
@@ -216,13 +205,20 @@ public class CellScript : MonoBehaviour
     /// プレイヤー攻撃の受け付け用
     /// </summary>
     /// <param name="damage">ダメージ量</param>
-    public void ReciveAttack(int damage)//演出上後々bool返すことになるかも
+    public void ReciveAttack(int damage, Vector2Int direction = default, bool isEnemy = false)//演出上後々bool返すことになるかも
     {
-        if (state == CellState.enemy)
+        if (!isEnemy && state == CellState.enemy)
         {
-            foreach(var enemy in enemyList)
+            foreach (var enemy in enemyList)
             {
-                enemy.ReciveDamage(damage,new Vector2(0,0));
+                enemy.ReciveDamage(damage, new Vector2(0, 0));
+            }
+        }
+        else if (isEnemy && state == CellState.player)
+        {
+            foreach (var player in playerList)
+            {
+                player.ReciveDamage(damage, direction);
             }
         }
     }

@@ -153,7 +153,9 @@ public class PlayerController : CharaScript
     }
 
     IEnumerator KnockBack(Vector2 kbDir)
-    {   
+    {
+        Debug.Log("KB");
+
         //Œ³‚ÌˆÊ’u
         Vector3 originPos = playerPos;
         //ˆÚ“®æ‚ÌˆÊ’u

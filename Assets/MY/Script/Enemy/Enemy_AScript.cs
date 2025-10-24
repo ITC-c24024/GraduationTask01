@@ -73,7 +73,13 @@ public class Enemy_AScript : CharaScript
                 StartCoroutine(Back(originPos));
                 yield break;
             }
+            //プレイヤーがいたら攻撃する
+            if(gridManager.CheckCellState((int)curPos.z, (int)curPos.x) == CellScript.CellState.player)
+            {
+                gridManager.SendDamage((int)curPos.z, (int)curPos.x, damage);
+            }
 
+            //マスの状態を敵自身にする
             gridManager.ChangeCellState(
                 (int)curPos.z,
                 (int)curPos.x,
@@ -83,6 +89,7 @@ public class Enemy_AScript : CharaScript
                 );
             //ひとつ前のマスを空にする
             gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);
+            
             
         }
         turnManager.FinCoroutine();

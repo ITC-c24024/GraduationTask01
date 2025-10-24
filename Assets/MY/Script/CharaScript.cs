@@ -24,8 +24,13 @@ public class CharaScript : MonoBehaviour
 
     //行動可能回数
     public int actionLimit = 1;
+    //行動した回数
+    public int actionNum = 0;
     //移動法則
     public Direction[] moveRule;
+
+    //敵が攻撃だけ行う判定
+    public bool attackOnly = false;
 
     //現在位置
     public Vector3 curPos;
@@ -110,6 +115,44 @@ public class CharaScript : MonoBehaviour
     public virtual IEnumerator Move()
     {
         yield return null;
+    }
+
+    /// <summary>
+    /// プレイヤーがノックバックできないとき、攻撃だけして元の位置に戻る
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerator Back(Vector3 originPos)
+    {
+        Vector3 startPos = curPos;
+        Vector3 targetPos = originPos;
+
+        float time = 0;
+        float required = 0.15f;
+        while (time < required)
+        {
+            time += Time.deltaTime;
+
+            //現在地を計算
+            Vector3 currentPos = Vector3.Lerp(startPos, targetPos, time / required);
+
+            //キャラを移動
+            transform.position = currentPos;
+
+            yield return null;
+        }
+        transform.position = targetPos;
+        curPos = targetPos;
+
+        gridManager.ChangeCellState(
+                (int)curPos.z,
+                (int)curPos.x,
+                CellScript.CellState.enemy,
+                this,
+                new Vector2Int(0,0)
+                );
+        //ひとつ前のマスを空にする
+        gridManager.LeaveCell((int)startPos.z, (int)startPos.x, this);
+        turnManager.FinCoroutine();
     }
 
     /// <summary>

@@ -166,7 +166,7 @@ public class PlayerController : CharaScript
             );
 
         float time = 0;
-        float required = 0.15f;
+        float required = 0.1f;
         while (time < required)
         {
             time += Time.deltaTime;
@@ -199,8 +199,6 @@ public class PlayerController : CharaScript
     /// <returns></returns>
     public IEnumerator SelectAction()
     {
-        Debug.Log("‘I‘ğ’†");
-
         //s“®ˆÊ’u‚ğ•Û‘¶
         startPos = playerPos;
 

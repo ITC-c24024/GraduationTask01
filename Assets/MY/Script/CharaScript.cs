@@ -37,8 +37,13 @@ public class CharaScript : MonoBehaviour
     //éüÇ…êiÇﬁó\íËà íu
     public Vector3 nextPos;
 
+    public Animator animator;
+
+
     void Start()
     {
+        animator = GetComponent<Animator>();
+        
         hpSlider.maxValue = hp;
         hpSlider.value = hp;
     }
@@ -127,7 +132,7 @@ public class CharaScript : MonoBehaviour
         Vector3 targetPos = originPos;
 
         float time = 0;
-        float required = 0.15f;
+        float required = 0.1f;
         while (time < required)
         {
             time += Time.deltaTime;

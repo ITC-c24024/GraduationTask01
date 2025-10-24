@@ -90,10 +90,16 @@ public class TurnManager : MonoBehaviour
             yield return new WaitForSeconds(0.5f);
 
             //プレイヤー実行
-            StartCoroutine(playerCon[0].ExecutionAct());
-            runnning++;
-            StartCoroutine(playerCon[1].ExecutionAct());
-            runnning++;
+            if(i < playerCon[0].actionLimit)
+            {
+                StartCoroutine(playerCon[0].ExecutionAct(i));
+                runnning++;
+            }
+            if(i < playerCon[1].actionLimit)
+            {
+                StartCoroutine(playerCon[1].ExecutionAct(i));
+                runnning++;
+            }          
 
             while (runnning != 0) yield return null;
 

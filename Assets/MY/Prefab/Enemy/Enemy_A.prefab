@@ -59,13 +59,10 @@ MonoBehaviour:
   moveRule:
   - x: 0
     z: 1
-  - x: 0
-    z: 1
-  - x: 0
-    z: 1
   attackOnly: 0
   curPos: {x: 0, y: 0, z: 0}
   nextPos: {x: 0, y: 0, z: 0}
+  animator: {fileID: 0}
 --- !u!212 &4542727635757921862
 SpriteRenderer:
   m_ObjectHideFlags: 0

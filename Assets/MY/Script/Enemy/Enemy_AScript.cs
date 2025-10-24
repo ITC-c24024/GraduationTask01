@@ -14,7 +14,7 @@ public class Enemy_AScript : CharaScript
         Vector3[] playerPos = turnManager.GetPlayerPos();
         Vector3 startPos = transform.position;
 
-        animator.SetTrigger("IsMove");
+        animator.SetTrigger("New Trigger");
         for (int i = 0; i < moveRule.Length; i++)
         {
             Vector2 direction = GetDirection(playerPos, startPos, i);
@@ -81,7 +81,8 @@ public class Enemy_AScript : CharaScript
             {
                 gridManager.SendDamage(
                     (int)curPos.z,
-                    (int)curPos.x, damage,
+                    (int)curPos.x, 
+                    damage,
                     new Vector2Int((int)direction.x, (int)direction.y)
                     );
             }
@@ -95,9 +96,7 @@ public class Enemy_AScript : CharaScript
                 new Vector2Int((int)direction.x, (int)direction.y)
                 );
             //‚Ð‚Æ‚Â‘O‚Ìƒ}ƒX‚ð‹ó‚É‚·‚é
-            gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);
-            
-            
+            gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);          
         }
         turnManager.FinCoroutine();
     }

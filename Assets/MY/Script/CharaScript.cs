@@ -10,6 +10,7 @@ public class CharaScript : MonoBehaviour
     public GridManager gridManager;
     public CellScript cellScript;
 
+    public GameObject charaImage;
     public Slider hpSlider;
 
     //接触優先度
@@ -24,8 +25,7 @@ public class CharaScript : MonoBehaviour
 
     //行動可能回数
     public int actionLimit = 1;
-    //行動した回数
-    public int actionNum = 0;
+
     //移動法則
     public Direction[] moveRule;
 
@@ -39,11 +39,8 @@ public class CharaScript : MonoBehaviour
 
     public Animator animator;
 
-
     void Start()
-    {
-        animator = GetComponent<Animator>();
-        
+    {       
         hpSlider.maxValue = hp;
         hpSlider.value = hp;
     }

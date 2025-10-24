@@ -148,6 +148,7 @@ public class CharaScript : MonoBehaviour
         transform.position = targetPos;
         curPos = targetPos;
 
+        //ƒ}ƒX‚Ìó‘Ô‚ğ“G©g‚É‚·‚é
         gridManager.ChangeCellState(
                 (int)curPos.z,
                 (int)curPos.x,

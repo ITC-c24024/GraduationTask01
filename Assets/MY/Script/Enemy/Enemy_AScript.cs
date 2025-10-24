@@ -70,13 +70,20 @@ public class Enemy_AScript : CharaScript
 
             if (attackOnly)
             {
+                //プレイヤーに攻撃
+                gridManager.SendDamage((int)curPos.z, (int)curPos.x, damage);
+
                 StartCoroutine(Back(originPos));
                 yield break;
             }
             //プレイヤーがいたら攻撃する
             if(gridManager.CheckCellState((int)curPos.z, (int)curPos.x) == CellScript.CellState.player)
             {
-                gridManager.SendDamage((int)curPos.z, (int)curPos.x, damage);
+                gridManager.SendDamage(
+                    (int)curPos.z,
+                    (int)curPos.x, damage,
+                    new Vector2Int((int)direction.x, (int)direction.y)
+                    );
             }
 
             //マスの状態を敵自身にする

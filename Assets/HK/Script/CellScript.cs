@@ -205,16 +205,16 @@ public class CellScript : MonoBehaviour
     /// プレイヤー攻撃の受け付け用
     /// </summary>
     /// <param name="damage">ダメージ量</param>
-    public void ReciveAttack(int damage, Vector2Int direction = default, bool isEnemy = false)//演出上後々bool返すことになるかも
+    public void ReciveAttack(int damage, bool isEnemy, Vector2Int direction = default)//演出上後々bool返すことになるかも
     {
-        if (!isEnemy && state == CellState.enemy)
+        if (!isEnemy && enemyList.Count > 0)
         {
             foreach (var enemy in enemyList)
             {
                 enemy.ReciveDamage(damage, new Vector2(0, 0));
             }
         }
-        else if (isEnemy && state == CellState.player)
+        else if (isEnemy && playerList.Count > 0)
         {
             foreach (var player in playerList)
             {

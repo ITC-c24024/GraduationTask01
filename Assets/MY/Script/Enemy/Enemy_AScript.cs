@@ -14,7 +14,7 @@ public class Enemy_AScript : CharaScript
         Vector3[] playerPos = turnManager.GetPlayerPos();
         Vector3 startPos = transform.position;
 
-        animator.SetTrigger("New Trigger");
+        animator.SetTrigger("IsAttack");
         for (int i = 0; i < moveRule.Length; i++)
         {
             Vector2 direction = GetDirection(playerPos, startPos, i);
@@ -71,18 +71,19 @@ public class Enemy_AScript : CharaScript
             if (attackOnly)
             {
                 //プレイヤーに攻撃
-                gridManager.SendDamage((int)curPos.z, (int)curPos.x, damage);
+                gridManager.SendDamage((int)curPos.z, (int)curPos.x, damage, true);
 
                 StartCoroutine(Back(originPos));
                 yield break;
             }
             //プレイヤーがいたら攻撃する
-            if(gridManager.CheckCellState((int)curPos.z, (int)curPos.x) == CellScript.CellState.player)
+            else
             {
                 gridManager.SendDamage(
                     (int)curPos.z,
-                    (int)curPos.x, 
+                    (int)curPos.x,
                     damage,
+                    true,
                     new Vector2Int((int)direction.x, (int)direction.y)
                     );
             }

@@ -187,10 +187,12 @@ public class PlayerController : CharaScript
         gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.player, this, default);
         gridManager.LeaveCell((int)nextPos.z, (int)nextPos.x, this);
 
-        isKnockBack = false;
         isRun = false;
-
-        turnManager.FinCoroutine();
+        if (isKnockBack)
+        {
+            isKnockBack = false;
+            turnManager.FinCoroutine();
+        }
     }
 
     /// <summary>
@@ -348,7 +350,7 @@ public class PlayerController : CharaScript
         else //UŒ‚
         {
             //ƒ}ƒX‚ğUŒ‚—\’è‚É‚·‚é
-            gridManager.SendDamage((int)playerPos.z + z, (int)playerPos.x + x, damage);
+            gridManager.SendDamage((int)playerPos.z + z, (int)playerPos.x + x, damage, false);
 
             StartCoroutine(Attack(x, z));
         }

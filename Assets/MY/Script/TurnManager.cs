@@ -37,7 +37,7 @@ public class TurnManager : MonoBehaviour
     {
         GameObject enemy = Instantiate(
            enemyPrefab,
-           new Vector3(7, 0.5f, 7),
+           new Vector3(6, 0.5f, 4),
            enemyPrefab.transform.rotation
            );
 

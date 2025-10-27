@@ -9,6 +9,13 @@ public class SquareScript : MonoBehaviour
     [SerializeField, Header("マス選択中イメージ")]
     GameObject selectObj;
 
+    Vector3 startPos;
+
+    void Start()
+    {
+        startPos = transform.position;
+    }
+
     /// <summary>
     /// マスイメージをすべて非表示
     /// </summary>
@@ -42,7 +49,7 @@ public class SquareScript : MonoBehaviour
             float posX = playerPos.x + i;
             if (0 <= posX && posX <= 7 && i != 0)
             {
-                squares[n].transform.position = new Vector3(posX, 0.01f, playerPos.z);
+                squares[n].transform.position = new Vector3(posX, startPos.y, playerPos.z);
                 squares[n].SetActive(true);
                 n++;
             }
@@ -52,7 +59,7 @@ public class SquareScript : MonoBehaviour
             float posZ = playerPos.z + i;
             if (0 <= posZ && posZ <= 7 && i != 0)
             {
-                squares[n].transform.position = new Vector3(playerPos.x, 0.01f, posZ);
+                squares[n].transform.position = new Vector3(playerPos.x, startPos.y, posZ);
                 squares[n].SetActive(true);
                 n++;
             }
@@ -68,7 +75,7 @@ public class SquareScript : MonoBehaviour
     {
         Vector3 selectPos = new Vector3(
             playerPos.x + direction.x,
-            0.01f,
+            startPos.y,
             playerPos.z + direction.y
             );
 

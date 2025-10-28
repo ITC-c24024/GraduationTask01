@@ -51,11 +51,12 @@ MonoBehaviour:
   charaImage: {fileID: 5649160074311771487}
   hpSlider: {fileID: 0}
   worldCamera: {fileID: 0}
+  canvas: {fileID: 0}
   rank: 1
   hp: 100
   damage: 10
   recieveDamage: 0
-  actionLimit: 5
+  actionLimit: 10
   moveRule:
   - x: 0
     z: 1

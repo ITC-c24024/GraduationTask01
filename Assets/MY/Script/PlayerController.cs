@@ -59,11 +59,6 @@ public class PlayerController : CharaScript
         curPos = playerPos;
     }
 
-    void Update()
-    {
-        
-    }
-
     /// <summary>
     /// ƒvƒŒƒCƒ„[‚ÌˆÚ“®
     /// </summary>

@@ -51,10 +51,6 @@ public class TurnManager : MonoBehaviour
     /// <param name="enemyNum">スポーンさせたい敵の数</param>
     public bool EnemySpown()
     {
-        //スポーンしたい位置を調べる(仮)
-        int x = Random.Range(0, 8);
-        int z = Random.Range(0, 8);
-
         //gridManagerから座標もらう
         Vector2Int spownPos = gridManager.EnemySpawnCheck(GetPlayerPos());
         if (spownPos == -Vector2.one) return false;
@@ -83,7 +79,7 @@ public class TurnManager : MonoBehaviour
         enemyList.Add(enemySC);
 
         //マス状態更新
-        gridManager.ChangeCellState(z, x, CellScript.CellState.enemy, enemySC, Vector2Int.zero);
+        gridManager.ChangeCellState(spownPos.x, spownPos.y, CellScript.CellState.enemy, enemySC, Vector2Int.zero);
 
         return true;
     }

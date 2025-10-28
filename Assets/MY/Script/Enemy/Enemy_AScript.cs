@@ -74,6 +74,7 @@ public class Enemy_AScript : CharaScript
                 gridManager.SendDamage((int)curPos.z, (int)curPos.x, damage, true);
 
                 StartCoroutine(Back(originPos));
+                attackOnly = false;
                 yield break;
             }
             //ƒvƒŒƒCƒ„[‚ª‚¢‚½‚çUŒ‚‚·‚é

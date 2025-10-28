@@ -6,14 +6,14 @@ using UnityEngine.UI;
 public class TurnManager : MonoBehaviour
 {
     [SerializeField] PlayerController[] playerCon;
-    //仮
-    [SerializeField] CharaScript enemySC;
-    //仮
-    GridManager gridManager;
-    
+    GridManager gridManager;   
     [SerializeField] CellScript cellScript;
 
-    //仮
+    [SerializeField, Header("ワールドカメラ")]
+    Camera worldCamera;
+
+    //スポーンした敵のList
+    List<CharaScript> enemyList = new List<CharaScript>();
     [SerializeField, Header("敵Prefab")]
     GameObject enemyPrefab;
     [SerializeField, Header("敵のHPバー")]
@@ -23,32 +23,66 @@ public class TurnManager : MonoBehaviour
     //実行中コルーチンの数
     int runnning = 0;
 
-    void Start()
+    void Awake()
     {
-        //仮
         Application.targetFrameRate = 30;
+    }
+
+    void Start()
+    {        
         gridManager = gameObject.GetComponent<GridManager>();
-        EnemySpown();
+
+        //仮
+        Invoke("Call",3) ;      
+    }
+    //仮
+    void Call()
+    {
+        EnemySpown(3);
         StartCoroutine(TurnStart());
     }
 
-    //仮
-    void EnemySpown()
+    /// <summary>
+    /// 敵をスポーン
+    /// </summary>
+    /// <param name="enemyNum">スポーンさせたい敵の数</param>
+    public void EnemySpown(int enemyNum)
     {
-        GameObject enemy = Instantiate(
-           enemyPrefab,
-           new Vector3(6, 0.5f, 4),
-           enemyPrefab.transform.rotation
-           );
+        for (int i = 0; i < enemyNum; i++)
+        {
+            //スポーンしたい位置を調べる(仮)
+            int x = Random.Range(0, 8);
+            int z = Random.Range(0, 8);
+            if (!(gridManager.CheckCellState(z, x) == CellScript.CellState.empty)) continue;
 
-        Slider slider = Instantiate(hpPrefab);
-        slider.transform.SetParent(canvas.transform);
+            //gridManagerから座標もらう
 
-        enemySC = enemy.GetComponent<CharaScript>();
-        enemySC.turnManager = this;
-        enemySC.gridManager = gridManager;
-        enemySC.cellScript = cellScript;
-        enemySC.hpSlider = slider;
+            //敵スポーン
+            GameObject enemy = Instantiate(
+            enemyPrefab,
+            new Vector3(x, 0.6f, z),
+            enemyPrefab.transform.rotation
+            );
+
+            //HPスライダーアタッチ
+            Slider slider = Instantiate(hpPrefab);
+            slider.transform.SetParent(canvas.transform);
+
+            //必要なコンポーネントを取得
+            CharaScript enemySC = enemy.GetComponent<CharaScript>();
+            enemySC.turnManager = this;
+            enemySC.gridManager = gridManager;
+            enemySC.cellScript = cellScript;
+            enemySC.hpSlider = slider;
+            enemySC.worldCamera = worldCamera;
+            enemySC.canvas = canvas;
+
+            //Listに追加
+            enemyList.Add(enemySC);
+
+            //マス状態更新
+            gridManager.ChangeCellState(z, x, CellScript.CellState.enemy, enemySC, Vector2Int.zero);
+        }
     }
 
     /// <summary>
@@ -63,7 +97,7 @@ public class TurnManager : MonoBehaviour
     /// ターン進行管理
     /// </summary>
     /// <returns></returns>
-    IEnumerator TurnStart()
+    public IEnumerator TurnStart()
     {
         //行動選択
         StartCoroutine(playerCon[0].SelectAction());
@@ -106,10 +140,14 @@ public class TurnManager : MonoBehaviour
             yield return new WaitForSeconds(0.5f);
 
             //後行動敵
-            if (i < enemySC.actionLimit)
+            for (int n = 0; n < enemyList.Count; n++)
             {
-                StartCoroutine(enemySC.Move());
-                runnning++;
+                //行動回数が足りるなら動く
+                if (n < enemyList[n].actionLimit)
+                {
+                    StartCoroutine(enemyList[n].Move());
+                    runnning++;
+                }
             }
 
             while (runnning != 0) yield return null;

@@ -50,6 +50,7 @@ MonoBehaviour:
   cellScript: {fileID: 0}
   charaImage: {fileID: 5649160074311771487}
   hpSlider: {fileID: 0}
+  worldCamera: {fileID: 0}
   rank: 1
   hp: 100
   damage: 10
@@ -144,7 +145,7 @@ SpriteRenderer:
   m_Size: {x: 0.32, y: 0.32}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!95 &8265614465209262376

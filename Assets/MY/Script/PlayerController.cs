@@ -134,7 +134,7 @@ public class PlayerController : CharaScript
     {
         attackImage.transform.position = new Vector3(
             playerPos.x + x,
-            0.01f,
+            0.1f,
             playerPos.z + z
             );
         attackImage.SetActive(true);

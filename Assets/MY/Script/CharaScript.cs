@@ -12,6 +12,8 @@ public class CharaScript : MonoBehaviour
 
     public GameObject charaImage;
     public Slider hpSlider;
+    public Camera worldCamera;
+    public Canvas canvas;
 
     //ê⁄êGóDêÊìx
     public int rank;
@@ -45,6 +47,19 @@ public class CharaScript : MonoBehaviour
         hpSlider.value = hp;
     }
 
+    void Update()
+    {
+        //HPÉoÅ[í«è]
+        Vector2 viewPos = worldCamera.WorldToViewportPoint(transform.position);
+        RectTransform canvasRect = canvas.GetComponent<RectTransform>();
+        Vector2 charaScreenPos = new Vector2(
+            canvasRect.sizeDelta.x * viewPos.x - (canvasRect.sizeDelta.x * 0.5f),
+            canvasRect.sizeDelta.y * viewPos.y - (canvasRect.sizeDelta.y * 0.5f)
+            );
+
+        hpSlider.transform.localPosition = charaScreenPos;
+        hpSlider.transform.localScale = Vector2.one;
+    }
     /// <summary>
     /// êiÇﬂÇÈÇ©ÇÃîªíË
     /// </summary>

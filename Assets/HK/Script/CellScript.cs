@@ -54,6 +54,15 @@ public class CellScript : MonoBehaviour
     }
 
     /// <summary>
+    /// マスの座標を取得する
+    /// </summary>
+    /// <returns>座標</returns>
+    public Vector2Int GetPosition()
+    {
+        return cellPos;
+    }
+
+    /// <summary>
     /// 予約用関数(ステート切り替えの前に必ず呼ぶ)
     /// </summary>
     /// <param name="unitSC">呼びだす側のユニットスクリプト</param>

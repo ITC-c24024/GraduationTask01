@@ -107,4 +107,66 @@ public class GridManager : MonoBehaviour
     {
         cellSC[y, x].ReciveAttack(damage,isEnemy,direction);
     }
+
+    /// <summary>
+    /// 敵スポーンの位置を決める
+    /// </summary>
+    /// <param name="playerPos">プレイヤー座標リスト</param>
+    /// <returns>スポーン座標</returns>
+    public Vector2Int EnemySpawnCheck(Vector3[] playerPos)
+    {
+        List<Vector2Int> playerPosList = new();//プレイヤー座標リスト(Vector2Int変換後用)
+        List<Vector2Int> spawnPosList = new();//スポーン可能場所のリスト
+        List<Vector2Int> emptyPosList = new();//空マスの座標リスト
+
+        //Vector2Intに変換
+        foreach(var pos in playerPos)
+        {
+            var newPos = new Vector2Int((int)pos.x, (int)pos.z);
+            playerPosList.Add(newPos);
+        }
+
+        //空マスを登録
+        foreach(var cell in cellSC)
+        {
+            if(cell.CheckState() == CellScript.CellState.empty)
+            {
+                emptyPosList.Add(cell.GetPosition());
+            }
+        }
+
+        //空マスリストから条件に合うものをスポーン座標に追加
+        foreach(var pos in emptyPosList)
+        {
+            var ok = true;
+
+            //プレイヤー座標から1マス以上離れていたらスポーン可能
+            foreach(var checkPos in playerPosList)
+            {
+                var distance = new Vector2Int(Mathf.Abs(checkPos.x - pos.y), Mathf.Abs(checkPos.y - pos.x));
+                if(distance.x <= 1 && distance.y <= 1)
+                {
+                    ok = false;
+                    break;
+                }
+                
+            }
+
+            if (ok)
+            {
+                spawnPosList.Add(pos);
+            }
+        }
+
+        //スポーン不可の場合
+        if (spawnPosList.Count == 0)
+        {
+            Debug.LogWarning("敵をスポーンできる位置がありません。");
+            return new Vector2Int(-1, -1); // 失敗時
+        }
+
+        var posNum = Random.Range(0, spawnPosList.Count);
+
+        return spawnPosList[posNum];
+    }
 }

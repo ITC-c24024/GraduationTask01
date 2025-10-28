@@ -38,7 +38,10 @@ public class TurnManager : MonoBehaviour
     //仮
     void Call()
     {
-        EnemySpown(3);
+        for (int i = 0; i < 3; i++)
+        {
+            EnemySpown();
+        }
         StartCoroutine(TurnStart());
     }
 
@@ -46,43 +49,43 @@ public class TurnManager : MonoBehaviour
     /// 敵をスポーン
     /// </summary>
     /// <param name="enemyNum">スポーンさせたい敵の数</param>
-    public void EnemySpown(int enemyNum)
+    public bool EnemySpown()
     {
-        for (int i = 0; i < enemyNum; i++)
-        {
-            //スポーンしたい位置を調べる(仮)
-            int x = Random.Range(0, 8);
-            int z = Random.Range(0, 8);
-            if (!(gridManager.CheckCellState(z, x) == CellScript.CellState.empty)) continue;
+        //スポーンしたい位置を調べる(仮)
+        int x = Random.Range(0, 8);
+        int z = Random.Range(0, 8);
 
-            //gridManagerから座標もらう
+        //gridManagerから座標もらう
+        Vector2Int spownPos = gridManager.EnemySpawnCheck(GetPlayerPos());
+        if (spownPos == -Vector2.one) return false;
 
-            //敵スポーン
-            GameObject enemy = Instantiate(
+        //敵スポーン
+        GameObject enemy = Instantiate(
             enemyPrefab,
-            new Vector3(x, 0.6f, z),
+            new Vector3(spownPos.y, 0.6f, spownPos.x),
             enemyPrefab.transform.rotation
             );
 
-            //HPスライダーアタッチ
-            Slider slider = Instantiate(hpPrefab);
-            slider.transform.SetParent(canvas.transform);
+        //HPスライダーアタッチ
+        Slider slider = Instantiate(hpPrefab);
+        slider.transform.SetParent(canvas.transform);
 
-            //必要なコンポーネントを取得
-            CharaScript enemySC = enemy.GetComponent<CharaScript>();
-            enemySC.turnManager = this;
-            enemySC.gridManager = gridManager;
-            enemySC.cellScript = cellScript;
-            enemySC.hpSlider = slider;
-            enemySC.worldCamera = worldCamera;
-            enemySC.canvas = canvas;
+        //必要なコンポーネントを取得
+        CharaScript enemySC = enemy.GetComponent<CharaScript>();
+        enemySC.turnManager = this;
+        enemySC.gridManager = gridManager;
+        enemySC.cellScript = cellScript;
+        enemySC.hpSlider = slider;
+        enemySC.worldCamera = worldCamera;
+        enemySC.canvas = canvas;
 
-            //Listに追加
-            enemyList.Add(enemySC);
+        //Listに追加
+        enemyList.Add(enemySC);
 
-            //マス状態更新
-            gridManager.ChangeCellState(z, x, CellScript.CellState.enemy, enemySC, Vector2Int.zero);
-        }
+        //マス状態更新
+        gridManager.ChangeCellState(z, x, CellScript.CellState.enemy, enemySC, Vector2Int.zero);
+
+        return true;
     }
 
     /// <summary>

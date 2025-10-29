@@ -30,17 +30,6 @@ public class GridManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 指定したマスに移動予約をする
-    /// </summary>
-    /// <param name="y">y座標</param>
-    /// <param name="x">x座標</param>
-    /// <param name="unitSC">呼びだす側のユニットスクリプト</param>
-    public void ReserveCell(int y, int x, CharaScript unitSC)
-    {
-        cellSC[y, x].ReserveState(unitSC);
-    }
-
-    /// <summary>
     /// 指定したマスの状態を変更する
     /// </summary>
     /// <param name="y">y座標(縦の列)</param>
@@ -62,28 +51,6 @@ public class GridManager : MonoBehaviour
     public CellScript.CellState CheckCellState(int y, int x)
     {
         return cellSC[y, x].CheckState();
-    }
-
-    /// <summary>
-    /// 指定したマスの予約の有無を確認する
-    /// </summary>
-    /// <param name="y">y座標</param>
-    /// <param name="x">x座標</param>
-    /// <returns>予約あり=true, 予約なし=false</returns>
-    public bool CheckCellReserve(int y, int x) => cellSC[y, x].CheckReserve();
-
-    /// <summary>
-    /// すべてのマスの予約をリセット(1行動ごとの終了時に呼ぶ)
-    /// </summary>
-    public void ResetReserveListAll()
-    {
-        for (int y = 0; y < height; y++)
-        {
-            for (int x = 0; x < width; x++)
-            {
-                cellSC[y, x].ResetList();
-            }
-        }
     }
 
     /// <summary>

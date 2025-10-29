@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.InputSystem.LowLevel;
 
 public class CellScript : MonoBehaviour
 {
@@ -34,9 +35,6 @@ public class CellScript : MonoBehaviour
     [SerializeField, Header("マスの状態")]
     CellState state = CellState.empty;
 
-    [SerializeField, Header("予約数")]
-    List<CharaScript> reserveList = new();
-
     [SerializeField, Header("プレイヤー数")]
     List<CharaScript> playerList = new();
 
@@ -61,19 +59,6 @@ public class CellScript : MonoBehaviour
     {
         return cellPos;
     }
-
-    /// <summary>
-    /// 予約用関数(ステート切り替えの前に必ず呼ぶ)
-    /// </summary>
-    /// <param name="unitSC">呼びだす側のユニットスクリプト</param>
-    public void ReserveState(CharaScript unitSC)
-    {
-        if (!reserveList.Contains(unitSC))
-        {
-            reserveList.Add(unitSC);
-        }
-    }
-
 
     /// <summary>
     /// 可能であればマスの状態を変える
@@ -147,8 +132,6 @@ public class CellScript : MonoBehaviour
         return result;
     }
 
-
-
     /// <summary>
     /// ステート切り替え処理
     /// </summary>
@@ -178,14 +161,12 @@ public class CellScript : MonoBehaviour
     {
         playerList.Remove(unitSC);
         enemyList.Remove(unitSC);
-        reserveList.Remove(unitSC);
 
         if (UnitCount == 0)
         {
             state = CellState.empty;
         }
     }
-
 
     /// <summary>
     /// マスの状態を確認する
@@ -194,20 +175,6 @@ public class CellScript : MonoBehaviour
     public CellState CheckState()
     {
         return state;
-    }
-
-    /// <summary>
-    /// 予約確認用(主に敵の行動判定で使う用)
-    /// </summary>
-    /// <returns>予約あり=true, 予約なし=false</returns>
-    public bool CheckReserve() => reserveList.Count > 0;
-
-    /// <summary>
-    /// 予約リストを空にする(行動1手ごとの終了時に呼ぶ)
-    /// </summary>
-    public void ResetList()
-    {
-        reserveList.Clear();
     }
 
     /// <summary>

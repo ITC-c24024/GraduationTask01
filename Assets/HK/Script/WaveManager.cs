@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem.XInput;
 
 public class WaveManager : MonoBehaviour
 {
     [SerializeField, Header("ウェーブ数")]
-    int waveCount = 0;
+    int waveCount = 1;
 
     [SerializeField, Header("ターン数")]
     int turnCount = 0;
@@ -15,6 +16,9 @@ public class WaveManager : MonoBehaviour
 
     [SerializeField, Header("現在出現敵数")]
     int nowEnemyCount = 0;
+
+    [SerializeField, Header("ターンごとの出現敵数")]
+    int spawnEnemyCount = 1;
 
     [SerializeField, Header("プレイヤー数")]
     int playerCount = 0;
@@ -38,16 +42,28 @@ public class WaveManager : MonoBehaviour
 
     }
 
-    void WaveStart()
+    void StartTurn()
     {
-        if(allEnemyCount <= 0 && nowEnemyCount < 10)
+        turnCount++;
+
+        for (int i = 0; i < spawnEnemyCount + (int)waveCount / 5; i++)
         {
-            //turnManagerSC.EnemySpown();
+            if (allEnemyCount <= 0 && nowEnemyCount < 10)
+            {
+                if (turnManagerSC.EnemySpown())
+                {
+                    nowEnemyCount++;
+                }
+            }
+            else
+            {
+                break;
+            }
         }
-        //StartCoroutine(turnManagerSC.TurnStart());
+        StartCoroutine(turnManagerSC.TurnStart());
     }
 
-    void TurnFinish()
+    void FinishTurn()
     {
         if (playerCount <= 0)
         {
@@ -57,6 +73,11 @@ public class WaveManager : MonoBehaviour
         else if (allEnemyCount <= 0)
         {
             WaveClear();
+            return;
+        }
+        else
+        {
+            StartTurn();
         }
     }
 
@@ -64,10 +85,6 @@ public class WaveManager : MonoBehaviour
     void PlayerDead()
     {
         playerCount--;
-        if (playerCount <= 0)
-        {
-            GameOver();
-        }
     }
 
     void EnemyDead()
@@ -79,6 +96,10 @@ public class WaveManager : MonoBehaviour
     void WaveClear()
     {
         isClear = true;
+        waveCount++;
+        turnCount--;
+        allEnemyCount = 3 + 2 * waveCount;
+
     }
 
     void GameOver()

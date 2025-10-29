@@ -21,7 +21,7 @@ public class GridManager : MonoBehaviour
         {
             for (int x = 0; x < width; x++)
             {
-                var cellObj = Instantiate(cellPrefab, new Vector3(x, 0, y), Quaternion.identity);
+                var cellObj = Instantiate(cellPrefab, new Vector3(x, 0.05f, y), Quaternion.identity);
                 cellSC[y, x] = cellObj.GetComponent<CellScript>();
                 cellSC[y, x].SetPosition(new Vector2Int(y, x));
                 cellSC[y, x].gridManagerSC = this;
@@ -113,7 +113,7 @@ public class GridManager : MonoBehaviour
     /// </summary>
     /// <param name="playerPos">プレイヤー座標リスト</param>
     /// <returns>スポーン座標</returns>
-    public Vector2Int EnemySpawnCheck(Vector3[] playerPos)
+    public Vector2Int EnemySpawnCheck(Vector3[] playerPos, int minDistance=1)
     {
         List<Vector2Int> playerPosList = new();//プレイヤー座標リスト(Vector2Int変換後用)
         List<Vector2Int> spawnPosList = new();//スポーン可能場所のリスト
@@ -144,12 +144,11 @@ public class GridManager : MonoBehaviour
             foreach(var checkPos in playerPosList)
             {
                 var distance = new Vector2Int(Mathf.Abs(checkPos.x - pos.y), Mathf.Abs(checkPos.y - pos.x));
-                if(distance.x <= 1 && distance.y <= 1)
+                if(distance.x <= minDistance && distance.y <= minDistance)
                 {
                     ok = false;
                     break;
                 }
-                
             }
 
             if (ok)
@@ -162,11 +161,11 @@ public class GridManager : MonoBehaviour
         if (spawnPosList.Count == 0)
         {
             Debug.LogWarning("敵をスポーンできる位置がありません。");
-            return new Vector2Int(-1, -1); // 失敗時
+            return new Vector2Int(-1, -1);
         }
 
+        //スポーン可能座標リストからランダムで返す
         var posNum = Random.Range(0, spawnPosList.Count);
-
         return spawnPosList[posNum];
     }
 }

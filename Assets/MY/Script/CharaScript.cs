@@ -16,7 +16,7 @@ public class CharaScript : MonoBehaviour
     public Canvas canvas;
 
     //接触優先度
-    public int rank;
+    //public int rank;
 
     //HP
     public int hp = 100;
@@ -45,6 +45,7 @@ public class CharaScript : MonoBehaviour
     {       
         hpSlider.maxValue = hp;
         hpSlider.value = hp;
+        curPos = transform.position;
     }
 
     void Update()
@@ -93,7 +94,7 @@ public class CharaScript : MonoBehaviour
     /// <summary>
     /// プレイヤーの位置、距離を調べ、進む方向を決める
     /// </summary>
-    public Vector2 GetDirection(Vector3[] playerPos, Vector3 startPos, int i)
+    public Vector2[] GetDirection(Vector3[] playerPos, Vector3 startPos, int i)
     {
         //プレイヤーとの距離を計算
         float diff_A = GetDistance(playerPos[0], startPos);
@@ -109,6 +110,8 @@ public class CharaScript : MonoBehaviour
         {
             targetPos = playerPos[1];
         }
+        //選んだプレイヤーの位置
+        Vector2 selectPos = new Vector2(targetPos.x, targetPos.y);
 
         //x座標、z座標の差を計算
         float diffX = targetPos.x - startPos.x;
@@ -116,12 +119,63 @@ public class CharaScript : MonoBehaviour
 
         //より離れてる軸に進む
         if (Mathf.Abs(diffX) <= Mathf.Abs(diffZ))
-        {
-            return new Vector2(moveRule[i].x * Mathf.Sign(diffX), moveRule[i].z * Mathf.Sign(diffZ));
+        {          
+            //進行方向
+            Vector2 moveDir= new Vector2(moveRule[i].x * Mathf.Sign(diffX), moveRule[i].z * Mathf.Sign(diffZ));
+            //返り値
+            Vector2[] vector2s = new Vector2[2] { selectPos, moveDir };
+            return vector2s;
         }
         else
         {
-            return new Vector2(moveRule[i].z * Mathf.Sign(diffX), moveRule[i].x * Mathf.Sign(diffZ));
+            //進行方向
+            Vector2 moveDir = new Vector2(moveRule[i].z * Mathf.Sign(diffX), moveRule[i].x * Mathf.Sign(diffZ));
+            //返り値
+            Vector2[] vector2s = new Vector2[2] { selectPos, moveDir };
+            return vector2s;
+        }
+    }
+
+    //進めないとき、もう一度進む方向を決める
+    public Vector2 SelectAgain(Vector2 direction, Vector2 playerPos)
+    {
+        Debug.Log(curPos);
+        Debug.Log(new Vector3(curPos.x + direction.x, curPos.y, curPos.z + direction.y));
+
+        //進もうとした方向の右か左にする
+
+        //x座標、z座標の差を計算
+        float diffX = playerPos.x - transform.position.x;
+        float diffZ = playerPos.y - transform.position.z;
+        
+        if (direction.y > 0)
+        {
+            Debug.Log(0);
+            if (diffX > 0) return new Vector2(direction.y, direction.x);
+            else return new Vector2(-direction.y, direction.x);
+        }
+        else if (direction.y < 0)
+        {
+            Debug.Log(1);
+            if (diffX > 0) return new Vector2(-direction.y, direction.x);
+            else return new Vector2(direction.y, direction.x);
+        }
+        else if (direction.x > 0)
+        {
+            Debug.Log(2);
+            if (diffZ > 0) return new Vector2(direction.y, direction.x);
+            else return new Vector2(direction.y, -direction.x);
+        }
+        else if (direction.x < 0)
+        {
+            Debug.Log(3);
+            if (diffZ > 0) return new Vector2(direction.y, -direction.x);
+            else return new Vector2(direction.y, direction.x);
+        }
+        else
+        {
+            Debug.Log("おかしい");
+            return Vector2.zero;
         }
     }
 
@@ -170,6 +224,7 @@ public class CharaScript : MonoBehaviour
                 );
         //ひとつ前のマスを空にする
         gridManager.LeaveCell((int)startPos.z, (int)startPos.x, this);
+        attackOnly = false;
         turnManager.FinCoroutine();
     }
 

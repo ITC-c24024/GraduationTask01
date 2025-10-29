@@ -33,12 +33,12 @@ public class TurnManager : MonoBehaviour
         gridManager = gameObject.GetComponent<GridManager>();
 
         //‰¼
-        Invoke("Call",3) ;      
+        Invoke("Call",2) ;      
     }
     //‰¼
     void Call()
     {
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 5; i++)
         {
             EnemySpown();
         }
@@ -58,7 +58,7 @@ public class TurnManager : MonoBehaviour
         //“GƒXƒ|[ƒ“
         GameObject enemy = Instantiate(
             enemyPrefab,
-            new Vector3(spownPos.y, 0.6f, spownPos.x),
+            new Vector3(spownPos.y, enemyPrefab.transform.position.y, spownPos.x),
             enemyPrefab.transform.rotation
             );
 
@@ -135,6 +135,8 @@ public class TurnManager : MonoBehaviour
             }          
 
             while (runnning != 0) yield return null;
+
+            gridManager.ResetReserveListAll();
 
             yield return new WaitForSeconds(0.5f);
 

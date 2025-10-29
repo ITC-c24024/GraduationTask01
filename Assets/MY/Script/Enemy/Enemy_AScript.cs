@@ -17,7 +17,9 @@ public class Enemy_AScript : CharaScript
         animator.SetTrigger("IsAttack");
         for (int i = 0; i < moveRule.Length; i++)
         {
-            Vector2 direction = GetDirection(playerPos, startPos, i);
+            Vector2[] vector2s = GetDirection(playerPos, startPos, i);
+            Vector2 selectPos = vector2s[0];//選んだプレイヤーの位置
+            Vector2 direction = vector2s[1];//selectPosに進むための方向
             Vector3 originPos = transform.position;
 
             Vector3 targetPos = new Vector3(
@@ -26,21 +28,39 @@ public class Enemy_AScript : CharaScript
                 originPos.z + direction.y
                 );
 
-            //進めないとき移動終了
-            if (!CanMove(targetPos)) yield break;
+            //範囲外の時
+            if (!CanMove(targetPos))
+            {
+                Debug.Log("進めない");
+                direction = SelectAgain(direction, selectPos);
 
-            nextPos = targetPos;
+                targetPos = new Vector3(
+                    originPos.x + direction.x,
+                    originPos.y,
+                    originPos.z + direction.y
+                    );
+            }
+            /*
+            //敵がいたら
+            if (gridManager.CheckCellState((int)targetPos.z, (int)targetPos.x) == CellScript.CellState.enemy)
+            {
+                Debug.Log("進めない");
+                direction = SelectAgain(direction, selectPos);
 
-            //敵がいたらせき止められる
-            if (gridManager.CheckCellState((int)nextPos.z, (int)nextPos.x) == CellScript.CellState.enemy) yield break;
-
+                targetPos = new Vector3(
+                    originPos.x + direction.x,
+                    originPos.y,
+                    originPos.z + direction.y
+                    );
+            }
+            */
             //プレイヤーがいる場合
-            if (gridManager.CheckCellState((int)nextPos.z, (int)nextPos.x) == CellScript.CellState.player)
+            if (gridManager.CheckCellState((int)targetPos.z, (int)targetPos.x) == CellScript.CellState.player)
             {
                 //ノックバックできない状態なら攻撃だけ予定する
                 var result = gridManager.ChangeCellState(
-                      (int)nextPos.z,
-                      (int)nextPos.x,
+                      (int)targetPos.z,
+                      (int)targetPos.x,
                       CellScript.CellState.enemy,
                       this,
                       new Vector2Int((int)direction.x, (int)direction.y)
@@ -48,9 +68,23 @@ public class Enemy_AScript : CharaScript
                 if (!result.canMove) attackOnly = true;
             }
 
-            //予約
-            gridManager.ReserveCell((int)nextPos.z, (int)nextPos.x, this);
-            
+            //先約がいなかったら予約
+            if (!gridManager.CheckCellReserve((int)targetPos.z, (int)targetPos.x))
+                gridManager.ReserveCell((int)targetPos.z, (int)targetPos.x, this);
+            else
+            {
+                Debug.Log("進めない");
+                direction = SelectAgain(direction, selectPos);
+
+                targetPos = new Vector3(
+                    originPos.x + direction.x,
+                    originPos.y,
+                    originPos.z + direction.y
+                    );
+            }
+
+            nextPos = targetPos;
+
             float time = 0;
             float required = 0.5f / moveRule.Length;
             while (time < required)
@@ -74,7 +108,6 @@ public class Enemy_AScript : CharaScript
                 gridManager.SendDamage((int)curPos.z, (int)curPos.x, damage, true);
 
                 StartCoroutine(Back(originPos));
-                attackOnly = false;
                 yield break;
             }
             //プレイヤーがいたら攻撃する
@@ -100,7 +133,7 @@ public class Enemy_AScript : CharaScript
             //ひとつ前のマスを空にする
             gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);          
         }
-        turnManager.FinCoroutine();
+        if (!attackOnly) turnManager.FinCoroutine();
     }
 
     public override void ReciveDamage(int amount, Vector2 kbDir)

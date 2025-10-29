@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,9 +16,6 @@ public class CharaScript : MonoBehaviour
     public Camera worldCamera;
     public Canvas canvas;
 
-    //接触優先度
-    //public int rank;
-
     //HP
     public int hp = 100;
     //攻撃力
@@ -28,6 +26,8 @@ public class CharaScript : MonoBehaviour
     //行動可能回数
     public int actionLimit = 1;
 
+    //プレイヤーとの最短距離
+    public float shortDir = 0;
     //移動法則
     public Direction[] moveRule;
 
@@ -36,8 +36,6 @@ public class CharaScript : MonoBehaviour
 
     //現在位置
     public Vector3 curPos;
-    //次に進む予定位置
-    public Vector3 nextPos;
 
     public Animator animator;
 
@@ -61,6 +59,7 @@ public class CharaScript : MonoBehaviour
         hpSlider.transform.localPosition = charaScreenPos;
         hpSlider.transform.localScale = Vector2.one;
     }
+
     /// <summary>
     /// 進めるかの判定
     /// </summary>
@@ -78,7 +77,7 @@ public class CharaScript : MonoBehaviour
     }
 
     /// <summary>
-    /// 距離を計算
+    /// 2点間距離を計算
     /// </summary>
     /// <param name="targetPos">目標位置</param>
     /// <param name="startPos">スタート位置</param>
@@ -92,13 +91,39 @@ public class CharaScript : MonoBehaviour
     }
 
     /// <summary>
-    /// プレイヤーの位置、距離を調べ、進む方向を決める
+    /// プレイヤーとの最短距離を設定
     /// </summary>
-    public Vector2[] GetDirection(Vector3[] playerPos, Vector3 startPos, int i)
+    public void SetShortDir()
     {
+        //プレイヤーの位置を取得
+        Vector3[] playerPos = turnManager.GetPlayerPos();
+
         //プレイヤーとの距離を計算
-        float diff_A = GetDistance(playerPos[0], startPos);
-        float diff_B = GetDistance(playerPos[1], startPos);
+        float diff_A = GetDistance(playerPos[0], curPos);
+        float diff_B = GetDistance(playerPos[1], curPos);
+
+        if (diff_A <= diff_B)
+        {
+            shortDir = diff_A;
+        }
+        else
+        {
+            shortDir = diff_B;
+        }
+    }
+
+    /// <summary>
+    /// どのプレイヤーのを追うか決める
+    /// </summary>
+    /// <returns>追うプレイヤーの位置</returns>
+    public Vector3 SelectPlayer()
+    {
+        //プレイヤーの位置を取得
+        Vector3[] playerPos = turnManager.GetPlayerPos();
+
+        //プレイヤーとの距離を計算
+        float diff_A = GetDistance(playerPos[0], curPos);
+        float diff_B = GetDistance(playerPos[1], curPos);
 
         //近い方を追う位置とする
         Vector3 targetPos;
@@ -110,73 +135,38 @@ public class CharaScript : MonoBehaviour
         {
             targetPos = playerPos[1];
         }
-        //選んだプレイヤーの位置
-        Vector2 selectPos = new Vector2(targetPos.x, targetPos.y);
 
-        //x座標、z座標の差を計算
-        float diffX = targetPos.x - startPos.x;
-        float diffZ = targetPos.z - startPos.z;
-
-        //より離れてる軸に進む
-        if (Mathf.Abs(diffX) <= Mathf.Abs(diffZ))
-        {          
-            //進行方向
-            Vector2 moveDir= new Vector2(moveRule[i].x * Mathf.Sign(diffX), moveRule[i].z * Mathf.Sign(diffZ));
-            //返り値
-            Vector2[] vector2s = new Vector2[2] { selectPos, moveDir };
-            return vector2s;
-        }
-        else
-        {
-            //進行方向
-            Vector2 moveDir = new Vector2(moveRule[i].z * Mathf.Sign(diffX), moveRule[i].x * Mathf.Sign(diffZ));
-            //返り値
-            Vector2[] vector2s = new Vector2[2] { selectPos, moveDir };
-            return vector2s;
-        }
+        return targetPos;
     }
 
-    //進めないとき、もう一度進む方向を決める
-    public Vector2 SelectAgain(Vector2 direction, Vector2 playerPos)
+    /// <summary>
+    /// プレイヤーの位置に行くための方向を決める
+    /// </summary>
+    /// <param name="playerPos">プレイヤーの位置</param>
+    /// <param name="startPos">移動開始位置</param>
+    /// <returns>進む方向</returns>
+    public Vector2 GetDirection(Vector3 playerPos, Vector3 startPos, int ruleNum)
     {
-        Debug.Log(curPos);
-        Debug.Log(new Vector3(curPos.x + direction.x, curPos.y, curPos.z + direction.y));
-
-        //進もうとした方向の右か左にする
+        //進行方向
+        Vector2 moveDir;
 
         //x座標、z座標の差を計算
-        float diffX = playerPos.x - transform.position.x;
-        float diffZ = playerPos.y - transform.position.z;
-        
-        if (direction.y > 0)
-        {
-            Debug.Log(0);
-            if (diffX > 0) return new Vector2(direction.y, direction.x);
-            else return new Vector2(-direction.y, direction.x);
-        }
-        else if (direction.y < 0)
-        {
-            Debug.Log(1);
-            if (diffX > 0) return new Vector2(-direction.y, direction.x);
-            else return new Vector2(direction.y, direction.x);
-        }
-        else if (direction.x > 0)
-        {
-            Debug.Log(2);
-            if (diffZ > 0) return new Vector2(direction.y, direction.x);
-            else return new Vector2(direction.y, -direction.x);
-        }
-        else if (direction.x < 0)
-        {
-            Debug.Log(3);
-            if (diffZ > 0) return new Vector2(direction.y, -direction.x);
-            else return new Vector2(direction.y, direction.x);
-        }
+        float diffX = playerPos.x - startPos.x;
+        float diffZ = playerPos.z - startPos.z;
+
+        //より離れてる軸に進む(Z軸優先)
+        if (Mathf.Abs(diffX) <= Mathf.Abs(diffZ))
+            moveDir = new Vector2(
+                moveRule[ruleNum].x * Mathf.Sign(diffX),
+                moveRule[ruleNum].z * Mathf.Sign(diffZ)
+                );
         else
-        {
-            Debug.Log("おかしい");
-            return Vector2.zero;
-        }
+            moveDir = new Vector2(
+                moveRule[ruleNum].z * Mathf.Sign(diffX),
+                moveRule[ruleNum].x * Mathf.Sign(diffZ)
+                );
+
+        return moveDir;
     }
 
     /// <summary>
@@ -220,7 +210,7 @@ public class CharaScript : MonoBehaviour
                 (int)curPos.x,
                 CellScript.CellState.enemy,
                 this,
-                new Vector2Int(0,0)
+                new Vector2Int(0, 0)
                 );
         //ひとつ前のマスを空にする
         gridManager.LeaveCell((int)startPos.z, (int)startPos.x, this);

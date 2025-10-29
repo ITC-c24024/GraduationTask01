@@ -12,12 +12,6 @@ public class PlayerController : CharaScript
     [SerializeField, Header("攻撃イメージ")]//仮
     GameObject attackImage;
 
-    //実行中判定
-    bool isRun = false;
-
-    //ノックバック判定
-    bool isKnockBack = false;
-
     //ノックバック方向
     Vector2 kbDirection;
 
@@ -25,25 +19,8 @@ public class PlayerController : CharaScript
     InputAction selectAttack;
     InputAction selectMove;
 
-    public struct Action 
-    {
-        public int a;//0:移動,1:攻撃
-        public Vector2 direction;//移動方向
-
-        public Action(int a,Vector2 direction) 
-        {
-            this.a = a;
-            this.direction = direction;
-        }
-    }
-
-    //行動予定List
-    List<Action> actionList = new List<Action>();
-
     //プレイヤーの位置
     public Vector3 playerPos;
-    //行動開始位置
-    Vector3 startPos;
 
     //移動中判定
     bool isMove = false;
@@ -77,13 +54,7 @@ public class PlayerController : CharaScript
             playerPos.z + z
             );
 
-        //実行中なら行き先を予約
-        if (isRun)
-        {
-            nextPos = targetPos;
-            gridManager.ReserveCell((int)nextPos.z, (int)nextPos.x, this);
-        }
-
+        animator.SetBool("IsWalk", true);
         float time = 0;
         float required = 0.5f;
         while (time < required)
@@ -101,27 +72,13 @@ public class PlayerController : CharaScript
         transform.position = targetPos;
         playerPos = transform.position;
         curPos = playerPos;
+        animator.SetBool("IsWalk", false);
 
-        //ノックバック
-        if (isKnockBack)
-        {            
-            ReciveDamage(recieveDamage, kbDirection);
-
-            yield break;
-        }
-
-        //実行中なら現在地のマス状態を変更
-        if (isRun)
-        {
-            gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.player, this, default);
-            //元居たマスを空にする
-            gridManager.LeaveCell((int)originPos.z, (int)originPos.x,this);
-
-            turnManager.FinCoroutine();
-        }
+        gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.player, this, default);
+        //元居たマスを空にする
+        gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);
 
         isMove = false;
-        isRun = false;  
     }
 
     //仮攻撃
@@ -143,6 +100,7 @@ public class PlayerController : CharaScript
         hp -= amount;
         hpSlider.value = hp;
 
+        //ノックバックできる場合
         if (kbDir != Vector2.zero) StartCoroutine(KnockBack(kbDir));
     }
 
@@ -174,19 +132,12 @@ public class PlayerController : CharaScript
             yield return null;
         }
         transform.position = targetPos;
-        playerPos = transform.position;
+        playerPos = targetPos;
         curPos = playerPos;
 
         //マス更新
         gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.player, this, default);
-        gridManager.LeaveCell((int)nextPos.z, (int)nextPos.x, this);
-
-        isRun = false;
-        if (isKnockBack)
-        {
-            isKnockBack = false;
-            turnManager.FinCoroutine();
-        }
+        gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);
     }
 
     /// <summary>
@@ -195,9 +146,7 @@ public class PlayerController : CharaScript
     /// <returns></returns>
     public IEnumerator SelectAction()
     {
-        //行動位置を保存
-        startPos = playerPos;
-
+        //行動回数分
         for (int i = 0; i < actionLimit; i++)
         {        
             yield return new WaitForSeconds(0.5f);
@@ -271,9 +220,6 @@ public class PlayerController : CharaScript
                 if (move && direction != Vector2.zero && !isInput)
                 {
                     StartCoroutine(MovePlayer((int)direction.x, (int)direction.y));
-
-                    Action action = new Action(0, direction);
-                    actionList.Add(action);
                     
                     isInput = true;
                 }
@@ -281,79 +227,17 @@ public class PlayerController : CharaScript
                 else if (attack && direction != Vector2.zero && !isInput)
                 {
                     //攻撃処理呼ぶ
-
-                    Action action = new Action(1, direction);
-                    actionList.Add(action);
+                    StartCoroutine(Attack((int)(playerPos.x + direction.x), (int)(playerPos.z + direction.y)));
                     
                     isInput = true;
                 }
 
                 yield return null;
             }
-        }
-        
+        }        
         yield return new WaitForSeconds(0.5f);
         squareSC.DeleteSquare();
+
         turnManager.FinCoroutine();
-    }
-
-    /// <summary>
-    /// 選択フェーズ終了後位置リセット
-    /// </summary>
-    public void PosReset()
-    {    
-        //位置を戻す(仮)
-        playerPos = startPos;
-        curPos = playerPos;
-        transform.position = playerPos;       
-    }
-
-    /// <summary>
-    /// 行動を実行
-    /// </summary>
-    /// <returns></returns>
-    public IEnumerator ExecutionAct(int i)
-    {
-        isRun = true;
-
-        int x = (int)actionList[i].direction.x;
-        int z = (int)actionList[i].direction.y;
-        
-        if (actionList[i].a == 0) //移動
-        {
-            //動きを確認
-            var result = gridManager.ChangeCellState(
-                (int)playerPos.z + z,
-                (int)playerPos.x + x,
-                CellScript.CellState.player,
-                this,
-                new Vector2Int(x, z)
-                );
-            //動けるなら普通に動く
-            if(result.canMove) StartCoroutine(MovePlayer(x, z));
-            else//ノックバックを予定して動く
-            {        
-                isKnockBack = true;
-                kbDirection = result.knockbackDir;
-                recieveDamage = result.damage;
-                StartCoroutine(MovePlayer(x, z));
-            }
-        }
-        else //攻撃
-        {
-            //マスを攻撃予定にする
-            //gridManager.SendDamage((int)playerPos.z + z, (int)playerPos.x + x, damage, false);
-            //タイミング調整   
-            yield return new WaitForSeconds(0.5f);
-            turnManager.FinCoroutine();
-            yield return null;
-            yield return new WaitForSeconds(1.0f);
-            
-            //マスを攻撃予定にする
-            gridManager.SendDamage((int)playerPos.z + z, (int)playerPos.x + x, damage, false);            
-            StartCoroutine(Attack(x, z));
-        }
-
-        yield return null;
     }
 }

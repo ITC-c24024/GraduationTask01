@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -93,6 +94,21 @@ public class TurnManager : MonoBehaviour
     }
 
     /// <summary>
+    /// 敵をプレイヤーとの距離が近い順に並べ替え
+    /// </summary>
+    public void SortEnemy()
+    {
+        //敵自身のshortDirを更新
+        foreach(var enemy in enemyList)
+        {
+            enemy.SetShortDir();
+        }
+
+        //リストを並べ替え
+        enemyList.OrderByDescending(x => x.shortDir);
+    }
+
+    /// <summary>
     /// ターン進行管理
     /// </summary>
     /// <returns></returns>
@@ -108,53 +124,20 @@ public class TurnManager : MonoBehaviour
 
         yield return new WaitForSeconds(0.5f);
 
-        playerCon[0].PosReset();
-        playerCon[1].PosReset();
+        //距離順並べ替え
+        SortEnemy();
 
-        yield return new WaitForSeconds(1.0f);
-
-        //実行ターン
-        for (int i = 0; i < playerCon[0].actionLimit || i < playerCon[1].actionLimit; i++)
+        //敵行動
+        for (int n = 0; n < enemyList.Count; n++)
         {
-            //先行動敵
-
-            while (runnning != 0) yield return null;
-
-            yield return new WaitForSeconds(0.5f);
-
-            //プレイヤー実行
-            if(i < playerCon[0].actionLimit)
+            //行動回数が足りるなら動く
+            if (n < enemyList[n].actionLimit)
             {
-                StartCoroutine(playerCon[0].ExecutionAct(i));
+                StartCoroutine(enemyList[n].Move());
                 runnning++;
+
+                while (runnning != 0) yield return null;
             }
-            if(i < playerCon[1].actionLimit)
-            {
-                StartCoroutine(playerCon[1].ExecutionAct(i));
-                runnning++;
-            }          
-
-            while (runnning != 0) yield return null;
-
-            gridManager.ResetReserveListAll();
-
-            yield return new WaitForSeconds(0.5f);
-
-            //後行動敵
-            for (int n = 0; n < enemyList.Count; n++)
-            {
-                //行動回数が足りるなら動く
-                if (n < enemyList[n].actionLimit)
-                {
-                    StartCoroutine(enemyList[n].Move());
-                    runnning++;
-                }
-            }
-
-            while (runnning != 0) yield return null;
-
-            //予約をすべて削除
-            gridManager.ResetReserveListAll();
         }
     }
 

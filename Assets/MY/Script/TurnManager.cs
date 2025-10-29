@@ -33,12 +33,12 @@ public class TurnManager : MonoBehaviour
         gridManager = gameObject.GetComponent<GridManager>();
 
         //仮
-        Invoke("Call",3) ;      
+        Invoke("Call",2) ;      
     }
     //仮
     void Call()
     {
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 5; i++)
         {
             EnemySpown();
         }
@@ -51,10 +51,6 @@ public class TurnManager : MonoBehaviour
     /// <param name="enemyNum">スポーンさせたい敵の数</param>
     public bool EnemySpown()
     {
-        //スポーンしたい位置を調べる(仮)
-        int x = Random.Range(0, 8);
-        int z = Random.Range(0, 8);
-
         //gridManagerから座標もらう
         Vector2Int spownPos = gridManager.EnemySpawnCheck(GetPlayerPos());
         if (spownPos == -Vector2.one) return false;
@@ -62,7 +58,7 @@ public class TurnManager : MonoBehaviour
         //敵スポーン
         GameObject enemy = Instantiate(
             enemyPrefab,
-            new Vector3(spownPos.y, 0.6f, spownPos.x),
+            new Vector3(spownPos.y, enemyPrefab.transform.position.y, spownPos.x),
             enemyPrefab.transform.rotation
             );
 
@@ -83,7 +79,7 @@ public class TurnManager : MonoBehaviour
         enemyList.Add(enemySC);
 
         //マス状態更新
-        gridManager.ChangeCellState(z, x, CellScript.CellState.enemy, enemySC, Vector2Int.zero);
+        gridManager.ChangeCellState(spownPos.x, spownPos.y, CellScript.CellState.enemy, enemySC, Vector2Int.zero);
 
         return true;
     }
@@ -139,6 +135,8 @@ public class TurnManager : MonoBehaviour
             }          
 
             while (runnning != 0) yield return null;
+
+            gridManager.ResetReserveListAll();
 
             yield return new WaitForSeconds(0.5f);
 

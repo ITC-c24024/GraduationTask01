@@ -59,11 +59,6 @@ public class PlayerController : CharaScript
         curPos = playerPos;
     }
 
-    void Update()
-    {
-        
-    }
-
     /// <summary>
     /// プレイヤーの移動
     /// </summary>
@@ -140,7 +135,6 @@ public class PlayerController : CharaScript
         attackImage.SetActive(true);
         yield return new WaitForSeconds(0.2f);
         attackImage.SetActive(false);
-        turnManager.FinCoroutine();
     }
 
     //ダメージを受けてノックバックさせる
@@ -296,8 +290,6 @@ public class PlayerController : CharaScript
 
                 yield return null;
             }
-
-            Debug.Log($"残り行動回数:{actionLimit - i - 1}");
         }
         
         yield return new WaitForSeconds(0.5f);
@@ -326,7 +318,7 @@ public class PlayerController : CharaScript
 
         int x = (int)actionList[i].direction.x;
         int z = (int)actionList[i].direction.y;
-
+        
         if (actionList[i].a == 0) //移動
         {
             //動きを確認
@@ -350,8 +342,15 @@ public class PlayerController : CharaScript
         else //攻撃
         {
             //マスを攻撃予定にする
-            gridManager.SendDamage((int)playerPos.z + z, (int)playerPos.x + x, damage, false);
-
+            //gridManager.SendDamage((int)playerPos.z + z, (int)playerPos.x + x, damage, false);
+            //タイミング調整   
+            yield return new WaitForSeconds(0.5f);
+            turnManager.FinCoroutine();
+            yield return null;
+            yield return new WaitForSeconds(1.0f);
+            
+            //マスを攻撃予定にする
+            gridManager.SendDamage((int)playerPos.z + z, (int)playerPos.x + x, damage, false);            
             StartCoroutine(Attack(x, z));
         }
 

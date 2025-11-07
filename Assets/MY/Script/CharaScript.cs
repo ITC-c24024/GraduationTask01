@@ -33,6 +33,8 @@ public class CharaScript : MonoBehaviour
 
     //敵が攻撃だけ行う判定
     public bool attackOnly = false;
+    //移動しようとして戻る判定
+    public bool goBack = false;
 
     //現在位置
     public Vector3 curPos;
@@ -40,7 +42,8 @@ public class CharaScript : MonoBehaviour
     public Animator animator;
 
     void Start()
-    {       
+    {
+        hpSlider.transform.SetAsFirstSibling();
         hpSlider.maxValue = hp;
         hpSlider.value = hp;
         curPos = transform.position;
@@ -56,8 +59,11 @@ public class CharaScript : MonoBehaviour
             canvasRect.sizeDelta.y * viewPos.y - (canvasRect.sizeDelta.y * 0.5f)
             );
 
-        hpSlider.transform.localPosition = charaScreenPos;
-        hpSlider.transform.localScale = Vector2.one;
+        if (hpSlider != null)
+        {
+            hpSlider.transform.localPosition = charaScreenPos;
+            hpSlider.transform.localScale = Vector2.one;
+        }       
     }
 
     /// <summary>
@@ -179,12 +185,12 @@ public class CharaScript : MonoBehaviour
     }
 
     /// <summary>
-    /// プレイヤーがノックバックできないとき、攻撃だけして元の位置に戻る
+    /// 進めないとき、移動しようとして元の位置に戻る
     /// </summary>
     /// <returns></returns>
     public IEnumerator Back(Vector3 originPos)
     {
-        Vector3 startPos = curPos;
+        Vector3 startPos = transform.position;
         Vector3 targetPos = originPos;
 
         float time = 0;
@@ -212,10 +218,6 @@ public class CharaScript : MonoBehaviour
                 this,
                 new Vector2Int(0, 0)
                 );
-        //ひとつ前のマスを空にする
-        gridManager.LeaveCell((int)startPos.z, (int)startPos.x, this);
-        attackOnly = false;
-        turnManager.FinCoroutine();
     }
 
     /// <summary>
@@ -225,6 +227,41 @@ public class CharaScript : MonoBehaviour
     public virtual void ReciveDamage(int amount, Vector2 kbDir)
     {
         
+    }
+
+    /// <summary>
+    /// 死んだときの演出
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerator Dead()
+    {
+        Debug.Log("倒した");
+        //プレイヤーなら非表示
+        if (gameObject.CompareTag("Player")) hpSlider.gameObject.SetActive(false);
+        //敵ならDestroy
+        else Destroy(hpSlider.gameObject);
+
+        Vector3 startScale = transform.localScale;
+        Vector3 targetScale = Vector3.zero;
+
+        float time = 0;
+        float required = 0.5f;
+        while (time < required)
+        {
+            time += Time.deltaTime;
+
+            //現在のスケールを計算
+            Vector3 currentScale = Vector3.Lerp(startScale, targetScale, time / required);
+
+            //キャラを縮小
+            transform.localScale = currentScale;
+
+            yield return null;
+        }
+        //プレイヤーなら非表示
+        if (gameObject.CompareTag("Player")) gameObject.SetActive(false);
+        //敵ならDestroy
+        else Destroy(gameObject);
     }
 }
 

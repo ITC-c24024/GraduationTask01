@@ -14,7 +14,7 @@ public class TurnManager : MonoBehaviour
     Camera worldCamera;
 
     //スポーンした敵のList
-    List<CharaScript> enemyList = new List<CharaScript>();
+    public List<CharaScript> enemyList = new List<CharaScript>();
     [SerializeField, Header("敵Prefab")]
     GameObject enemyPrefab;
     [SerializeField, Header("敵のHPバー")]
@@ -44,12 +44,14 @@ public class TurnManager : MonoBehaviour
             EnemySpown();
         }
         StartCoroutine(TurnStart());
+
+        playerCon[0].SetPlayerState();
+        playerCon[1].SetPlayerState();
     }
 
     /// <summary>
     /// 敵をスポーン
     /// </summary>
-    /// <param name="enemyNum">スポーンさせたい敵の数</param>
     public bool EnemySpown()
     {
         //gridManagerから座標もらう
@@ -105,7 +107,8 @@ public class TurnManager : MonoBehaviour
         }
 
         //リストを並べ替え
-        enemyList.OrderByDescending(x => x.shortDir);
+        var sorted = enemyList.OrderBy(x => x.shortDir).ToList<CharaScript>();
+        enemyList = sorted;
     }
 
     /// <summary>
@@ -130,14 +133,10 @@ public class TurnManager : MonoBehaviour
         //敵行動
         for (int n = 0; n < enemyList.Count; n++)
         {
-            //行動回数が足りるなら動く
-            if (n < enemyList[n].actionLimit)
-            {
-                StartCoroutine(enemyList[n].Move());
-                runnning++;
+            StartCoroutine(enemyList[n].Move());
+            runnning++;
 
-                while (runnning != 0) yield return null;
-            }
+            while (runnning != 0) yield return null;
         }
     }
 

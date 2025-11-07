@@ -39,12 +39,14 @@ public class Enemy_AScript : CharaScript
                 if (!CanMove(targetPos))
                 {
                     Debug.Log("※範囲外です");
+                    goBack = true;
                 }
 
                 //敵がいたらせき止め
                 if (gridManager.CheckCellState((int)targetPos.z, (int)targetPos.x) == CellScript.CellState.enemy)
                 {
                     Debug.Log("進めない");
+                    goBack = true;
                 }
 
                 //プレイヤーがいる場合
@@ -69,6 +71,8 @@ public class Enemy_AScript : CharaScript
                 {
                     time += Time.deltaTime;
 
+                    //if (time >= (required / 2) && goBack) break;
+
                     //現在地を計算
                     Vector3 currentPos = Vector3.Lerp(originPos, targetPos, time / required);
 
@@ -79,14 +83,26 @@ public class Enemy_AScript : CharaScript
                 }
                 transform.position = targetPos;
                 curPos = targetPos;
+                if (goBack)
+                {
+                    StartCoroutine(Back(originPos));
+                    goBack = false;
+
+                    continue;
+                }
+
+                
 
                 if (attackOnly)
                 {
+                    attackOnly = false;
+
                     //プレイヤーに攻撃
                     gridManager.SendDamage((int)curPos.z, (int)curPos.x, damage, true);
 
                     StartCoroutine(Back(originPos));
-                    yield break;
+                    
+                    continue;
                 }
                 //プレイヤーがいたら攻撃する
                 else
@@ -111,15 +127,23 @@ public class Enemy_AScript : CharaScript
                 //ひとつ前のマスを空にする
                 gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);
             }
+            yield return new WaitForSeconds(0.2f);
         }
 
         
         if (!attackOnly) turnManager.FinCoroutine();
     }
-
+    
     public override void ReciveDamage(int amount, Vector2 kbDir)
     {
         hp -= amount;
         hpSlider.value = hp;
+
+        //HPが0になったら死亡
+        if (hp <= 0)
+        {
+            StartCoroutine(Dead());
+            turnManager.enemyList.Remove(this);
+        }
     }
 }

@@ -37,6 +37,14 @@ public class PlayerController : CharaScript
     }
 
     /// <summary>
+    /// ゲーム開始時に、マスにプレイヤーを設定
+    /// </summary>
+    public void SetPlayerState()
+    {
+        gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.player, this, default);
+    }
+
+    /// <summary>
     /// プレイヤーの移動
     /// </summary>
     /// <param name="x">x軸入力</param>
@@ -84,12 +92,11 @@ public class PlayerController : CharaScript
     //仮攻撃
     IEnumerator Attack(int x, int z)
     {
-        attackImage.transform.position = new Vector3(
-            playerPos.x + x,
-            0.1f,
-            playerPos.z + z
-            );
+        attackImage.transform.position = new Vector3(x, 0.102f, z);
         attackImage.SetActive(true);
+        //敵にダメージを与える
+        gridManager.SendDamage(z, x, damage, false, default);
+
         yield return new WaitForSeconds(0.2f);
         attackImage.SetActive(false);
     }
@@ -100,8 +107,10 @@ public class PlayerController : CharaScript
         hp -= amount;
         hpSlider.value = hp;
 
+        //HPが0なら死亡
+        if (hp <= 0) StartCoroutine(Dead());
         //ノックバックできる場合
-        if (kbDir != Vector2.zero) StartCoroutine(KnockBack(kbDir));
+        else if (kbDir != Vector2.zero) StartCoroutine(KnockBack(kbDir));
     }
 
     IEnumerator KnockBack(Vector2 kbDir)

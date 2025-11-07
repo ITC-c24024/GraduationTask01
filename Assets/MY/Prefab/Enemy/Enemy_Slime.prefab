@@ -52,16 +52,17 @@ MonoBehaviour:
   hpSlider: {fileID: 0}
   worldCamera: {fileID: 0}
   canvas: {fileID: 0}
-  hp: 100
+  hp: 20
   damage: 10
   recieveDamage: 0
-  actionLimit: 10
+  actionLimit: 5
+  shortDir: 0
   moveRule:
   - x: 0
     z: 1
   attackOnly: 0
+  goBack: 0
   curPos: {x: 0, y: 0, z: 0}
-  nextPos: {x: 0, y: 0, z: 0}
   animator: {fileID: 8265614465209262376}
 --- !u!1 &5649160074311771487
 GameObject:

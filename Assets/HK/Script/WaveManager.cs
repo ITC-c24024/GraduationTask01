@@ -34,7 +34,7 @@ public class WaveManager : MonoBehaviour
 
     void Start()
     {
-
+        StartTurn();
     }
 
     void Update()
@@ -48,22 +48,16 @@ public class WaveManager : MonoBehaviour
 
         for (int i = 0; i < spawnEnemyCount + (int)waveCount / 5; i++)
         {
-            if (allEnemyCount <= 0 && nowEnemyCount < 10)
+            if (allEnemyCount > 0 && nowEnemyCount < 10)
             {
-                if (turnManagerSC.EnemySpown())
-                {
-                    nowEnemyCount++;
-                }
+                if (turnManagerSC.EnemySpown()) nowEnemyCount++;
             }
-            else
-            {
-                break;
-            }
+            else break;
         }
         StartCoroutine(turnManagerSC.TurnStart());
     }
 
-    void FinishTurn()
+    public void FinishTurn()
     {
         if (playerCount <= 0)
         {
@@ -82,12 +76,12 @@ public class WaveManager : MonoBehaviour
     }
 
 
-    void PlayerDead()
+    public void PlayerDead()
     {
         playerCount--;
     }
 
-    void EnemyDead()
+    public void EnemyDead()
     {
         allEnemyCount--;
         nowEnemyCount--;
@@ -99,7 +93,6 @@ public class WaveManager : MonoBehaviour
         waveCount++;
         turnCount--;
         allEnemyCount = 3 + 2 * waveCount;
-
     }
 
     void GameOver()

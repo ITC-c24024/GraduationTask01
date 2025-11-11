@@ -35,17 +35,9 @@ public class Enemy_AScript : CharaScript
                     originPos.z + direction.y
                     );
 
-                //範囲外の時
+                //範囲外の時、敵がいるとき
                 if (!CanMove(targetPos))
                 {
-                    Debug.Log("※範囲外です");
-                    goBack = true;
-                }
-
-                //敵がいたらせき止め
-                if (gridManager.CheckCellState((int)targetPos.z, (int)targetPos.x) == CellScript.CellState.enemy)
-                {
-                    Debug.Log("進めない");
                     goBack = true;
                 }
 

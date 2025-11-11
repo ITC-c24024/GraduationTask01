@@ -12,7 +12,7 @@ public class GridManager : MonoBehaviour
 
     CellScript[,] cellSC;
 
-    void Start()
+    void Awake()
     {
         cellSC = new CellScript[width, height];//”z—ñ‰Šú‰»
 

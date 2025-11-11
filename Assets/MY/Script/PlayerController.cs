@@ -96,12 +96,13 @@ public class PlayerController : CharaScript
     }
 
     //仮攻撃
-    IEnumerator Attack(int x, int z)
+    IEnumerator Attack(int x, int z,int amount)
     {
+        Debug.Log("アタック");
         attackImage.transform.position = new Vector3(x, 0.102f, z);
         attackImage.SetActive(true);
         //敵にダメージを与える
-        gridManager.SendDamage(z, x, damage, false, default);
+        gridManager.SendDamage(z, x, amount, false, default);
 
         yield return new WaitForSeconds(0.2f);
         attackImage.SetActive(false);
@@ -163,21 +164,23 @@ public class PlayerController : CharaScript
     /// 四方に攻撃
     /// </summary>
     public void SurrundAttack()
-    {
+    {      
         //隣接敵の位置
         var enemyPos = new List<Vector2>();
         //四方に敵がいるか確認
-        for (int i = -1; i <= 1 && i != 0; i++)
+        for (int i = -1; i <= 1; i++) 
         {
             Vector2 checkPos = new Vector2(playerPos.x + i, playerPos.z);
-            if(gridManager.CheckCellState((int)checkPos.y, (int)checkPos.x) == CellScript.CellState.enemy)
+            if (checkPos.x < 0 || 7 < checkPos.x || i == 0) continue;
+            if (gridManager.CheckCellState((int)checkPos.y, (int)checkPos.x) == CellScript.CellState.enemy)
             {
                 enemyPos.Add(checkPos);
             }        
         }
-        for (int i = -1; i <= 1 && i != 0; i++)
+        for (int i = -1; i <= 1; i++) 
         {
             Vector2 checkPos = new Vector2(playerPos.x, playerPos.z + i);
+            if (checkPos.y < 0 || 7 < checkPos.y || i == 0) continue;
             if (gridManager.CheckCellState((int)checkPos.y, (int)checkPos.x) == CellScript.CellState.enemy)
             {
                 enemyPos.Add(checkPos);
@@ -189,8 +192,12 @@ public class PlayerController : CharaScript
 
         foreach (var item in enemyPos)
         {
-            StartCoroutine(Attack((int)item.x, (int)item.y));
+            Debug.Log("十字攻撃");
+            //敵にダメージを与える
+            StartCoroutine(Attack((int)item.x, (int)item.y, combo));
         }
+
+        turnManager.FinCoroutine();
     }
 
     /// <summary>
@@ -289,12 +296,11 @@ public class PlayerController : CharaScript
 
                 yield return null;
             }
+            squareSC.DeleteSquare();
         }        
         yield return new WaitForSeconds(0.5f);
         squareSC.DeleteSquare();
 
-        SurrundAttack();
-
-        turnManager.FinCoroutine();
+        SurrundAttack();   
     }
 }

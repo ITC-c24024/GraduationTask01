@@ -143,6 +143,18 @@ public class TurnManager : MonoBehaviour
             while (runnning != 0) yield return null;
         }
 
+        //UŒ‚
+        for (int i = 0; i < playerCon.Length; i++)
+        {
+            if (playerCon[i].alive)
+            {
+                playerCon[i].SurrundAttack();
+                runnning++;
+            }
+        }
+
+        while (runnning != 0) yield return null;
+
         //ƒ^[ƒ“I—¹
         waveManager.FinishTurn();
     }

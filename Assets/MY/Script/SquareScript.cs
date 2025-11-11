@@ -49,10 +49,16 @@ public class SquareScript : MonoBehaviour
         for (int i = -1; i <= 1; i++)
         {
             float posX = playerPos.x + i;
+            if (posX < 0 || 7 < posX) continue;
             var isEnemy = gridManager.CheckCellState((int)playerPos.z, (int)posX) == CellScript.CellState.enemy;
-            if (0 <= posX && posX <= 7 && i != 0 && !isEnemy)
+            if (i != 0 && !isEnemy)
             {
-                squares[n].transform.position = new Vector3(posX, squarePosY, playerPos.z);
+                squares[n].transform.position = new Vector3(playerPos.x + i*2/3f, squarePosY, playerPos.z);
+                squares[n].transform.localEulerAngles = new Vector3(
+                    squares[n].transform.localEulerAngles.x,
+                    GetAngle(i, 0),
+                    squares[n].transform.localEulerAngles.z
+                    );
                 squares[n].SetActive(true);
                 n++;
             }
@@ -60,14 +66,36 @@ public class SquareScript : MonoBehaviour
         for (int i = -1; i <= 1; i++)
         {            
             float posZ = playerPos.z + i;
+            if (posZ < 0 || 7 < posZ) continue;
             var isEnemy = gridManager.CheckCellState((int)posZ, (int)playerPos.x) == CellScript.CellState.enemy;
-            if (0 <= posZ && posZ <= 7 && i != 0 && !isEnemy)
+            if (i != 0 && !isEnemy)
             {
-                squares[n].transform.position = new Vector3(playerPos.x, squarePosY, posZ);
+                squares[n].transform.position = new Vector3(playerPos.x, squarePosY, playerPos.z + i * 2 / 3f);
+                squares[n].transform.localEulerAngles = new Vector3(
+                    squares[n].transform.localEulerAngles.x,
+                    GetAngle(0, i),
+                    squares[n].transform.localEulerAngles.z
+                    );
                 squares[n].SetActive(true);
                 n++;
             }
         }
+    }
+
+    /// <summary>
+    /// Imageの向きを計算
+    /// </summary>
+    /// <param name="direction">選んだマスの方向</param>
+    /// <returns>Imageの向き</returns>
+    int GetAngle(int x,int y)
+    {
+        int angle = 0;
+        if (x > 0) angle = 90;
+        else if (x < 0) angle = -90;
+        else if (y > 0) angle = 0;
+        else if (y < 0) angle = 180;
+
+        return angle;
     }
 
     /// <summary>
@@ -78,12 +106,24 @@ public class SquareScript : MonoBehaviour
     public void SelectImage(Vector3 playerPos, Vector2 direction)
     {
         Vector3 selectPos = new Vector3(
-            playerPos.x + direction.x,
-            squarePosY,
-            playerPos.z + direction.y
+            playerPos.x + direction.x/2,
+            selectObj.transform.position.y,
+            playerPos.z + direction.y/2
             );
 
         selectObj.transform.position = selectPos;
+
+        int angle = 0;
+        if (direction.x > 0) angle = 90;
+        else if (direction.x < 0) angle = -90;
+        else if (direction.y > 0) angle = 0;
+        else if (direction.y < 0) angle = 180;
+
+        selectObj.transform.localEulerAngles = new Vector3(
+            selectObj.transform.localEulerAngles.x, 
+            angle, 
+            selectObj.transform.localEulerAngles.z
+            );
 
         selectObj.SetActive(true);
     }

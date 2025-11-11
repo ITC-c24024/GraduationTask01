@@ -79,6 +79,8 @@ public class CharaScript : MonoBehaviour
         float posZ = targetPos.z;
         if (posX < 0 || 7 < posX) return false;
         else if (posZ < 0 || 7 < posZ) return false;
+        //‚Ù‚©‚Ì“G‚ª‚¢‚È‚¢‚©’²‚×‚é
+        else if (gridManager.CheckCellState((int)posZ, (int)posX) == CellScript.CellState.enemy) return false;
         else return true;
     }
 
@@ -258,6 +260,9 @@ public class CharaScript : MonoBehaviour
 
             yield return null;
         }
+
+        gridManager.LeaveCell((int)curPos.z, (int)curPos.x, this);
+
         //ƒvƒŒƒCƒ„[‚È‚ç”ñ•\Ž¦
         if (gameObject.CompareTag("Player")) gameObject.SetActive(false);
         //“G‚È‚çDestroy

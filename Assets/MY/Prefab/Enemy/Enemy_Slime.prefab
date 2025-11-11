@@ -55,7 +55,7 @@ MonoBehaviour:
   hp: 20
   damage: 10
   recieveDamage: 0
-  actionLimit: 5
+  actionLimit: 1
   shortDir: 0
   moveRule:
   - x: 0

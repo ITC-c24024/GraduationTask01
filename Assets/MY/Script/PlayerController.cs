@@ -21,7 +21,8 @@ public class PlayerController : CharaScript
 
     //プレイヤーの位置
     public Vector3 playerPos;
-
+    //生存判定
+    public bool alive = true;
     //移動中判定
     bool isMove = false;
 
@@ -34,6 +35,11 @@ public class PlayerController : CharaScript
 
         playerPos = transform.position;
         curPos = playerPos;
+    }
+
+    void Start()
+    {
+        SetPlayerState();
     }
 
     /// <summary>
@@ -108,7 +114,11 @@ public class PlayerController : CharaScript
         hpSlider.value = hp;
 
         //HPが0なら死亡
-        if (hp <= 0) StartCoroutine(Dead());
+        if (hp <= 0)
+        {
+            alive = false;
+            StartCoroutine(Dead());
+        }
         //ノックバックできる場合
         else if (kbDir != Vector2.zero) StartCoroutine(KnockBack(kbDir));
     }
@@ -147,6 +157,40 @@ public class PlayerController : CharaScript
         //マス更新
         gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.player, this, default);
         gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);
+    }
+
+    /// <summary>
+    /// 四方に攻撃
+    /// </summary>
+    public void SurrundAttack()
+    {
+        //隣接敵の位置
+        var enemyPos = new List<Vector2>();
+        //四方に敵がいるか確認
+        for (int i = -1; i <= 1 && i != 0; i++)
+        {
+            Vector2 checkPos = new Vector2(playerPos.x + i, playerPos.z);
+            if(gridManager.CheckCellState((int)checkPos.y, (int)checkPos.x) == CellScript.CellState.enemy)
+            {
+                enemyPos.Add(checkPos);
+            }        
+        }
+        for (int i = -1; i <= 1 && i != 0; i++)
+        {
+            Vector2 checkPos = new Vector2(playerPos.x, playerPos.z + i);
+            if (gridManager.CheckCellState((int)checkPos.y, (int)checkPos.x) == CellScript.CellState.enemy)
+            {
+                enemyPos.Add(checkPos);
+            }
+        }
+
+        //隣接している敵の数に応じて攻撃力UP
+        int combo = damage * enemyPos.Count;
+
+        foreach (var item in enemyPos)
+        {
+            StartCoroutine(Attack((int)item.x, (int)item.y));
+        }
     }
 
     /// <summary>
@@ -232,6 +276,7 @@ public class PlayerController : CharaScript
                     
                     isInput = true;
                 }
+                /*
                 //攻撃入力
                 else if (attack && direction != Vector2.zero && !isInput)
                 {
@@ -240,12 +285,15 @@ public class PlayerController : CharaScript
                     
                     isInput = true;
                 }
+                */
 
                 yield return null;
             }
         }        
         yield return new WaitForSeconds(0.5f);
         squareSC.DeleteSquare();
+
+        SurrundAttack();
 
         turnManager.FinCoroutine();
     }

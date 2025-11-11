@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class SquareScript : MonoBehaviour
 {
+    [SerializeField] GridManager gridManager;
+    
     [SerializeField, Header("選択可能マスイメージ")]
     GameObject[] squares;
     [SerializeField, Header("マス選択中イメージ")]
@@ -47,7 +49,8 @@ public class SquareScript : MonoBehaviour
         for (int i = -1; i <= 1; i++)
         {
             float posX = playerPos.x + i;
-            if (0 <= posX && posX <= 7 && i != 0)
+            var isEnemy = gridManager.CheckCellState((int)playerPos.z, (int)posX) == CellScript.CellState.enemy;
+            if (0 <= posX && posX <= 7 && i != 0 && !isEnemy)
             {
                 squares[n].transform.position = new Vector3(posX, squarePosY, playerPos.z);
                 squares[n].SetActive(true);
@@ -57,7 +60,8 @@ public class SquareScript : MonoBehaviour
         for (int i = -1; i <= 1; i++)
         {            
             float posZ = playerPos.z + i;
-            if (0 <= posZ && posZ <= 7 && i != 0)
+            var isEnemy = gridManager.CheckCellState((int)posZ, (int)playerPos.x) == CellScript.CellState.enemy;
+            if (0 <= posZ && posZ <= 7 && i != 0 && !isEnemy)
             {
                 squares[n].transform.position = new Vector3(playerPos.x, squarePosY, posZ);
                 squares[n].SetActive(true);

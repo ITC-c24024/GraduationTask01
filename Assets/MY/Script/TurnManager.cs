@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class TurnManager : MonoBehaviour
 {
+    [SerializeField] WaveManager waveManager;
     [SerializeField] PlayerController[] playerCon;
     GridManager gridManager;   
     [SerializeField] CellScript cellScript;
@@ -27,14 +28,13 @@ public class TurnManager : MonoBehaviour
     void Awake()
     {
         Application.targetFrameRate = 30;
+        gridManager = gameObject.GetComponent<GridManager>();
     }
 
     void Start()
     {        
-        gridManager = gameObject.GetComponent<GridManager>();
-
         //仮
-        Invoke("Call",2) ;      
+        //Invoke("Call",2) ;      
     }
     //仮
     void Call()
@@ -118,10 +118,14 @@ public class TurnManager : MonoBehaviour
     public IEnumerator TurnStart()
     {
         //行動選択
-        StartCoroutine(playerCon[0].SelectAction());
-        runnning++;
-        StartCoroutine(playerCon[1].SelectAction());
-        runnning++;
+        for(int i = 0; i < playerCon.Length; i++)
+        {
+            if (playerCon[i].alive)
+            {
+                StartCoroutine(playerCon[i].SelectAction());
+                runnning++;
+            }
+        }
 
         while (runnning != 0) yield return null;
 
@@ -138,6 +142,9 @@ public class TurnManager : MonoBehaviour
 
             while (runnning != 0) yield return null;
         }
+
+        //ターン終了
+        waveManager.FinishTurn();
     }
 
     public Vector3[] GetPlayerPos()

@@ -25,12 +25,12 @@
                 },
                 {
                     "name": "SelectMove",
-                    "type": "Button",
+                    "type": "Value",
                     "id": "96647f8f-41c2-4dc4-95ef-d828c1a74702",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Pose",
@@ -171,17 +171,6 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
-                    "action": "SelectMove",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "71c918d3-b9ae-40cf-a9e3-3b3d4f807ca7",
-                    "path": "<Gamepad>/{SecondaryAction}",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard&Mouse",
                     "action": "SelectMove",
                     "isComposite": false,
                     "isPartOfComposite": false

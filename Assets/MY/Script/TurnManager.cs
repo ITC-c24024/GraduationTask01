@@ -150,7 +150,7 @@ public class TurnManager : MonoBehaviour
         {
             if (playerCon[i].alive)
             {
-                playerCon[i].SurrundAttack();
+                StartCoroutine(playerCon[i].SurrundAttack());
                 runnning++;
             }
         }

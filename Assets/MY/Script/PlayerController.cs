@@ -69,6 +69,7 @@ public class PlayerController : CharaScript
             );
 
         animator.SetBool("IsWalk", true);
+        shadowAnim.SetBool("IsWalk", true);
         float time = 0;
         float required = 0.5f;
         while (time < required)
@@ -87,6 +88,7 @@ public class PlayerController : CharaScript
         playerPos = transform.position;
         curPos = playerPos;
         animator.SetBool("IsWalk", false);
+        shadowAnim.SetBool("IsWalk", false);
 
         gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.player, this, default);
         //Œ³‹‚½ƒ}ƒX‚ğ‹ó‚É‚·‚é
@@ -95,13 +97,13 @@ public class PlayerController : CharaScript
         isMove = false;
     }
 
-    //‰¼UŒ‚
+    //UŒ‚
     IEnumerator Attack(int x, int z,int amount)
-    {
+    {       
         animator.SetTrigger("IsAttack");
+        shadowAnim.SetTrigger("IsAttack");
 
-        attackImage.transform.position = new Vector3(x, 0.102f, z);
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.8f);
 
         //“G‚Éƒ_ƒ[ƒW‚ğ—^‚¦‚é
         gridManager.SendDamage(z, x, amount, false, default);
@@ -164,7 +166,7 @@ public class PlayerController : CharaScript
     /// <summary>
     /// l•û‚ÉUŒ‚
     /// </summary>
-    public void SurrundAttack()
+    public IEnumerator SurrundAttack()
     {      
         //—×Ú“G‚ÌˆÊ’u
         var enemyPos = new List<Vector2>();
@@ -195,10 +197,10 @@ public class PlayerController : CharaScript
         {   
             //“G‚Éƒ_ƒ[ƒW‚ğ—^‚¦‚é
             StartCoroutine(Attack((int)enemyPos[i].x, (int)enemyPos[i].y, combo));
+            yield return new WaitForSeconds(1.0f);
         }
 
-        //if (enemyPos.Count == 0) 
-            turnManager.FinCoroutine();
+        turnManager.FinCoroutine();
     }
 
     /// <summary>
@@ -302,6 +304,6 @@ public class PlayerController : CharaScript
         yield return new WaitForSeconds(0.5f);
         squareSC.DeleteSquare();
 
-        SurrundAttack();   
+        StartCoroutine(SurrundAttack());   
     }
 }

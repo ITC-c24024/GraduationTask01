@@ -62,6 +62,7 @@ public class Enemy_AScript : CharaScript
 
                 //’ÊíˆÚ“®
                 animator.SetTrigger("IsAttack");
+                shadowAnim.SetTrigger("IsAttack");
                 float time = 0;
                 float required = 0.5f / moveRule.Length;
                 while (time < required)
@@ -84,9 +85,7 @@ public class Enemy_AScript : CharaScript
                     goBack = false;
 
                     continue;
-                }
-
-                
+                }             
 
                 if (attackOnly)
                 {
@@ -122,9 +121,10 @@ public class Enemy_AScript : CharaScript
                 //‚Ğ‚Æ‚Â‘O‚Ìƒ}ƒX‚ğ‹ó‚É‚·‚é
                 gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);
             }
+            DeleteImage();
             yield return new WaitForSeconds(0.2f);
         }
-
+        
         
         if (!attackOnly) turnManager.FinCoroutine();
     }

@@ -5,7 +5,7 @@ using UnityEngine;
 public class SquareScript : MonoBehaviour
 {
     [SerializeField] GridManager gridManager;
-    
+
     [SerializeField, Header("選択可能マスイメージ")]
     GameObject[] squares;
     [SerializeField, Header("マス選択中イメージ")]
@@ -106,9 +106,9 @@ public class SquareScript : MonoBehaviour
     public void SelectImage(Vector3 playerPos, Vector2 direction)
     {
         Vector3 selectPos = new Vector3(
-            playerPos.x + direction.x/2,
+            playerPos.x + direction.x*2/3,
             selectObj.transform.position.y,
-            playerPos.z + direction.y/2
+            playerPos.z + direction.y*2/3
             );
 
         selectObj.transform.position = selectPos;

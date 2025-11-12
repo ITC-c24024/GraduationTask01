@@ -12,6 +12,8 @@ public class CharaScript : MonoBehaviour
     public CellScript cellScript;
 
     public GameObject charaImage;
+    public GameObject attackImage;
+    public GameObject arrowImage;
     public Slider hpSlider;
     public Camera worldCamera;
     public Canvas canvas;
@@ -36,8 +38,13 @@ public class CharaScript : MonoBehaviour
     //移動しようとして戻る判定
     public bool goBack = false;
 
+    //移動方向
+    public Vector2 targetDir;
+
     //現在位置
     public Vector3 curPos;
+    //移動予定位置
+    public Vector3 movePos;
 
     public Animator animator;
 
@@ -175,6 +182,58 @@ public class CharaScript : MonoBehaviour
                 );
 
         return moveDir;
+    }
+
+    /// <summary>
+    /// 進む予定のマスを決める
+    /// </summary>
+    public void SetTargetPos()
+    {
+        //現在位置を移動開始位置とする
+        Vector3 startPos = curPos;
+
+        //プレイヤーの位置を見て、どのプレイヤーについていくか決める
+        Vector3 playerPos = SelectPlayer();
+
+        //移動開始位置からプレイヤーの位置に行くためにどの方向に行けばいいか決める
+        targetDir = GetDirection(playerPos, startPos, 0);
+
+        Vector3 originPos = curPos;
+
+        //進む位置
+        movePos = new Vector3(
+            originPos.x + targetDir.x,
+            originPos.y,
+            originPos.z + targetDir.y
+            );
+        /*
+        attackState.transform.localPosition = new Vector3(
+            movePos.x, 
+            attackState.transform.localPosition.y,
+            movePos.z
+            );
+        */
+    }
+
+    /// <summary>
+    /// 敵の攻撃予定地を表示
+    /// </summary>
+    public void AttackState()
+    {
+        //攻撃予定位置を表示
+        attackImage.transform.localPosition = new Vector3(movePos.x, 0.101f, movePos.z);
+        attackImage.SetActive(true);
+
+        //矢印イメージを表示
+        arrowImage.transform.localPosition= new Vector3(movePos.x - (targetDir.x / 2), 0.101f, movePos.z - (targetDir.y / 2));
+        
+        int angle = 0;
+        if (targetDir.x > 0) angle = 90;
+        else if (targetDir.x < 0) angle = -90;
+        else if (targetDir.y > 0) angle = 0;
+        else if (targetDir.y < 0) angle = 180;
+        arrowImage.transform.localEulerAngles = new Vector3(arrowImage.transform.localEulerAngles.x, angle, arrowImage.transform.localEulerAngles.z);
+        arrowImage.SetActive(true);     
     }
 
     /// <summary>

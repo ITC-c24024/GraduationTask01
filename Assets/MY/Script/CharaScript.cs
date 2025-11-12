@@ -47,6 +47,7 @@ public class CharaScript : MonoBehaviour
     public Vector3 movePos;
 
     public Animator animator;
+    public Animator shadowAnim;
 
     void Start()
     {
@@ -206,13 +207,6 @@ public class CharaScript : MonoBehaviour
             originPos.y,
             originPos.z + targetDir.y
             );
-        /*
-        attackState.transform.localPosition = new Vector3(
-            movePos.x, 
-            attackState.transform.localPosition.y,
-            movePos.z
-            );
-        */
     }
 
     /// <summary>
@@ -234,6 +228,15 @@ public class CharaScript : MonoBehaviour
         else if (targetDir.y < 0) angle = 180;
         arrowImage.transform.localEulerAngles = new Vector3(arrowImage.transform.localEulerAngles.x, angle, arrowImage.transform.localEulerAngles.z);
         arrowImage.SetActive(true);     
+    }
+
+    /// <summary>
+    /// çUåÇUIÇîÒï\é¶
+    /// </summary>
+    public void DeleteImage()
+    {
+        attackImage.gameObject.SetActive(false);
+        arrowImage.gameObject.SetActive(false);
     }
 
     /// <summary>
@@ -296,11 +299,15 @@ public class CharaScript : MonoBehaviour
     /// <returns></returns>
     public IEnumerator Dead()
     {
-        Debug.Log("ì|ÇµÇΩ");
         //ÉvÉåÉCÉÑÅ[Ç»ÇÁîÒï\é¶
         if (gameObject.CompareTag("Player")) hpSlider.gameObject.SetActive(false);
         //ìGÇ»ÇÁDestroy
-        else Destroy(hpSlider.gameObject);
+        else
+        {
+            Destroy(attackImage);
+            Destroy(arrowImage);
+            Destroy(hpSlider.gameObject);
+        }
 
         Vector3 startScale = transform.localScale;
         Vector3 targetScale = Vector3.zero;

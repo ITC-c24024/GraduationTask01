@@ -129,7 +129,8 @@ public class PlayerController : CharaScript
 
     IEnumerator KnockBack(Vector2 kbDir)
     {
-        Debug.Log("KB");
+        animator.SetTrigger("IsKB");
+        shadowAnim.SetTrigger("IsKB");
 
         //Œ³‚ÌˆÊ’u
         Vector3 originPos = playerPos;

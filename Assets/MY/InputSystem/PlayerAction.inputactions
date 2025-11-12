@@ -177,6 +177,17 @@
                 },
                 {
                     "name": "",
+                    "id": "7d05b80e-0517-4b1d-b331-2d0a27cd2549",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SelectMove",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "3253e894-c332-454d-ad04-24ccd1528728",
                     "path": "<SwitchProControllerHID>/start",
                     "interactions": "",

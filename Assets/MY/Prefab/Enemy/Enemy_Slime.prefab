@@ -52,6 +52,7 @@ MonoBehaviour:
   hpSlider: {fileID: 0}
   worldCamera: {fileID: 0}
   canvas: {fileID: 0}
+  attackState: {fileID: 0}
   hp: 20
   damage: 10
   recieveDamage: 0
@@ -62,7 +63,9 @@ MonoBehaviour:
     z: 1
   attackOnly: 0
   goBack: 0
+  targetDir: {x: 0, y: 0}
   curPos: {x: 0, y: 0, z: 0}
+  movePos: {x: 0, y: 0, z: 0}
   animator: {fileID: 8265614465209262376}
 --- !u!1 &5649160074311771487
 GameObject:

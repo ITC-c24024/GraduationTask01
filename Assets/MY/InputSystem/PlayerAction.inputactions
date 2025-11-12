@@ -177,6 +177,17 @@
                 },
                 {
                     "name": "",
+                    "id": "71c918d3-b9ae-40cf-a9e3-3b3d4f807ca7",
+                    "path": "<Gamepad>/{SecondaryAction}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "SelectMove",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "3253e894-c332-454d-ad04-24ccd1528728",
                     "path": "<SwitchProControllerHID>/start",
                     "interactions": "",

@@ -16,6 +16,10 @@ public class TurnManager : MonoBehaviour
 
     //ƒXƒ|[ƒ“‚µ‚½“G‚ÌList
     public List<CharaScript> enemyList = new List<CharaScript>();
+    [SerializeField, Header("“G‚ÌUŒ‚—\’èƒCƒ[ƒW")]
+    GameObject attackImage;
+    [SerializeField, Header("“G‚ÌUŒ‚•ûŒüƒCƒ[ƒW")]
+    GameObject arrowImage;
     [SerializeField, Header("“GPrefab")]
     GameObject enemyPrefab;
     [SerializeField, Header("“G‚ÌHPƒo[")]
@@ -33,20 +37,7 @@ public class TurnManager : MonoBehaviour
 
     void Start()
     {        
-        //‰¼
-        //Invoke("Call",2) ;      
-    }
-    //‰¼
-    void Call()
-    {
-        for (int i = 0; i < 5; i++)
-        {
-            EnemySpown();
-        }
-        StartCoroutine(TurnStart());
-
-        playerCon[0].SetPlayerState();
-        playerCon[1].SetPlayerState();
+         
     }
 
     /// <summary>
@@ -77,6 +68,8 @@ public class TurnManager : MonoBehaviour
         enemySC.hpSlider = slider;
         enemySC.worldCamera = worldCamera;
         enemySC.canvas = canvas;
+        enemySC.attackImage = Instantiate(attackImage);
+        enemySC.arrowImage = Instantiate(arrowImage);
 
         //List‚É’Ç‰Á
         enemyList.Add(enemySC);
@@ -117,8 +110,17 @@ public class TurnManager : MonoBehaviour
     /// <returns></returns>
     public IEnumerator TurnStart()
     {
+        yield return null;
+
+        //“G‚Ìs“®—\’è’n‚ğİ’è
+        for (int n = 0; n < enemyList.Count; n++)
+        {
+            enemyList[n].SetTargetPos();
+            enemyList[n].AttackState();
+        }
+
         //s“®‘I‘ğ
-        for(int i = 0; i < playerCon.Length; i++)
+        for (int i = 0; i < playerCon.Length; i++)
         {
             if (playerCon[i].alive)
             {

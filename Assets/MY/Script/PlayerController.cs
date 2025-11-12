@@ -9,9 +9,6 @@ public class PlayerController : CharaScript
 {
     [SerializeField] SquareScript squareSC;
 
-    [SerializeField, Header("攻撃イメージ")]//仮
-    GameObject attackImage;
-
     //ノックバック方向
     Vector2 kbDirection;
 
@@ -36,10 +33,13 @@ public class PlayerController : CharaScript
         playerPos = transform.position;
         curPos = playerPos;
     }
-
+    
     void Start()
     {
         SetPlayerState();
+
+        hpSlider.maxValue = hp;
+        hpSlider.value = hp;
     }
 
     /// <summary>
@@ -98,14 +98,15 @@ public class PlayerController : CharaScript
     //仮攻撃
     IEnumerator Attack(int x, int z,int amount)
     {
-        Debug.Log("アタック");
+        animator.SetTrigger("IsAttack");
+
         attackImage.transform.position = new Vector3(x, 0.102f, z);
-        attackImage.SetActive(true);
+        yield return new WaitForSeconds(0.5f);
+
         //敵にダメージを与える
         gridManager.SendDamage(z, x, amount, false, default);
 
         yield return new WaitForSeconds(0.2f);
-        attackImage.SetActive(false);
     }
 
     //ダメージを受けてノックバックさせる
@@ -190,14 +191,14 @@ public class PlayerController : CharaScript
         //隣接している敵の数に応じて攻撃力UP
         int combo = damage * enemyPos.Count;
 
-        foreach (var item in enemyPos)
-        {
-            Debug.Log("十字攻撃");
+        for (int i = 0; i < enemyPos.Count; i++)
+        {   
             //敵にダメージを与える
-            StartCoroutine(Attack((int)item.x, (int)item.y, combo));
+            StartCoroutine(Attack((int)enemyPos[i].x, (int)enemyPos[i].y, combo));
         }
 
-        turnManager.FinCoroutine();
+        //if (enemyPos.Count == 0) 
+            turnManager.FinCoroutine();
     }
 
     /// <summary>

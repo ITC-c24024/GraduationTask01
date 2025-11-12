@@ -14,26 +14,31 @@ public class Enemy_AScript : CharaScript
         //行動回数分
         for(int n = 0; n < actionLimit; n++)
         {
+            /*
             //現在位置を移動開始位置とする
             Vector3 startPos = curPos;
 
             //プレイヤーの位置を見て、どのプレイヤーについていくか決める
             Vector3 playerPos = SelectPlayer();
-            
+            */
             //1行動
             for (int i = 0; i < moveRule.Length; i++)
             {
+                /*
                 //移動開始位置からプレイヤーの位置に行くためにどの方向に行けばいいか決める
                 Vector2 direction = GetDirection(playerPos, startPos, i);
-
+                */
                 Vector3 originPos = curPos;
-
+                /*
                 //進む位置
                 Vector3 targetPos = new Vector3(
                     originPos.x + direction.x,
                     originPos.y,
                     originPos.z + direction.y
                     );
+                */
+
+                Vector3 targetPos = movePos;
 
                 //範囲外の時、敵がいるとき
                 if (!CanMove(targetPos))
@@ -50,7 +55,7 @@ public class Enemy_AScript : CharaScript
                           (int)targetPos.x,
                           CellScript.CellState.enemy,
                           this,
-                          new Vector2Int((int)direction.x, (int)direction.y)
+                          new Vector2Int((int)targetDir.x, (int)targetDir.y)
                           );
                     if (!result.canMove) attackOnly = true;
                 }
@@ -62,8 +67,6 @@ public class Enemy_AScript : CharaScript
                 while (time < required)
                 {
                     time += Time.deltaTime;
-
-                    //if (time >= (required / 2) && goBack) break;
 
                     //現在地を計算
                     Vector3 currentPos = Vector3.Lerp(originPos, targetPos, time / required);
@@ -104,7 +107,7 @@ public class Enemy_AScript : CharaScript
                         (int)curPos.x,
                         damage,
                         true,
-                        new Vector2Int((int)direction.x, (int)direction.y)
+                        new Vector2Int((int)targetDir.x, (int)targetDir.y)
                         );
                 }
 
@@ -114,7 +117,7 @@ public class Enemy_AScript : CharaScript
                     (int)curPos.x,
                     CellScript.CellState.enemy,
                     this,
-                    new Vector2Int((int)direction.x, (int)direction.y)
+                    new Vector2Int((int)targetDir.x, (int)targetDir.y)
                     );
                 //ひとつ前のマスを空にする
                 gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);

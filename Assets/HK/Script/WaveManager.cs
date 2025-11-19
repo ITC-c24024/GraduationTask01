@@ -32,6 +32,9 @@ public class WaveManager : MonoBehaviour
     [SerializeField, Header("ターンマネージャースクリプト")]
     TurnManager turnManagerSC;
 
+    [SerializeField, Header("UIスクリプト")]
+    StartUIScript startUISC;
+
     void Start()
     {
 
@@ -40,6 +43,12 @@ public class WaveManager : MonoBehaviour
     void Update()
     {
 
+    }
+
+    public void StartWave()
+    {
+
+        StartTurn();
     }
 
     public void StartTurn()

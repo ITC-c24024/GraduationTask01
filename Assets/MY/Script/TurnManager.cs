@@ -10,6 +10,7 @@ public class TurnManager : MonoBehaviour
     [SerializeField] PlayerController[] playerCon;
     GridManager gridManager;   
     [SerializeField] CellScript cellScript;
+    StartUIScript startUIScript;
 
     [SerializeField, Header("ワールドカメラ")]
     Camera worldCamera;
@@ -33,6 +34,7 @@ public class TurnManager : MonoBehaviour
     {
         Application.targetFrameRate = 30;
         gridManager = gameObject.GetComponent<GridManager>();
+        startUIScript = gameObject.GetComponent<StartUIScript>();
     }
 
     void Start()
@@ -62,6 +64,7 @@ public class TurnManager : MonoBehaviour
 
         //必要なコンポーネントを取得
         CharaScript enemySC = enemy.GetComponent<CharaScript>();
+        enemySC.waveManager = waveManager;
         enemySC.turnManager = this;
         enemySC.gridManager = gridManager;
         enemySC.cellScript = cellScript;
@@ -110,7 +113,9 @@ public class TurnManager : MonoBehaviour
     /// <returns></returns>
     public IEnumerator TurnStart()
     {
-        yield return null;
+        StartCoroutine(startUIScript.SetUI(1));
+
+        yield return new WaitForSeconds(1.5f);
 
         //敵の行動予定地を設定
         for (int n = 0; n < enemyList.Count; n++)
@@ -119,7 +124,7 @@ public class TurnManager : MonoBehaviour
             enemyList[n].AttackState();
         }
 
-        //行動選択
+        //プレイヤーの行動選択
         for (int i = 0; i < playerCon.Length; i++)
         {
             if (playerCon[i].alive)
@@ -136,7 +141,7 @@ public class TurnManager : MonoBehaviour
         //距離順並べ替え
         SortEnemy();
 
-        //敵行動
+        //敵の行動
         for (int n = 0; n < enemyList.Count; n++)
         {
             StartCoroutine(enemyList[n].Move());
@@ -145,7 +150,7 @@ public class TurnManager : MonoBehaviour
             while (runnning != 0) yield return null;
         }
 
-        //攻撃
+        //プレイヤーの攻撃
         for (int i = 0; i < playerCon.Length; i++)
         {
             if (playerCon[i].alive)
@@ -156,6 +161,8 @@ public class TurnManager : MonoBehaviour
         }
 
         while (runnning != 0) yield return null;
+
+        yield return new WaitForSeconds(1.0f);
 
         //ターン終了
         waveManager.FinishTurn();

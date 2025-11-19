@@ -7,6 +7,7 @@ using UnityEngine.UI;
 
 public class CharaScript : MonoBehaviour
 {
+    public WaveManager waveManager;
     public TurnManager turnManager;
     public GridManager gridManager;
     public CellScript cellScript;
@@ -71,7 +72,7 @@ public class CharaScript : MonoBehaviour
         {
             hpSlider.transform.localPosition = charaScreenPos;
             hpSlider.transform.localScale = Vector2.one;
-        }       
+        }
     }
 
     /// <summary>
@@ -219,15 +220,15 @@ public class CharaScript : MonoBehaviour
         attackImage.SetActive(true);
 
         //矢印イメージを表示
-        arrowImage.transform.localPosition= new Vector3(movePos.x - (targetDir.x / 2), 0.101f, movePos.z - (targetDir.y / 2));
-        
+        arrowImage.transform.localPosition = new Vector3(movePos.x - (targetDir.x / 2), 0.101f, movePos.z - (targetDir.y / 2));
+
         int angle = 0;
         if (targetDir.x > 0) angle = 90;
         else if (targetDir.x < 0) angle = -90;
         else if (targetDir.y > 0) angle = 0;
         else if (targetDir.y < 0) angle = 180;
         arrowImage.transform.localEulerAngles = new Vector3(arrowImage.transform.localEulerAngles.x, angle, arrowImage.transform.localEulerAngles.z);
-        arrowImage.SetActive(true);     
+        arrowImage.SetActive(true);
     }
 
     /// <summary>
@@ -290,7 +291,7 @@ public class CharaScript : MonoBehaviour
     /// <param name="amount">被ダメージ</param>
     public virtual void ReciveDamage(int amount, Vector2 kbDir)
     {
-        
+
     }
 
     /// <summary>
@@ -330,9 +331,17 @@ public class CharaScript : MonoBehaviour
         gridManager.LeaveCell((int)curPos.z, (int)curPos.x, this);
 
         //プレイヤーなら非表示
-        if (gameObject.CompareTag("Player")) gameObject.SetActive(false);
+        if (gameObject.CompareTag("Player"))
+        {
+            waveManager.PlayerDead();
+            gameObject.SetActive(false);
+        }
         //敵ならDestroy
-        else Destroy(gameObject);
+        else
+        {
+            waveManager.EnemyDead();
+            Destroy(gameObject);
+        }
     }
 }
 

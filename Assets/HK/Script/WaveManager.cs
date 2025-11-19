@@ -34,7 +34,7 @@ public class WaveManager : MonoBehaviour
 
     void Start()
     {
-        StartTurn();
+
     }
 
     void Update()
@@ -42,13 +42,13 @@ public class WaveManager : MonoBehaviour
 
     }
 
-    void StartTurn()
+    public void StartTurn()
     {
         turnCount++;
 
         for (int i = 0; i < spawnEnemyCount + (int)waveCount / 5; i++)
         {
-            if (allEnemyCount > 0 && nowEnemyCount < 10)
+            if (allEnemyCount-nowEnemyCount > 0 && nowEnemyCount < 10)
             {
                 if (turnManagerSC.EnemySpown()) nowEnemyCount++;
             }

@@ -36,6 +36,8 @@ public class PlayerController : CharaScript
     
     void Start()
     {
+        charaState = CharaState.player;
+        
         SetPlayerState();
 
         hpSlider.maxValue = hp;
@@ -99,16 +101,19 @@ public class PlayerController : CharaScript
 
     //攻撃
     IEnumerator Attack(int x, int z,int amount)
-    {       
-        animator.SetTrigger("IsAttack");
-        shadowAnim.SetTrigger("IsAttack");
+    {
+        if (gridManager.CheckCellState(z, x)==CellScript.CellState.enemy)
+        {
+            animator.SetTrigger("IsAttack");
+            shadowAnim.SetTrigger("IsAttack");
 
-        yield return new WaitForSeconds(0.8f);
+            yield return new WaitForSeconds(0.8f);
 
-        //敵にダメージを与える
-        gridManager.SendDamage(z, x, amount, false, default);
+            //敵にダメージを与える
+            gridManager.SendDamage(z, x, amount, false, default);
 
-        yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(0.2f);
+        }  
     }
 
     //ダメージを受けてノックバックさせる
@@ -214,7 +219,7 @@ public class PlayerController : CharaScript
         for (int i = 0; i < actionLimit; i++)
         {        
             yield return new WaitForSeconds(0.5f);
-            squareSC.SetImage(playerPos);
+            SetImage();
 
             Vector2 direction = Vector2.zero;
 
@@ -306,5 +311,10 @@ public class PlayerController : CharaScript
         squareSC.DeleteSquare();
 
         StartCoroutine(SurrundAttack());   
+    }
+
+    public void SetImage()
+    {
+        squareSC.SetImage(playerPos);
     }
 }

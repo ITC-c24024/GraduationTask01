@@ -50,8 +50,8 @@ public class SquareScript : MonoBehaviour
         {
             float posX = playerPos.x + i;
             if (posX < 0 || 7 < posX) continue;
-            var isEnemy = gridManager.CheckCellState((int)playerPos.z, (int)posX) == CellScript.CellState.enemy;
-            if (i != 0 && !isEnemy)
+            var isEmpty = gridManager.CheckCellState((int)playerPos.z, (int)posX) == CellScript.CellState.empty;
+            if (i != 0 && isEmpty)
             {
                 squares[n].transform.position = new Vector3(playerPos.x + i*2/3f, squarePosY, playerPos.z);
                 squares[n].transform.localEulerAngles = new Vector3(
@@ -67,8 +67,8 @@ public class SquareScript : MonoBehaviour
         {            
             float posZ = playerPos.z + i;
             if (posZ < 0 || 7 < posZ) continue;
-            var isEnemy = gridManager.CheckCellState((int)posZ, (int)playerPos.x) == CellScript.CellState.enemy;
-            if (i != 0 && !isEnemy)
+            var isEmpty = gridManager.CheckCellState((int)posZ, (int)playerPos.x) == CellScript.CellState.empty;
+            if (i != 0 && isEmpty)
             {
                 squares[n].transform.position = new Vector3(playerPos.x, squarePosY, playerPos.z + i * 2 / 3f);
                 squares[n].transform.localEulerAngles = new Vector3(
@@ -105,6 +105,8 @@ public class SquareScript : MonoBehaviour
     /// <param name="direction">playerPos‚©‚çŒ©‚½‘I‘ð‚·‚éƒ}ƒX‚Ì•ûŒü</param>
     public void SelectImage(Vector3 playerPos, Vector2 direction)
     {
+        SetImage(playerPos);
+
         Vector3 selectPos = new Vector3(
             playerPos.x + direction.x*2/3,
             selectObj.transform.position.y,

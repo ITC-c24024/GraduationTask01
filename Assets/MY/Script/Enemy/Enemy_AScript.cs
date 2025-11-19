@@ -5,6 +5,14 @@ using UnityEngine;
 
 public class Enemy_AScript : CharaScript
 {
+    void Start()
+    {
+        charaState = CharaState.enemy;
+        hpSlider.transform.SetAsFirstSibling();
+        hpSlider.maxValue = hp;
+        hpSlider.value = hp;
+        curPos = transform.position;
+    }
     /// <summary>
     /// “GƒLƒƒƒ‰‚ðˆÚ“®
     /// </summary>

@@ -19,6 +19,13 @@ public class CharaScript : MonoBehaviour
     public Camera worldCamera;
     public Canvas canvas;
 
+    public enum CharaState
+    {
+        player,
+        enemy
+    }
+    public CharaState charaState;
+
     //HP
     public int hp = 100;
     //攻撃力
@@ -49,14 +56,6 @@ public class CharaScript : MonoBehaviour
 
     public Animator animator;
     public Animator shadowAnim;
-
-    void Start()
-    {
-        hpSlider.transform.SetAsFirstSibling();
-        hpSlider.maxValue = hp;
-        hpSlider.value = hp;
-        curPos = transform.position;
-    }
 
     void Update()
     {
@@ -90,6 +89,8 @@ public class CharaScript : MonoBehaviour
         else if (posZ < 0 || 7 < posZ) return false;
         //ほかの敵がいないか調べる
         else if (gridManager.CheckCellState((int)posZ, (int)posX) == CellScript.CellState.enemy) return false;
+        //自分がプレイヤーの場合、ほかのプレイヤーの場所には行けないようにする
+        else if (charaState == CharaState.player && gridManager.CheckCellState((int)posZ, (int)posX) == CellScript.CellState.player) return false;
         else return true;
     }
 
@@ -310,6 +311,8 @@ public class CharaScript : MonoBehaviour
             Destroy(hpSlider.gameObject);
         }
 
+        gridManager.LeaveCell((int)curPos.z, (int)curPos.x, this);
+
         Vector3 startScale = transform.localScale;
         Vector3 targetScale = Vector3.zero;
 
@@ -328,7 +331,7 @@ public class CharaScript : MonoBehaviour
             yield return null;
         }
 
-        gridManager.LeaveCell((int)curPos.z, (int)curPos.x, this);
+        
 
         //プレイヤーなら非表示
         if (gameObject.CompareTag("Player"))

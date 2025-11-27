@@ -117,7 +117,7 @@ GameObject:
   - component: {fileID: 2357015918359654141}
   - component: {fileID: 1673541861311330934}
   m_Layer: 0
-  m_Name: Enemy_Slime
+  m_Name: Enemy_Slime_03
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -163,8 +163,8 @@ MonoBehaviour:
   worldCamera: {fileID: 0}
   canvas: {fileID: 0}
   charaState: 0
-  hp: 20
-  damage: 10
+  hp: 60
+  damage: 30
   recieveDamage: 0
   actionLimit: 1
   shortDir: 0
@@ -231,7 +231,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 66676ec7aca3326438e06e62f88c0a44, type: 2}
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -253,7 +253,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 2
   m_Sprite: {fileID: 21300000, guid: 10b56107c3dee2745897b3d53d5074a8, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

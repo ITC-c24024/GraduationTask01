@@ -9,19 +9,9 @@ public class ControllerBindScript : MonoBehaviour
     PoseScript poseScript;
 
     [SerializeField, Header("プレイヤーオブジェクト")]
-    GameObject[] playerObj = new GameObject[2];
+    GameObject[] playerObj;
 
     int slotNum = 0;
-
-    void Start()
-    {
-        
-    }
-
-    void Update()
-    {
-        
-    }
 
     public void OnPlayerJoined(PlayerInput joined)
     {
@@ -42,7 +32,7 @@ public class ControllerBindScript : MonoBehaviour
         //全員現れたら
         if (slotNum == playerObj.Length - 1)
         {
-            gameController = GetComponent<GameController>();
+            gameController = GetComponent<GameController>(); 
             StartCoroutine(gameController.GameStart());
 
             poseScript = GetComponent<PoseScript>();

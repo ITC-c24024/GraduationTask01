@@ -117,7 +117,7 @@ GameObject:
   - component: {fileID: 2357015918359654141}
   - component: {fileID: 1673541861311330934}
   m_Layer: 0
-  m_Name: Enemy_Slime_02
+  m_Name: Enemy_Trapper
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -163,8 +163,8 @@ MonoBehaviour:
   worldCamera: {fileID: 0}
   canvas: {fileID: 0}
   charaState: 0
-  hp: 40
-  damage: 20
+  hp: 4
+  damage: 2
   recieveDamage: 0
   actionLimit: 1
   shortDir: 0

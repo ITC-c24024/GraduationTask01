@@ -17,6 +17,7 @@ public class PlayerController : CharaScript
     InputAction stickAction;
     InputAction selectAttack;
     InputAction selectMove;
+    InputAction speedUp;
 
     [SerializeField, Header("プレイヤーの初期配置")]
     Vector3 initialPos;
@@ -36,12 +37,20 @@ public class PlayerController : CharaScript
         var actionMap = GetComponent<PlayerInput>().currentActionMap;
         stickAction = actionMap["Move"];
         selectMove = actionMap["SelectMove"];
-        selectAttack = actionMap["SelectAttack"];  
+        selectAttack = actionMap["SelectAttack"];
+        speedUp = actionMap["SpeedUp"];
     }
     
     void Start()
     {
-           
+        
+    }
+
+    void Update()
+    {
+        //倍速
+        bool speedUpAct = speedUp.triggered;
+        if (speedUpAct) gameCon.SpeedUp();
     }
 
     public void SetPlayer()
@@ -159,21 +168,30 @@ public class PlayerController : CharaScript
     {
         hp -= amount;
         hpSlider.value = hp;
+        /*
+        //HPが0なら死亡
+        if (hp <= 0)
+        {
+            alive = false;
+            StartCoroutine(Dead());
+        }*/
+        //ノックバックできる場合
+        if (kbDir != Vector2.zero) StartCoroutine(KnockBack(kbDir));
+    }
 
+    IEnumerator KnockBack(Vector2 kbDir)
+    {
         //HPが0なら死亡
         if (hp <= 0)
         {
             alive = false;
             StartCoroutine(Dead());
         }
-        //ノックバックできる場合
-        else if (kbDir != Vector2.zero) StartCoroutine(KnockBack(kbDir));
-    }
-
-    IEnumerator KnockBack(Vector2 kbDir)
-    {
-        animator.SetTrigger("IsKB");
-        shadowAnim.SetTrigger("IsKB");
+        else
+        {
+            animator.SetTrigger("IsKB");
+            shadowAnim.SetTrigger("IsKB");
+        }     
 
         //元の位置
         Vector3 originPos = playerPos;

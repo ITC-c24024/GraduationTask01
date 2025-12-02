@@ -92,6 +92,8 @@ public class CharaScript : MonoBehaviour
         else if (gridManager.CheckCellState((int)posZ, (int)posX) == CellScript.CellState.enemy) return false;
         //自分がプレイヤーの場合、ほかのプレイヤーの場所には行けないようにする
         else if (charaState == CharaState.player && gridManager.CheckCellState((int)posZ, (int)posX) == CellScript.CellState.player) return false;
+        //死体があるとき
+        else if (gridManager.CheckCellState((int)posZ, (int)posX) == CellScript.CellState.dead) return false;
         else return true;
     }
 
@@ -116,10 +118,14 @@ public class CharaScript : MonoBehaviour
     {
         //プレイヤーの位置を取得
         Vector3[] playerPos = turnManager.GetPlayerPos();
+        //プレイヤーの生存判定を取得
+        bool[] alive = turnManager.GetPlayerAlive();
 
-        //プレイヤーとの距離を計算
+        //プレイヤーとの距離を計算(プレイヤーが死んでいたら距離を99にする)
         float diff_A = GetDistance(playerPos[0], curPos);
+        if (!alive[0]) diff_A = 99;
         float diff_B = GetDistance(playerPos[1], curPos);
+        if (!alive[1]) diff_B = 99;
 
         if (diff_A <= diff_B)
         {
@@ -139,10 +145,14 @@ public class CharaScript : MonoBehaviour
     {
         //プレイヤーの位置を取得
         Vector3[] playerPos = turnManager.GetPlayerPos();
-
-        //プレイヤーとの距離を計算
+        //プレイヤーの生存判定を取得
+        bool[] alive = turnManager.GetPlayerAlive();
+ 
+        //プレイヤーとの距離を計算(プレイヤーが死んでいたら距離を99にする)
         float diff_A = GetDistance(playerPos[0], curPos);
+        if (!alive[0]) diff_A = 99;
         float diff_B = GetDistance(playerPos[1], curPos);
+        if (!alive[1]) diff_B = 99;
 
         //近い方を追う位置とする
         Vector3 targetPos;

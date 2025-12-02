@@ -81,6 +81,7 @@ public class CellScript : MonoBehaviour
             //プレイヤーの場合
             if (newState == CellState.player)
             {
+
                 //敵ステートだったらノックバック
                 if (state == CellState.enemy)
                 {
@@ -105,8 +106,16 @@ public class CellScript : MonoBehaviour
                 // ノックバック方向のマスがマップ内かチェック
                 bool inBounds = x >= 0 && x < gridManagerSC.width &&
                                 y >= 0 && y < gridManagerSC.height;
-
+                //仮
+                bool isPlayer = false;
                 if (inBounds)
+                {
+                    //(ノックバック先に他のプレイヤーがいないか確認)
+                    isPlayer = gridManagerSC.CheckCellState(x, y) == CellState.player;
+                }
+                
+
+                if (!isPlayer)
                 {
                     var targetCell = gridManagerSC.CheckCellState(x, y);
 
@@ -185,9 +194,16 @@ public class CellScript : MonoBehaviour
     {
         if (!isEnemy && enemyList.Count > 0)
         {
+            //仮
+            List<CharaScript> recive = new List<CharaScript>();
             foreach (var enemy in enemyList)
             {
-                enemy.ReciveDamage(damage, new Vector2(0, 0));
+                recive.Add(enemy);
+                //enemy.ReciveDamage(damage, new Vector2(0, 0));
+            }
+            foreach(var r in recive)
+            {
+                enemyList[recive.IndexOf(r)].ReciveDamage(damage, new Vector2(0, 0));
             }
         }
         else if (isEnemy && playerList.Count > 0)

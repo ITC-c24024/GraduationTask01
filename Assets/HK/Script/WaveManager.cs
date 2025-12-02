@@ -2,9 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem.XInput;
+using UnityEngine.UIElements;
 
 public class WaveManager : MonoBehaviour
 {
+    //仮
+    GameController gameCon;
+    SelectContentScript selectContentSC;
+    
     [SerializeField, Header("ウェーブ数")]
     int waveCount = 1;
 
@@ -32,12 +37,14 @@ public class WaveManager : MonoBehaviour
     [SerializeField, Header("ターンマネージャースクリプト")]
     TurnManager turnManagerSC;
 
-    [SerializeField, Header("UIスクリプト")]
+    //仮(自身でGetComponentするためprivate)
     StartUIScript startUISC;
 
     void Start()
     {
-
+        //仮
+        startUISC = gameObject.GetComponent<StartUIScript>();
+        selectContentSC = GetComponent<SelectContentScript>();
     }
 
     void Update()
@@ -47,8 +54,15 @@ public class WaveManager : MonoBehaviour
 
     public void StartWave()
     {
+        //仮
+        StartCoroutine(startUISC.SetUI(0));
+        //仮
+        startUISC.SetWaveCount(waveCount);
+        //仮
+        startUISC.SetEnemyCount(allEnemyCount);
 
-        StartTurn();
+        //仮
+        Invoke("StartTurn", 3.0f);
     }
 
     public void StartTurn()
@@ -57,7 +71,7 @@ public class WaveManager : MonoBehaviour
 
         for (int i = 0; i < spawnEnemyCount + (int)waveCount / 5; i++)
         {
-            if (allEnemyCount-nowEnemyCount > 0 && nowEnemyCount < 10)
+            if (allEnemyCount-nowEnemyCount > 0 && nowEnemyCount < 20)
             {
                 if (turnManagerSC.EnemySpown()) nowEnemyCount++;
             }
@@ -75,7 +89,8 @@ public class WaveManager : MonoBehaviour
         }
         else if (allEnemyCount <= 0)
         {
-            WaveClear();
+            //仮
+            StartCoroutine(WaveClear());        
             return;
         }
         else
@@ -94,18 +109,38 @@ public class WaveManager : MonoBehaviour
     {
         allEnemyCount--;
         nowEnemyCount--;
+
+        //仮
+        startUISC.SetEnemyCount(allEnemyCount);
     }
 
-    void WaveClear()
+    //仮
+    IEnumerator WaveClear()
     {
+        //仮
+        StartCoroutine(startUISC.SetUI(3));
+
         isClear = true;
         waveCount++;
-        turnCount--;
+        //仮
+        turnCount = 0;
+
+        spawnEnemyCount++;
         allEnemyCount = 3 + 2 * waveCount;
+
+        //仮(強化内容選択)
+        yield return new WaitForSeconds(3.0f);
+        StartCoroutine(selectContentSC.SelectContent());
+
+        //仮
+        //Invoke("StartWave", 3.5f);
     }
 
     void GameOver()
     {
+        //仮
+        StartCoroutine(startUISC.SetUI(4));
+
         isGameOver = true;
     }
 }

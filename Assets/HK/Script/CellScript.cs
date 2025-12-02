@@ -14,6 +14,7 @@ public class CellScript : MonoBehaviour
         empty,//‹ó
         player,//ƒvƒŒƒCƒ„[
         enemy,//“G
+        dead,//€‘Ì
     }
 
     /// <summary>

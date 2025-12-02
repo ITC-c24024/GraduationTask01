@@ -113,19 +113,18 @@ public class CellScript : MonoBehaviour
                 {
                     //(ノックバック先に他のプレイヤーがいないか確認)
                     isPlayer = gridManagerSC.CheckCellState(x, y) == CellState.player;
-                }
-                
 
-                if (!isPlayer)
-                {
-                    var targetCell = gridManagerSC.CheckCellState(x, y);
-
-                    // そのマスが敵でなければノックバック可能
-                    if (targetCell != CellState.enemy)
+                    if (!isPlayer)
                     {
-                        result.canMove = true;
+                        var targetCell = gridManagerSC.CheckCellState(x, y);
+
+                        // そのマスが敵でなければノックバック可能
+                        if (targetCell != CellState.enemy)
+                        {
+                            result.canMove = true;
+                        }
                     }
-                }
+                } 
             }
         }
         //マスに他ユニットがいない場合

@@ -22,7 +22,7 @@ public class TurnManager : MonoBehaviour
     [SerializeField, Header("敵の攻撃方向イメージ")]
     GameObject arrowImage;
     [SerializeField, Header("敵Prefab")]
-    GameObject enemyPrefab;
+    GameObject[] enemyPrefab;
     [SerializeField, Header("敵のHPバー")]
     Slider hpPrefab;
     [SerializeField] Canvas canvas;
@@ -51,11 +51,13 @@ public class TurnManager : MonoBehaviour
         Vector2Int spownPos = gridManager.EnemySpawnCheck(GetPlayerPos());
         if (spownPos == -Vector2.one) return false;
 
+        int enemyNum = Random.Range(0, enemyPrefab.Length);
+
         //敵スポーン
         GameObject enemy = Instantiate(
-            enemyPrefab,
-            new Vector3(spownPos.y, enemyPrefab.transform.position.y, spownPos.x),
-            enemyPrefab.transform.rotation
+            enemyPrefab[enemyNum],
+            new Vector3(spownPos.y, enemyPrefab[enemyNum].transform.position.y, spownPos.x),
+            enemyPrefab[enemyNum].transform.rotation
             );
 
         //HPスライダーアタッチ
@@ -114,7 +116,6 @@ public class TurnManager : MonoBehaviour
     public IEnumerator TurnStart()
     {
         StartCoroutine(startUIScript.SetUI(1));
-
         yield return new WaitForSeconds(1.5f);
 
         //敵の行動予定地を設定
@@ -131,36 +132,43 @@ public class TurnManager : MonoBehaviour
             {
                 StartCoroutine(playerCon[i].SelectAction());
                 runnning++;
-            }
-        }
 
-        while (runnning != 0) yield return null;
+                while (runnning != 0) yield return null;
+            }
+        }      
 
         yield return new WaitForSeconds(0.5f);
 
-        //距離順並べ替え
-        SortEnemy();
-
-        //敵の行動
-        for (int n = 0; n < enemyList.Count; n++)
+        //敵がいたら
+        if (enemyList.Count != 0)
         {
-            StartCoroutine(enemyList[n].Move());
-            runnning++;
+            //距離順並べ替え
+            SortEnemy();
+
+            StartCoroutine(startUIScript.SetUI(2));
+            yield return new WaitForSeconds(1.5f);
+
+            //敵の行動
+            for (int n = 0; n < enemyList.Count; n++)
+            {
+                StartCoroutine(enemyList[n].Move());
+                runnning++;
+
+                while (runnning != 0) yield return null;
+            }
+
+            //プレイヤーの攻撃
+            for (int i = 0; i < playerCon.Length; i++)
+            {
+                if (playerCon[i].alive)
+                {
+                    StartCoroutine(playerCon[i].SurrundAttack());
+                    runnning++;
+                }
+            }
 
             while (runnning != 0) yield return null;
-        }
-
-        //プレイヤーの攻撃
-        for (int i = 0; i < playerCon.Length; i++)
-        {
-            if (playerCon[i].alive)
-            {
-                StartCoroutine(playerCon[i].SurrundAttack());
-                runnning++;
-            }
-        }
-
-        while (runnning != 0) yield return null;
+        }     
 
         yield return new WaitForSeconds(1.0f);
 

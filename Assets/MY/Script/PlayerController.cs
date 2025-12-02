@@ -7,7 +7,9 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : CharaScript
 {
+    [SerializeField] GameController gameCon;
     [SerializeField] SquareScript squareSC;
+    [SerializeField] SelectContentScript SelectContentSC;
 
     //ノックバック方向
     Vector2 kbDirection;
@@ -15,6 +17,12 @@ public class PlayerController : CharaScript
     InputAction stickAction;
     InputAction selectAttack;
     InputAction selectMove;
+
+    [SerializeField, Header("プレイヤーの初期配置")]
+    Vector3 initialPos;
+
+    //クリティカル率
+    public float criticalRate = 0;
 
     //プレイヤーの位置
     public Vector3 playerPos;
@@ -28,28 +36,51 @@ public class PlayerController : CharaScript
         var actionMap = GetComponent<PlayerInput>().currentActionMap;
         stickAction = actionMap["Move"];
         selectMove = actionMap["SelectMove"];
-        selectAttack = actionMap["SelectAttack"];
-
-        playerPos = transform.position;
-        curPos = playerPos;
+        selectAttack = actionMap["SelectAttack"];  
     }
     
     void Start()
     {
-        charaState = CharaState.player;
-        
-        SetPlayerState();
-
-        hpSlider.maxValue = hp;
-        hpSlider.value = hp;
+           
     }
 
-    /// <summary>
-    /// ゲーム開始時に、マスにプレイヤーを設定
-    /// </summary>
-    public void SetPlayerState()
+    public void SetPlayer()
     {
-        gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.player, this, default);
+        playerPos = initialPos;
+        curPos = transform.position;
+
+        StartCoroutine(MovePlayer(0,0));
+
+        charaState = CharaState.player;
+
+        hpSlider.gameObject.SetActive(true);
+        hpSlider.maxValue = hp;
+        hpSlider.value = hp;
+    } 
+
+    /// <summary>
+    /// HPを設定
+    /// </summary>
+    /// <param name="amount">変化量</param>
+    public void SetHP(int amount)
+    {
+        hp += amount;
+    }
+    /// <summary>
+    /// 攻撃力を設定
+    /// </summary>
+    /// <param name="amount">変化量</param>
+    public void SetDamage(int amount)
+    {
+        damage += amount;
+    }
+    /// <summary>
+    /// クリティカル率を設定
+    /// </summary>
+    /// <param name="amount">変化量</param>
+    public void SetCriticalRate(float amount)
+    {
+        criticalRate += amount;
     }
 
     /// <summary>
@@ -74,6 +105,8 @@ public class PlayerController : CharaScript
         shadowAnim.SetBool("IsWalk", true);
         float time = 0;
         float required = 0.5f;
+        //ゲーム開始していないなら
+        if (!gameCon.isStart) required = 1.5f;
         while (time < required)
         {
             time += Time.deltaTime;
@@ -93,8 +126,13 @@ public class PlayerController : CharaScript
         shadowAnim.SetBool("IsWalk", false);
 
         gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.player, this, default);
-        //元居たマスを空にする
-        gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);
+
+        //ゲーム進行中なら
+        if (gameCon.isStart)
+        {
+            //元居たマスを空にする
+            gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);
+        }     
 
         isMove = false;
     }
@@ -219,7 +257,7 @@ public class PlayerController : CharaScript
         for (int i = 0; i < actionLimit; i++)
         {        
             yield return new WaitForSeconds(0.5f);
-            SetImage();
+            squareSC.SetImage(playerPos);
 
             Vector2 direction = Vector2.zero;
 
@@ -227,9 +265,8 @@ public class PlayerController : CharaScript
             bool isInput = false;
             while (!isInput)
             {
-                Vector2 stick = stickAction.ReadValue<Vector2>();
-                bool move = selectMove.triggered;
-                bool attack = selectAttack.triggered;
+                Vector2 stick = stickAction.ReadValue<Vector2>();//スティックで移動方向指定
+                bool move = selectAttack.triggered;//Aボタンで移動
 
                 //マス選択入力
                 if (0.5 < stick.x && !isMove)
@@ -286,7 +323,7 @@ public class PlayerController : CharaScript
                 }
 
                 //移動入力
-                if (move && direction != Vector2.zero && !isInput)
+                if (move && direction != Vector2.zero)
                 {
                     StartCoroutine(MovePlayer((int)direction.x, (int)direction.y));
                     
@@ -312,9 +349,45 @@ public class PlayerController : CharaScript
 
         StartCoroutine(SurrundAttack());   
     }
-
-    public void SetImage()
+    
+    /// <summary>
+    /// 強化内容を選ぶ
+    /// </summary>
+    public IEnumerator SelectContent()
     {
-        squareSC.SetImage(playerPos);
+        bool isSelect = false;
+        int selectNum = 0;
+
+        while (!isSelect)
+        {
+            Vector2 stick = stickAction.ReadValue<Vector2>();
+            bool decision = selectAttack.triggered;
+            if (0.5 < stick.x)
+            {
+                if (selectNum != 2)
+                {
+                    selectNum++;
+                    SelectContentSC.SelectItem(selectNum);
+                    yield return new WaitForSeconds(0.2f);
+                }
+            }
+            else if (stick.x < -0.5)
+            {
+                if (selectNum != 0)
+                {
+                    selectNum--;
+                    SelectContentSC.SelectItem(selectNum);
+                    yield return new WaitForSeconds(0.2f);
+                }
+            }
+
+            if (decision)
+            {
+                isSelect = true;
+                SelectContentSC.DecisionItem(selectNum);
+            }
+
+            yield return null;
+        }
     }
 }

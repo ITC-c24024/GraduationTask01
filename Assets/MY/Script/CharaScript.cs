@@ -70,6 +70,7 @@ public class CharaScript : MonoBehaviour
         if (hpSlider != null)
         {
             hpSlider.transform.localPosition = charaScreenPos;
+            hpSlider.gameObject.SetActive(true);        
             hpSlider.transform.localScale = Vector2.one;
         }
     }

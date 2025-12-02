@@ -302,49 +302,45 @@ public class CharaScript : MonoBehaviour
     /// <returns></returns>
     public IEnumerator Dead()
     {
-        //プレイヤーなら非表示
-        if (gameObject.CompareTag("Player")) hpSlider.gameObject.SetActive(false);
         //敵ならDestroy
-        else
+        if (gameObject.CompareTag("Enemy"))
         {
             Destroy(attackImage);
             Destroy(arrowImage);
             Destroy(hpSlider.gameObject);
-        }
 
-        gridManager.LeaveCell((int)curPos.z, (int)curPos.x, this);
+            gridManager.LeaveCell((int)curPos.z, (int)curPos.x, this);
 
-        Vector3 startScale = transform.localScale;
-        Vector3 targetScale = Vector3.zero;
+            Vector3 startScale = transform.localScale;
+            Vector3 targetScale = Vector3.zero;
 
-        float time = 0;
-        float required = 0.5f;
-        while (time < required)
-        {
-            time += Time.deltaTime;
+            float time = 0;
+            float required = 0.5f;
+            while (time < required)
+            {
+                time += Time.deltaTime;
 
-            //現在のスケールを計算
-            Vector3 currentScale = Vector3.Lerp(startScale, targetScale, time / required);
+                //現在のスケールを計算
+                Vector3 currentScale = Vector3.Lerp(startScale, targetScale, time / required);
 
-            //キャラを縮小
-            transform.localScale = currentScale;
+                //キャラを縮小
+                transform.localScale = currentScale;
 
-            yield return null;
-        }
+                yield return null;
+            }
 
-        
-
-        //プレイヤーなら非表示
-        if (gameObject.CompareTag("Player"))
-        {
-            waveManager.PlayerDead();
-            gameObject.SetActive(false);
-        }
-        //敵ならDestroy
-        else
-        {
             waveManager.EnemyDead();
             Destroy(gameObject);
+        }
+        //プレイヤーなら非表示
+        else
+        {
+            hpSlider.gameObject.SetActive(false);
+
+            animator.SetBool("IsDead", true);
+            shadowAnim.SetBool("IsDead", true);
+
+            waveManager.PlayerDead();
         }
     }
 }

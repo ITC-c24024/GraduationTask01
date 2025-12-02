@@ -45,4 +45,17 @@ public class GameController : MonoBehaviour
         //ウェーブスタート
         waveManager.StartWave();
     }
+
+    /// <summary>
+    /// ゲーム速度アップ
+    /// </summary>
+    public void SpeedUp()
+    {
+        Time.timeScale += 0.5f;
+        //上限3倍
+        if (Time.timeScale == 3.0f)
+        {
+            Time.timeScale = 1;
+        }
+    }
 }

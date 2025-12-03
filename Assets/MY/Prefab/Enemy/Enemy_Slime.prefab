@@ -163,8 +163,8 @@ MonoBehaviour:
   worldCamera: {fileID: 0}
   canvas: {fileID: 0}
   charaState: 0
-  hp: 20
-  damage: 10
+  hp: 2
+  damage: 1
   recieveDamage: 0
   actionLimit: 1
   shortDir: 0

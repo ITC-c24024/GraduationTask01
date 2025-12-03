@@ -1,84 +1,45 @@
-Shader "Custom/SpriteLitTransparent"
+Shader "Custom/LitTransparent2D"
 {
     Properties
     {
         _MainTex ("Main Texture", 2D) = "white" {}
         _Color ("Color Tint", Color) = (1,1,1,1)
+        _Glossiness ("Smoothness", Range(0,1)) = 0.0
+        _Metallic ("Metallic", Range(0,1)) = 0.0
     }
-
     SubShader
     {
-        Tags { 
-            "Queue"="Transparent"
-            "RenderType"="Transparent"
-            "IgnoreProjector"="True"
-        }
+        Tags { "Queue"="Transparent" "RenderType"="Transparent" "IgnoreProjector"="True" }
+        LOD 200
 
         // 半透明対応
-        Cull Off
-        Lighting On
-        ZWrite Off
         Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off
+        ZWrite Off
 
-        Pass
+        CGPROGRAM
+        #pragma surface surf Standard fullforwardshadows alpha:fade
+        #pragma target 3.0
+
+        sampler2D _MainTex;
+        fixed4 _Color;
+        half _Glossiness;
+        half _Metallic;
+
+        struct Input
         {
-            Tags{"LightMode"="ForwardBase"}
+            float2 uv_MainTex;
+        };
 
-            CGPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
-
-            sampler2D _MainTex;
-            fixed4 _Color;
-
-            struct appdata
-            {
-                float4 vertex : POSITION;
-                float2 uv : TEXCOORD0;
-                float4 color : COLOR;   // SpriteRenderer の色も受け取る
-            };
-
-            struct v2f
-            {
-                float4 pos : SV_POSITION;
-                float2 uv : TEXCOORD0;
-                fixed4 color : COLOR;
-                float3 worldNormal : TEXCOORD1;
-                float3 worldPos : TEXCOORD2;
-            };
-
-            v2f vert (appdata v)
-            {
-                v2f o;
-                o.pos = UnityObjectToClipPos(v.vertex);
-                o.uv = v.uv;
-                o.color = v.color * _Color;
-
-                // 正面（2D）スプライトなので法線は -Z
-                o.worldNormal = UnityObjectToWorldNormal(float3(0,0,-1));
-                o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
-                return o;
-            }
-
-            fixed4 frag (v2f i) : SV_Target
-            {
-                fixed4 c = tex2D(_MainTex, i.uv) * i.color;
-
-                // Lambert 光
-                fixed3 normal = normalize(i.worldNormal);
-                fixed3 lightDir = normalize(_WorldSpaceLightPos0.xyz);
-                float NdotL = max(0, dot(normal, lightDir));
-                fixed3 diff = NdotL * _LightColor0.rgb;
-
-                // 環境光
-                fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.rgb;
-
-                c.rgb *= (diff + ambient);
-                return c;
-            }
-            ENDCG
+        void surf (Input IN, inout SurfaceOutputStandard o)
+        {
+            fixed4 c = tex2D(_MainTex, IN.uv_MainTex) * _Color;
+            o.Albedo = c.rgb;               // 光を受ける部分
+            o.Metallic = _Metallic;         // 光沢や反射をほぼオフ
+            o.Smoothness = _Glossiness;     // 滑らかさを調整
+            o.Alpha = c.a;                  // アルファ反映
         }
+        ENDCG
     }
+    FallBack "Transparent/Diffuse"
 }

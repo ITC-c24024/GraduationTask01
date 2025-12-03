@@ -184,4 +184,14 @@ public class TurnManager : MonoBehaviour
         };
         return playerPos;
     }
+
+    public bool[] GetPlayerAlive()
+    {
+        bool[] alive = new bool[]
+        {
+            playerCon[0].alive,
+            playerCon[1].alive
+        };
+        return alive;
+    }
 }

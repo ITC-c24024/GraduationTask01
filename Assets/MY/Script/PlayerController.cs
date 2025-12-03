@@ -168,15 +168,17 @@ public class PlayerController : CharaScript
     {
         hp -= amount;
         hpSlider.value = hp;
-        /*
+        
+        
+        //ノックバックできる場合
+        if (kbDir != Vector2.zero) StartCoroutine(KnockBack(kbDir));
         //HPが0なら死亡
-        if (hp <= 0)
+        else if (hp <= 0)
         {
             alive = false;
             StartCoroutine(Dead());
-        }*/
-        //ノックバックできる場合
-        if (kbDir != Vector2.zero) StartCoroutine(KnockBack(kbDir));
+            gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.dead, this, default);
+        }
     }
 
     IEnumerator KnockBack(Vector2 kbDir)
@@ -220,9 +222,10 @@ public class PlayerController : CharaScript
         playerPos = targetPos;
         curPos = playerPos;
 
-        //マス更新
-        gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.player, this, default);
         gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);
+        //マス更新
+        if (alive)gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.player, this, default);
+        else gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.dead, this, default);      
     }
 
     /// <summary>

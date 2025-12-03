@@ -1,9 +1,8 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy_AScript : CharaScript
+public class Enemy_BScript : CharaScript
 {
     void Start()
     {
@@ -13,43 +12,36 @@ public class Enemy_AScript : CharaScript
         hpSlider.value = hp;
         curPos = transform.position;
     }
+
     /// <summary>
     /// 敵キャラを移動
-    /// 行動ルール:前方1マス移動
+    /// 行動ルール:敵、移動不可プレイヤー、ステージ外に行くまで１マスずつ移動
     /// </summary>
     /// <returns></returns>
     public override IEnumerator Move()
     {
-        //行動回数分
-        for(int n = 0; n < actionLimit; n++)
+        //行動回数分移動する
+        for (int n = 0; n < actionLimit; n++)
         {
-            /*
-            //現在位置を移動開始位置とする
-            Vector3 startPos = curPos;
-
-            //プレイヤーの位置を見て、どのプレイヤーについていくか決める
-            Vector3 playerPos = SelectPlayer();
-            */
-            //1行動
-            for (int i = 0; i < moveRule.Length; i++)
+            //行動ルールに沿って移動
+            while (true)
             {
-                /*
-                //移動開始位置からプレイヤーの位置に行くためにどの方向に行けばいいか決める
-                Vector2 direction = GetDirection(playerPos, startPos, i);
-                */
+                //移動開始位置を設定
                 Vector3 originPos = curPos;
-                /*
-                //進む位置
+
+                //目標位置
                 Vector3 targetPos = new Vector3(
-                    originPos.x + direction.x,
+                    originPos.x + targetDir.x,
                     originPos.y,
-                    originPos.z + direction.y
+                    originPos.z + targetDir.y
                     );
-                */
 
-                Vector3 targetPos = movePos;
-
-                //範囲外の時、敵がいるとき
+                if (!InStage(targetPos))
+                {
+                    turnManager.FinCoroutine();
+                    break;
+                }
+               
                 if (!CanMove(targetPos))
                 {
                     goBack = true;
@@ -58,6 +50,7 @@ public class Enemy_AScript : CharaScript
                 //プレイヤーがいる場合
                 if (gridManager.CheckCellState((int)targetPos.z, (int)targetPos.x) == CellScript.CellState.player)
                 {
+                    Debug.Log("確認");
                     //ノックバックできない状態なら攻撃だけ予定する
                     var result = gridManager.ChangeCellState(
                           (int)targetPos.z,
@@ -66,14 +59,15 @@ public class Enemy_AScript : CharaScript
                           this,
                           new Vector2Int((int)targetDir.x, (int)targetDir.y)
                           );
-                    if (!result.canMove) attackOnly = true;
+                    if (!result.canMove)
+                    {
+                        attackOnly = true;
+                        Debug.Log("attackOnly");
+                    }
                 }
 
-                //通常移動
-                animator.SetTrigger("IsAttack");
-                shadowAnim.SetTrigger("IsAttack");
                 float time = 0;
-                float required = 0.5f / moveRule.Length;
+                float required = 0.5f;
                 while (time < required)
                 {
                     time += Time.deltaTime;
@@ -88,24 +82,25 @@ public class Enemy_AScript : CharaScript
                 }
                 transform.position = targetPos;
                 curPos = targetPos;
+
                 if (goBack)
                 {
                     StartCoroutine(Back(originPos));
                     goBack = false;
 
-                    continue;
-                }             
+                    break;
+                }
 
                 if (attackOnly)
-                {
+                {   
                     attackOnly = false;
 
                     //プレイヤーに攻撃
                     gridManager.SendDamage((int)curPos.z, (int)curPos.x, damage, true);
 
                     StartCoroutine(Back(originPos));
-                    
-                    continue;
+
+                    break;
                 }
                 //プレイヤーがいたら攻撃する
                 else
@@ -128,26 +123,8 @@ public class Enemy_AScript : CharaScript
                     new Vector2Int((int)targetDir.x, (int)targetDir.y)
                     );
                 //ひとつ前のマスを空にする
-                gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);
+                gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);               
             }
-            DeleteImage();
-            yield return new WaitForSeconds(0.2f);
-        }
-        
-        
-        if (!attackOnly) turnManager.FinCoroutine();
-    }
-    
-    public override void ReciveDamage(int amount, Vector2 kbDir)
-    {
-        hp -= amount;
-        hpSlider.value = hp;
-
-        //HPが0になったら死亡
-        if (hp <= 0)
-        {
-            StartCoroutine(Dead());
-            turnManager.enemyList.Remove(this);
         }
     }
 }

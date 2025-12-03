@@ -7,6 +7,9 @@ using UnityEngine.UI;
 
 public class CharaScript : MonoBehaviour
 {
+    [SerializeField] string charaName;
+
+
     public WaveManager waveManager;
     public TurnManager turnManager;
     public GridManager gridManager;
@@ -76,24 +79,36 @@ public class CharaScript : MonoBehaviour
     }
 
     /// <summary>
-    /// 進めるかの判定
+    /// 進みたいマスがステージ内か調べる
+    /// </summary>
+    /// <returns></returns>
+    public bool InStage(Vector3 targetPos)
+    {
+        float x = targetPos.x;
+        float z = targetPos.z;
+
+        if (x < 0 || 7 < x) return false;
+        else if (z < 0 || 7 < z) return false;
+        else return true;
+    }
+
+    /// <summary>
+    /// 進みたいマスに障害がないか調べる
     /// </summary>
     /// <param name="x">進みたいマスのx座標</param>
     /// <param name="z">進みたいマスのz座標</param>
     /// <returns></returns>
     public bool CanMove(Vector3 targetPos)
     {
-        //ステージ範囲内か調べる
-        float posX = targetPos.x;
-        float posZ = targetPos.z;
-        if (posX < 0 || 7 < posX) return false;
-        else if (posZ < 0 || 7 < posZ) return false;
+        int x = (int)targetPos.x;
+        int z = (int)targetPos.z;
+
         //ほかの敵がいないか調べる
-        else if (gridManager.CheckCellState((int)posZ, (int)posX) == CellScript.CellState.enemy) return false;
+        if (gridManager.CheckCellState(z, x) == CellScript.CellState.enemy) return false;
         //自分がプレイヤーの場合、ほかのプレイヤーの場所には行けないようにする
-        else if (charaState == CharaState.player && gridManager.CheckCellState((int)posZ, (int)posX) == CellScript.CellState.player) return false;
+        else if (charaState == CharaState.player && gridManager.CheckCellState(z, x) == CellScript.CellState.player) return false;
         //死体があるとき
-        else if (gridManager.CheckCellState((int)posZ, (int)posX) == CellScript.CellState.dead) return false;
+        else if (gridManager.CheckCellState(z, x) == CellScript.CellState.dead) return false;
         else return true;
     }
 

@@ -59,7 +59,7 @@ public class SelectContentScript : MonoBehaviour
 
     void SetItem()
     {
-
+        
     }
 
     public void SelectItem(int selectNum)
@@ -67,7 +67,7 @@ public class SelectContentScript : MonoBehaviour
         //選べるかどうかのboolを返したい(範囲外か、すでに選択されてるかを判定)
 
 
-        Vector2 selectPos = new Vector2(items[selectNum].transform.localPosition.x, items[selectNum].transform.localPosition.x + 165);
+        Vector2 selectPos = new Vector2(items[selectNum].transform.localPosition.x, items[selectNum].transform.localPosition.y + 165);
         selects[playerNum].transform.localPosition = selectPos;
         selects[playerNum].gameObject.SetActive(true);
     }

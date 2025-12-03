@@ -222,7 +222,7 @@ public class PlayerController : CharaScript
         playerPos = targetPos;
         curPos = playerPos;
 
-        gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);
+        //gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);
         //マス更新
         if (alive)gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.player, this, default);
         else gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.dead, this, default);      
@@ -293,54 +293,30 @@ public class PlayerController : CharaScript
                 if (0.5 < stick.x && !isMove)
                 {
                     direction = new Vector2(0, 1);
-                    if (CanMove(new Vector3(playerPos.x + direction.x, playerPos.y, playerPos.z + direction.y)))
-                    {
-                        squareSC.SelectImage(playerPos, direction);
-                    }
-                    else
-                    {
-                        direction = Vector2.zero;
-                        squareSC.DeleteSelect();
-                    }
                 }
                 else if (0.5 < stick.y && !isMove)
                 {
-                    direction = new Vector2(-1, 0);
-                    if (CanMove(new Vector3(playerPos.x + direction.x, playerPos.y, playerPos.z + direction.y)))
-                    {
-                        squareSC.SelectImage(playerPos, direction);
-                    }
-                    else
-                    {
-                        direction = Vector2.zero;
-                        squareSC.DeleteSelect();
-                    }
+                    direction = new Vector2(-1, 0);             
                 }
                 else if (stick.x < -0.5 && !isMove)
                 {
                     direction = new Vector2(0, -1);
-                    if (CanMove(new Vector3(playerPos.x + direction.x, playerPos.y, playerPos.z + direction.y)))
-                    {
-                        squareSC.SelectImage(playerPos, direction);
-                    }
-                    else
-                    {
-                        direction = Vector2.zero;
-                        squareSC.DeleteSelect();
-                    }
                 }
                 else if (stick.y < -0.5 && !isMove)
                 {
                     direction = new Vector2(1, 0);
-                    if (CanMove(new Vector3(playerPos.x + direction.x, playerPos.y, playerPos.z + direction.y)))
-                    {                      
-                        squareSC.SelectImage(playerPos, direction);
-                    }
-                    else
-                    {
-                        direction = Vector2.zero;
-                        squareSC.DeleteSelect();
-                    }
+                }
+
+                //進みたいマスの座標
+                Vector3 selectPos = new Vector3(playerPos.x + direction.x, playerPos.y, playerPos.z + direction.y);
+                if (InStage(selectPos) && CanMove(selectPos))
+                {
+                    squareSC.SelectImage(playerPos, direction);
+                }
+                else
+                {
+                    direction = Vector2.zero;
+                    squareSC.DeleteSelect();
                 }
 
                 //移動入力
@@ -350,16 +326,6 @@ public class PlayerController : CharaScript
                     
                     isInput = true;
                 }
-                /*
-                //攻撃入力
-                else if (attack && direction != Vector2.zero && !isInput)
-                {
-                    //攻撃処理呼ぶ
-                    StartCoroutine(Attack((int)(playerPos.x + direction.x), (int)(playerPos.z + direction.y)));
-                    
-                    isInput = true;
-                }
-                */
 
                 yield return null;
             }

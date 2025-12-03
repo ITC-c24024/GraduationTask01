@@ -157,6 +157,9 @@ public class TurnManager : MonoBehaviour
                 while (runnning != 0) yield return null;
             }
 
+            //ノックバックの分ディレイ
+            yield return new WaitForSeconds(0.1f);
+
             //プレイヤーの攻撃
             for (int i = 0; i < playerCon.Length; i++)
             {

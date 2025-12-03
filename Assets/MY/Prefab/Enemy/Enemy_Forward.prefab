@@ -115,9 +115,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2357015918359654141}
-  - component: {fileID: 1673541861311330934}
+  - component: {fileID: 2937523432494400744}
   m_Layer: 0
-  m_Name: Enemy_Slime_03
+  m_Name: Enemy_Forward
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -140,7 +140,7 @@ Transform:
   - {fileID: 2230977110554425175}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
---- !u!114 &1673541861311330934
+--- !u!114 &2937523432494400744
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -149,22 +149,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 4566348189215208971}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627dd705b5047d548949806e1439a7f4, type: 3}
+  m_Script: {fileID: 11500000, guid: 14bd71740040e21429a58946139e46a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  charaName: 
   waveManager: {fileID: 0}
   turnManager: {fileID: 0}
   gridManager: {fileID: 0}
   cellScript: {fileID: 0}
-  charaImage: {fileID: 5649160074311771487}
+  charaImage: {fileID: 0}
   attackImage: {fileID: 0}
   arrowImage: {fileID: 0}
   hpSlider: {fileID: 0}
   worldCamera: {fileID: 0}
   canvas: {fileID: 0}
-  charaState: 0
-  hp: 6
-  damage: 3
+  charaState: 1
+  hp: 4
+  damage: 2
   recieveDamage: 0
   actionLimit: 1
   shortDir: 0
@@ -176,8 +177,8 @@ MonoBehaviour:
   targetDir: {x: 0, y: 0}
   curPos: {x: 0, y: 0, z: 0}
   movePos: {x: 0, y: 0, z: 0}
-  animator: {fileID: 8265614465209262376}
-  shadowAnim: {fileID: 3757074604457976750}
+  animator: {fileID: 0}
+  shadowAnim: {fileID: 0}
 --- !u!1 &5649160074311771487
 GameObject:
   m_ObjectHideFlags: 0

@@ -152,6 +152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 627dd705b5047d548949806e1439a7f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  charaName: "\u732A\u7A81\u731B\u9032"
   waveManager: {fileID: 0}
   turnManager: {fileID: 0}
   gridManager: {fileID: 0}
@@ -162,7 +163,7 @@ MonoBehaviour:
   hpSlider: {fileID: 0}
   worldCamera: {fileID: 0}
   canvas: {fileID: 0}
-  charaState: 0
+  charaState: 1
   hp: 2
   damage: 1
   recieveDamage: 0

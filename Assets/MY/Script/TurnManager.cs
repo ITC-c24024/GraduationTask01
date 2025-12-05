@@ -19,8 +19,8 @@ public class TurnManager : MonoBehaviour
     public List<CharaScript> enemyList = new List<CharaScript>();
     [SerializeField, Header("“G‚ÌUŒ‚—\’èƒCƒ[ƒW")]
     GameObject attackImage;
-    [SerializeField, Header("“G‚ÌUŒ‚•ûŒüƒCƒ[ƒW")]
-    GameObject arrowImage;
+    [SerializeField, Header("“G‚ÌUŒ‚•ûŒüƒCƒ[ƒWPrefab")]
+    GameObject arrowPrefab;
     [SerializeField, Header("“GPrefab")]
     GameObject[] enemyPrefab;
     [SerializeField, Header("“G‚ÌHPƒo[")]
@@ -74,7 +74,7 @@ public class TurnManager : MonoBehaviour
         enemySC.worldCamera = worldCamera;
         enemySC.canvas = canvas;
         enemySC.attackImage = Instantiate(attackImage);
-        enemySC.arrowImage = Instantiate(arrowImage);
+        enemySC.arrowPrefab = Instantiate(arrowPrefab);
 
         //List‚É’Ç‰Á
         enemyList.Add(enemySC);

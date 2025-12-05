@@ -61,7 +61,7 @@ public class Enemy_BScript : CharaScript
                 }
 
                 float time = 0;
-                float required = 0.5f;
+                float required = 0.3f;
                 while (time < required)
                 {
                     time += Time.deltaTime;
@@ -122,5 +122,43 @@ public class Enemy_BScript : CharaScript
         }
         
         turnManager.FinCoroutine();
+    }
+
+    public override void AttackState()
+    {
+        //–îˆóUI‚Ì•ûŒü‚ðŒˆ‚ß‚é
+        int angle = 0;
+        if (targetDir.x > 0) angle = 90;
+        else if (targetDir.x < 0) angle = -90;
+        else if (targetDir.y > 0) angle = 0;
+        else if (targetDir.y < 0) angle = 180;
+
+        for (int i = 0; i < 3; i++)
+        {
+            var arrow = Instantiate(arrowPrefab);
+            arrowList.Add(arrow);
+
+            arrow.transform.localPosition = new Vector3(
+                movePos.x - targetDir.x / 2 - targetDir.x / 3 * -i,
+                0.101f,
+                movePos.z - targetDir.y / 2 - targetDir.y / 3 * -i
+                );
+
+            arrow.transform.localEulerAngles = new Vector3(arrow.transform.localEulerAngles.x, angle, arrow.transform.localEulerAngles.z);
+            arrow.SetActive(true);
+        }
+    }
+
+    public override void ReciveDamage(int amount, Vector2 kbDir)
+    {
+        hp -= amount;
+        hpSlider.value = hp;
+
+        //HP‚ª0‚É‚È‚Á‚½‚çŽ€–S
+        if (hp <= 0)
+        {
+            StartCoroutine(Dead());
+            turnManager.enemyList.Remove(this);
+        }
     }
 }

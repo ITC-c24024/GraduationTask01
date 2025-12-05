@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Enemy_BScript : CharaScript
 {
@@ -36,16 +37,9 @@ public class Enemy_BScript : CharaScript
                     originPos.z + targetDir.y
                     );
 
-                if (!InStage(targetPos))
-                {
-                    turnManager.FinCoroutine();
-                    break;
-                }
+                if (!InStage(targetPos)) break;
                
-                if (!CanMove(targetPos))
-                {
-                    goBack = true;
-                }
+                if (!CanMove(targetPos)) goBack = true;
 
                 //ÉvÉåÉCÉÑÅ[Ç™Ç¢ÇÈèÍçá
                 if (gridManager.CheckCellState((int)targetPos.z, (int)targetPos.x) == CellScript.CellState.player)
@@ -126,5 +120,7 @@ public class Enemy_BScript : CharaScript
                 gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);               
             }
         }
+        
+        turnManager.FinCoroutine();
     }
 }

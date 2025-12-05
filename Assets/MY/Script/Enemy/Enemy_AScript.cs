@@ -133,9 +133,8 @@ public class Enemy_AScript : CharaScript
             DeleteImage();
             yield return new WaitForSeconds(0.2f);
         }
-        
-        
-        if (!attackOnly) turnManager.FinCoroutine();
+      Å@
+        turnManager.FinCoroutine();
     }
     
     public override void ReciveDamage(int amount, Vector2 kbDir)

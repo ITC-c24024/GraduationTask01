@@ -10,6 +10,9 @@ public class GameController : MonoBehaviour
     [SerializeField, Header("プレイヤー待機UI")]
     Image waitImage;
 
+    [SerializeField, Header("速度UIの矢印")]
+    Image[] arrowImage;
+
     [SerializeField, Header("プレイヤーオブジェクト")]
     GameObject[] playerObj;
 
@@ -56,6 +59,26 @@ public class GameController : MonoBehaviour
         if (Time.timeScale == 3.0f)
         {
             Time.timeScale = 1;
+        }
+
+        SetSpeedUI(Time.timeScale);
+    }
+    /// <summary>
+    /// ゲーム速度に応じて速度UIを表示
+    /// </summary>
+    /// <param name="nowSpeed">現在の速度</param>
+    public void SetSpeedUI(float nowSpeed)
+    {
+        //表示するImageの数
+        int count = (int)(nowSpeed / 0.5f) - 1;
+
+        for (int i = 0; i < arrowImage.Length; i++)
+        {
+            arrowImage[i].gameObject.SetActive(false);
+        }
+        for (int i = 0; i < count; i++)
+        {
+            arrowImage[i].gameObject.SetActive(true);
         }
     }
 }

@@ -8,10 +8,16 @@ public class Enemy_BScript : CharaScript
     void Start()
     {
         charaState = CharaState.enemy;
-        hpSlider.transform.SetAsFirstSibling();
-        hpSlider.maxValue = hp;
-        hpSlider.value = hp;
         curPos = transform.position;
+    }
+
+    /// <summary>
+    /// 追うプレイヤー、追う方向を決めておく
+    /// </summary>
+    public override void SetAction()
+    {
+        SetTargetPos();
+        AttackState();
     }
 
     /// <summary>
@@ -24,6 +30,8 @@ public class Enemy_BScript : CharaScript
         //行動回数分移動する
         for (int n = 0; n < actionLimit; n++)
         {
+            DeleteImage();
+
             //行動ルールに沿って移動
             while (true)
             {
@@ -44,7 +52,6 @@ public class Enemy_BScript : CharaScript
                 //プレイヤーがいる場合
                 if (gridManager.CheckCellState((int)targetPos.z, (int)targetPos.x) == CellScript.CellState.player)
                 {
-                    Debug.Log("確認");
                     //ノックバックできない状態なら攻撃だけ予定する
                     var result = gridManager.ChangeCellState(
                           (int)targetPos.z,
@@ -119,6 +126,7 @@ public class Enemy_BScript : CharaScript
                 //ひとつ前のマスを空にする
                 gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);               
             }
+            
         }
         
         turnManager.FinCoroutine();
@@ -152,7 +160,12 @@ public class Enemy_BScript : CharaScript
     public override void ReciveDamage(int amount, Vector2 kbDir)
     {
         hp -= amount;
-        hpSlider.value = hp;
+        if (hp < 0) hp = 0;
+
+        for (int i = hp; i < hpBar.Length; i++)
+        {
+            hpBar[i].gameObject.SetActive(false);
+        }
 
         //HPが0になったら死亡
         if (hp <= 0)

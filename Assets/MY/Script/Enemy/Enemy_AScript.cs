@@ -8,11 +8,21 @@ public class Enemy_AScript : CharaScript
     void Start()
     {
         charaState = CharaState.enemy;
-        hpSlider.transform.SetAsFirstSibling();
-        hpSlider.maxValue = hp;
-        hpSlider.value = hp;
         curPos = transform.position;
+
+        attackImage = Instantiate(attackImagePrefab);
     }
+
+
+    /// <summary>
+    /// 追うプレイヤー、追う方向を決めておく
+    /// </summary>
+    public override void SetAction()
+    {
+        SetTargetPos();
+        AttackState();
+    }
+
     /// <summary>
     /// 敵キャラを移動
     /// 行動ルール:前方1マス移動
@@ -143,7 +153,7 @@ public class Enemy_AScript : CharaScript
         arrowList.Add(arrow);
 
         //攻撃予定位置を表示
-        attackImage.transform.localPosition = new Vector3(movePos.x, 0.101f, movePos.z);
+        attackImage.transform.position = new Vector3(movePos.x, 0.101f, movePos.z);
         attackImage.SetActive(true);
 
         //矢印イメージを表示
@@ -161,7 +171,12 @@ public class Enemy_AScript : CharaScript
     public override void ReciveDamage(int amount, Vector2 kbDir)
     {
         hp -= amount;
-        hpSlider.value = hp;
+        if (hp < 0) hp = 0;
+
+        for (int i = hp; i < hpBar.Length; i++)
+        {
+            hpBar[i].gameObject.SetActive(false);
+        }
 
         //HPが0になったら死亡
         if (hp <= 0)

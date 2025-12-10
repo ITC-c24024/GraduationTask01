@@ -159,8 +159,9 @@ MonoBehaviour:
   gridManager: {fileID: 0}
   cellScript: {fileID: 0}
   charaImage: {fileID: 5649160074311771487}
+  attackImagePrefab: {fileID: 6790218346866554214, guid: e9f7d1778838c7c478d65b9df5f082f1, type: 3}
   attackImage: {fileID: 0}
-  arrowPrefab: {fileID: 0}
+  arrowPrefab: {fileID: 7525773185347868891, guid: e624bb52002c3a049a7c5df1d7337907, type: 3}
   worldCamera: {fileID: 0}
   canvas: {fileID: 0}
   arrowList: []

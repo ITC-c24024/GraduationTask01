@@ -159,6 +159,7 @@ MonoBehaviour:
   gridManager: {fileID: 0}
   cellScript: {fileID: 0}
   charaImage: {fileID: 0}
+  attackImagePrefab: {fileID: 6790218346866554214, guid: 68d112e4a6097044fbe0d538cd3d14e6, type: 3}
   attackImage: {fileID: 0}
   arrowPrefab: {fileID: 0}
   worldCamera: {fileID: 0}
@@ -166,12 +167,12 @@ MonoBehaviour:
   arrowList: []
   hpObj: {fileID: 6144569871656368158}
   hpBar:
-  - {fileID: 7138078998716188340}
-  - {fileID: 8132736520852781760}
-  - {fileID: 1700512359856610069}
   - {fileID: 2464607381342176425}
+  - {fileID: 1700512359856610069}
+  - {fileID: 8132736520852781760}
+  - {fileID: 7138078998716188340}
   charaState: 1
-  hp: 100
+  hp: 4
   damage: 1
   recieveDamage: 0
   actionLimit: 1
@@ -182,8 +183,9 @@ MonoBehaviour:
   targetDir: {x: 0, y: 0}
   curPos: {x: 0, y: 0, z: 0}
   movePos: {x: 0, y: 0, z: 0}
-  animator: {fileID: 0}
-  shadowAnim: {fileID: 0}
+  animator: {fileID: 8265614465209262376}
+  shadowAnim: {fileID: 3757074604457976750}
+  ivyObj: {fileID: 8255223427682891224, guid: e8b12739b03a5944f81597db7bfcba68, type: 3}
 --- !u!1 &5649160074311771487
 GameObject:
   m_ObjectHideFlags: 0

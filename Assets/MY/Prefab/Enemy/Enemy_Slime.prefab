@@ -154,6 +154,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   charaName: "\u30B9\u30E9\u30A4\u30E0"
+  moneyScript: {fileID: 0}
   waveManager: {fileID: 0}
   turnManager: {fileID: 0}
   gridManager: {fileID: 0}
@@ -173,6 +174,7 @@ MonoBehaviour:
   hp: 2
   damage: 1
   recieveDamage: 0
+  dropMoney: 100
   actionLimit: 1
   shortDir: 0
   moveRule:

@@ -154,11 +154,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   charaName: 
+  moneyScript: {fileID: 0}
   waveManager: {fileID: 0}
   turnManager: {fileID: 0}
   gridManager: {fileID: 0}
   cellScript: {fileID: 0}
   charaImage: {fileID: 5649160074311771487}
+  attackImagePrefab: {fileID: 0}
   attackImage: {fileID: 0}
   arrowPrefab: {fileID: 7525773185347868891, guid: e624bb52002c3a049a7c5df1d7337907, type: 3}
   worldCamera: {fileID: 0}
@@ -173,6 +175,7 @@ MonoBehaviour:
   hp: 3
   damage: 1
   recieveDamage: 0
+  dropMoney: 200
   actionLimit: 1
   shortDir: 0
   moveRule:

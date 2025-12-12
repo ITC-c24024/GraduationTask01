@@ -1,29 +1,31 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class CharaScript : MonoBehaviour
 {
     [SerializeField] string charaName;
 
-
+    public MoneyScript moneyScript;
     public WaveManager waveManager;
     public TurnManager turnManager;
     public GridManager gridManager;
     public CellScript cellScript;
 
     public GameObject charaImage;
+    public GameObject attackImagePrefab;
     public GameObject attackImage;
     public GameObject arrowPrefab;
-    public Slider hpSlider;
     public Camera worldCamera;
     public Canvas canvas;
 
     public List<GameObject> arrowList = new List<GameObject>();
+
+    //hpBarをまとめてるオブジェクト
+    public GameObject hpObj;
+    [Tooltip("右側のFillオブジェクトから順に格納")]
+    public GameObject[] hpBar;
 
     public enum CharaState
     {
@@ -38,6 +40,8 @@ public class CharaScript : MonoBehaviour
     public int damage = 1;
     //被ダメージ
     public int recieveDamage = 0;
+    //ドロップするお金
+    public int dropMoney = 1;
 
     //行動可能回数
     public int actionLimit = 1;
@@ -65,6 +69,7 @@ public class CharaScript : MonoBehaviour
 
     void Update()
     {
+        /*
         //HPバー追従
         Vector2 viewPos = worldCamera.WorldToViewportPoint(transform.position);
         RectTransform canvasRect = canvas.GetComponent<RectTransform>();
@@ -72,13 +77,33 @@ public class CharaScript : MonoBehaviour
             canvasRect.sizeDelta.x * viewPos.x - (canvasRect.sizeDelta.x * 0.5f),
             canvasRect.sizeDelta.y * viewPos.y - (canvasRect.sizeDelta.y * 0.5f)
             );
-
-        if (hpSlider != null)
+        
+        if (hpBar != null)
         {
-            hpSlider.transform.localPosition = charaScreenPos;
-            hpSlider.gameObject.SetActive(true);        
-            hpSlider.transform.localScale = Vector2.one;
+            SetHpPos(charaScreenPos);
+            for(int i = 0; i < hpBar.Length; i++)
+            {
+                hpBar[i].SetActive(true);
+            }
         }
+        */
+    }
+
+    /// <summary>
+    /// HPバーの位置を設定
+    /// </summary>
+    /// <param name="vector3">中心座標</param>
+    public void SetHpPos(Vector3 vector3)
+    {
+
+    }
+
+    /// <summary>
+    /// 行動前に攻撃、移動の準備をする
+    /// </summary>
+    public virtual void SetAction()
+    {
+
     }
 
     /// <summary>
@@ -253,7 +278,15 @@ public class CharaScript : MonoBehaviour
     /// </summary>
     public void DeleteImage()
     {
-        attackImage.gameObject.SetActive(false);
+        if (attackImage != null)
+        {
+            attackImage.gameObject.SetActive(false);
+        }
+        
+        for (int i = 0; i<arrowList.Count; i++) 
+        {
+            Destroy(arrowList[i].gameObject);
+        }
         arrowList.Clear();
     }
 
@@ -320,11 +353,14 @@ public class CharaScript : MonoBehaviour
         //敵ならDestroy
         if (gameObject.CompareTag("Enemy"))
         {
-            Destroy(attackImage);
-            arrowList.Clear();
-            Destroy(hpSlider.gameObject);
+            DeleteImage();
+
+            Destroy(hpObj);
 
             gridManager.LeaveCell((int)curPos.z, (int)curPos.x, this);
+
+            //お金ドロップ
+            moneyScript.GetMoney(dropMoney, GetCanvasPos(transform.position));
 
             Vector3 startScale = transform.localScale;
             Vector3 targetScale = Vector3.zero;
@@ -350,13 +386,30 @@ public class CharaScript : MonoBehaviour
         //プレイヤーなら非表示
         else
         {
-            hpSlider.gameObject.SetActive(false);
+            hpObj.SetActive(false);
 
             animator.SetBool("IsDead", true);
             shadowAnim.SetBool("IsDead", true);
 
             waveManager.PlayerDead();
         }
+    }
+
+    /// <summary>
+    /// キャラクターのキャンバス上での位置を取得
+    /// </summary>
+    /// <param name="vector2"></param>
+    /// <returns></returns>
+    public Vector2 GetCanvasPos(Vector3 charaPos)
+    {
+        Vector2 viewPos = worldCamera.WorldToViewportPoint(charaPos);
+        RectTransform canvasRect = canvas.GetComponent<RectTransform>();
+        Vector2 charaScreenPos = new Vector2(
+            canvasRect.sizeDelta.x * viewPos.x - (canvasRect.sizeDelta.x * 0.5f),
+            canvasRect.sizeDelta.y * viewPos.y - (canvasRect.sizeDelta.y * 0.5f)
+            );
+        
+        return charaScreenPos;
     }
 }
 

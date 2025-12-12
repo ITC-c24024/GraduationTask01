@@ -10,16 +10,29 @@ public class MoneyScript : MonoBehaviour
     [SerializeField, Header("お金イメージ")]
     Image moneyImage;
 
-    [SerializeField] Canvas canvas;
+    [SerializeField, Header("所持金Text")]
+    Text moneyText;
 
-    List<Image> coinList = new List<Image>();
+    [SerializeField] Canvas canvas;
 
     //所持金
     public int money = 0;
+    [SerializeField, Header("お金追加獲得割合")]
+    float moneyGetRate = 0;
 
     void Start()
     {
         
+    }
+
+    //アイテム効果
+    /// <summary>
+    /// お金追加獲得割合を設定
+    /// </summary>
+    /// <param name="amount">変化量</param>
+    public void SetRate(float amount)
+    {
+        moneyGetRate += amount;
     }
 
     /// <summary>
@@ -29,7 +42,8 @@ public class MoneyScript : MonoBehaviour
     /// <param name="startPos">お金ドロップ位置</param>
     public void GetMoney(int amount, Vector2 startPos)
     {
-        money += amount;
+        money += amount + (int)(amount * moneyGetRate);
+        moneyText.text = "" + money;
 
         StartCoroutine(MoveMoney(startPos));
     }
@@ -40,6 +54,7 @@ public class MoneyScript : MonoBehaviour
     public void UseMoney(int amount)
     {
         money -= amount;
+        moneyText.text = "" + money;
     }
 
     /// <summary>
@@ -49,7 +64,7 @@ public class MoneyScript : MonoBehaviour
     /// <returns></returns>
     IEnumerator MoveMoney(Vector2 startPos)
     {
-        for(int i = 0; i < 10; i++)
+        for(int i = 0; i < 7; i++)
         {
             var coin = Instantiate(moneyImage);
             coin.transform.SetParent(canvas.transform);

@@ -75,6 +75,17 @@ public class GridManager : MonoBehaviour
         cellSC[y, x].ReciveAttack(damage,isEnemy,direction);
     }
 
+    //勝手に書き換え
+    /// <summary>
+    /// 指定したマスをダメージマス状態にする
+    /// </summary>
+    /// <param name="y">y座標</param>
+    /// <param name="x">x座標</param>
+    public void SetDamageState(int y,int x)
+    {
+        cellSC[y, x].haveDamage = true;
+    }
+
     /// <summary>
     /// 敵スポーンの位置を決める
     /// </summary>

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Enemy_BScript : CharaScript
 {
@@ -36,16 +37,9 @@ public class Enemy_BScript : CharaScript
                     originPos.z + targetDir.y
                     );
 
-                if (!InStage(targetPos))
-                {
-                    turnManager.FinCoroutine();
-                    break;
-                }
+                if (!InStage(targetPos)) break;
                
-                if (!CanMove(targetPos))
-                {
-                    goBack = true;
-                }
+                if (!CanMove(targetPos)) goBack = true;
 
                 //プレイヤーがいる場合
                 if (gridManager.CheckCellState((int)targetPos.z, (int)targetPos.x) == CellScript.CellState.player)
@@ -67,7 +61,7 @@ public class Enemy_BScript : CharaScript
                 }
 
                 float time = 0;
-                float required = 0.5f;
+                float required = 0.3f;
                 while (time < required)
                 {
                     time += Time.deltaTime;
@@ -125,6 +119,46 @@ public class Enemy_BScript : CharaScript
                 //ひとつ前のマスを空にする
                 gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);               
             }
+        }
+        
+        turnManager.FinCoroutine();
+    }
+
+    public override void AttackState()
+    {
+        //矢印UIの方向を決める
+        int angle = 0;
+        if (targetDir.x > 0) angle = 90;
+        else if (targetDir.x < 0) angle = -90;
+        else if (targetDir.y > 0) angle = 0;
+        else if (targetDir.y < 0) angle = 180;
+
+        for (int i = 0; i < 3; i++)
+        {
+            var arrow = Instantiate(arrowPrefab);
+            arrowList.Add(arrow);
+
+            arrow.transform.localPosition = new Vector3(
+                movePos.x - targetDir.x / 2 - targetDir.x / 3 * -i,
+                0.101f,
+                movePos.z - targetDir.y / 2 - targetDir.y / 3 * -i
+                );
+
+            arrow.transform.localEulerAngles = new Vector3(arrow.transform.localEulerAngles.x, angle, arrow.transform.localEulerAngles.z);
+            arrow.SetActive(true);
+        }
+    }
+
+    public override void ReciveDamage(int amount, Vector2 kbDir)
+    {
+        hp -= amount;
+        hpSlider.value = hp;
+
+        //HPが0になったら死亡
+        if (hp <= 0)
+        {
+            StartCoroutine(Dead());
+            turnManager.enemyList.Remove(this);
         }
     }
 }

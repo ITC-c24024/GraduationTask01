@@ -133,11 +133,31 @@ public class Enemy_AScript : CharaScript
             DeleteImage();
             yield return new WaitForSeconds(0.2f);
         }
-        
-        
-        if (!attackOnly) turnManager.FinCoroutine();
+      　
+        turnManager.FinCoroutine();
     }
-    
+
+    public override void AttackState()
+    {
+        var arrow = Instantiate(arrowPrefab);
+        arrowList.Add(arrow);
+
+        //攻撃予定位置を表示
+        attackImage.transform.localPosition = new Vector3(movePos.x, 0.101f, movePos.z);
+        attackImage.SetActive(true);
+
+        //矢印イメージを表示
+        arrow.transform.localPosition = new Vector3(movePos.x - (targetDir.x / 2), 0.101f, movePos.z - (targetDir.y / 2));
+
+        int angle = 0;
+        if (targetDir.x > 0) angle = 90;
+        else if (targetDir.x < 0) angle = -90;
+        else if (targetDir.y > 0) angle = 0;
+        else if (targetDir.y < 0) angle = 180;
+        arrow.transform.localEulerAngles = new Vector3(arrow.transform.localEulerAngles.x, angle, arrow.transform.localEulerAngles.z);
+        arrow.SetActive(true);
+    }
+
     public override void ReciveDamage(int amount, Vector2 kbDir)
     {
         hp -= amount;

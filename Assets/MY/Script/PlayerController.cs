@@ -204,6 +204,12 @@ public class PlayerController : CharaScript
             playerPos.z + kbDir.y
             );
 
+        //マス更新(KBが確定しているので、ここで更新)
+        gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);
+
+        if (alive) gridManager.ChangeCellState((int)targetPos.z, (int)targetPos.x, CellScript.CellState.player, this, default);
+        else gridManager.ChangeCellState((int)originPos.z, (int)originPos.x, CellScript.CellState.dead, this, default);
+
         float time = 0;
         float required = 0.1f;
         while (time < required)
@@ -222,10 +228,8 @@ public class PlayerController : CharaScript
         playerPos = targetPos;
         curPos = playerPos;
 
-        //gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);
-        //マス更新
-        if (alive)gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.player, this, default);
-        else gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.dead, this, default);      
+        
+        
     }
 
     /// <summary>

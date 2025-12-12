@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,10 +18,12 @@ public class CharaScript : MonoBehaviour
 
     public GameObject charaImage;
     public GameObject attackImage;
-    public GameObject arrowImage;
+    public GameObject arrowPrefab;
     public Slider hpSlider;
     public Camera worldCamera;
     public Canvas canvas;
+
+    public List<GameObject> arrowList = new List<GameObject>();
 
     public enum CharaState
     {
@@ -240,22 +243,9 @@ public class CharaScript : MonoBehaviour
     /// <summary>
     /// ìGÇÃçUåÇó\íËínÇï\é¶
     /// </summary>
-    public void AttackState()
+    public virtual void AttackState()
     {
-        //çUåÇó\íËà íuÇï\é¶
-        attackImage.transform.localPosition = new Vector3(movePos.x, 0.101f, movePos.z);
-        attackImage.SetActive(true);
-
-        //ñÓàÛÉCÉÅÅ[ÉWÇï\é¶
-        arrowImage.transform.localPosition = new Vector3(movePos.x - (targetDir.x / 2), 0.101f, movePos.z - (targetDir.y / 2));
-
-        int angle = 0;
-        if (targetDir.x > 0) angle = 90;
-        else if (targetDir.x < 0) angle = -90;
-        else if (targetDir.y > 0) angle = 0;
-        else if (targetDir.y < 0) angle = 180;
-        arrowImage.transform.localEulerAngles = new Vector3(arrowImage.transform.localEulerAngles.x, angle, arrowImage.transform.localEulerAngles.z);
-        arrowImage.SetActive(true);
+        
     }
 
     /// <summary>
@@ -264,7 +254,7 @@ public class CharaScript : MonoBehaviour
     public void DeleteImage()
     {
         attackImage.gameObject.SetActive(false);
-        arrowImage.gameObject.SetActive(false);
+        arrowList.Clear();
     }
 
     /// <summary>
@@ -331,7 +321,7 @@ public class CharaScript : MonoBehaviour
         if (gameObject.CompareTag("Enemy"))
         {
             Destroy(attackImage);
-            Destroy(arrowImage);
+            arrowList.Clear();
             Destroy(hpSlider.gameObject);
 
             gridManager.LeaveCell((int)curPos.z, (int)curPos.x, this);

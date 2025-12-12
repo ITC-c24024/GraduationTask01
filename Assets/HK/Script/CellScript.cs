@@ -192,14 +192,14 @@ public class CellScript : MonoBehaviour
     /// <param name="damage">ダメージ量</param>
     public void ReciveAttack(int damage, bool isEnemy, Vector2Int direction)//演出上後々bool返すことになるかも
     {
+        //ダメージ与える予定の相手リスト
+        List<CharaScript> recive = new List<CharaScript>();
+
         if (!isEnemy && enemyList.Count > 0)
-        {
-            //仮
-            List<CharaScript> recive = new List<CharaScript>();
+        {          
             foreach (var enemy in enemyList)
             {
                 recive.Add(enemy);
-                //enemy.ReciveDamage(damage, new Vector2(0, 0));
             }
             foreach(var r in recive)
             {
@@ -210,7 +210,11 @@ public class CellScript : MonoBehaviour
         {
             foreach (var player in playerList)
             {
-                player.ReciveDamage(damage, direction);
+                recive.Add(player);
+            }
+            foreach (var r in recive)
+            {
+                playerList[recive.IndexOf(r)].ReciveDamage(damage, direction);
             }
         }
     }

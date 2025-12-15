@@ -13,9 +13,14 @@ public class SelectContentScript : MonoBehaviour
     [SerializeField, Header("強化内容選択画面")]
     Image selectImage;
     [SerializeField, Header("選択中Image")]
-    Image[] selects;
+    GameObject[] selects;
     [SerializeField, Header("強化内容Image")]
-    Image[] items; 
+    GameObject[] items;
+
+    [SerializeField, Header("メインカメラ")]
+    Camera mainCamera;
+    [SerializeField, Header("ショップカメラ")]
+    Camera shopCamera;
 
     int playerNum = 0;
 
@@ -34,11 +39,14 @@ public class SelectContentScript : MonoBehaviour
 
     public IEnumerator SelectContent()
     {
+        shopCamera.gameObject.SetActive(true);
+        mainCamera.gameObject.SetActive(false);
+        
         //選択アイテムをセット
         SetItem();
         
         //選択画面表示
-        selectImage.gameObject.SetActive(true);     
+        //selectImage.gameObject.SetActive(true);     
 
         //プレイヤーが交互に選択する
         for (int i = 0; i < playerCons.Length; i++)
@@ -55,6 +63,9 @@ public class SelectContentScript : MonoBehaviour
         selectImage.gameObject.SetActive(false);
 
         yield return new WaitForSeconds(0.5f);
+
+        mainCamera.gameObject.SetActive(true);
+        shopCamera.gameObject.SetActive(false);
 
         //次のウェーブへ
         waveManager.StartWave();
@@ -86,7 +97,11 @@ public class SelectContentScript : MonoBehaviour
     /// <param name="selectNum">選択する内容のImage要素数</param>
     public void SelectItem(int selectNum)
     {
-        Vector2 selectPos = new Vector2(items[selectNum].transform.localPosition.x, items[selectNum].transform.localPosition.y + 165);
+        Vector3 selectPos = new Vector3(
+            items[selectNum].transform.localPosition.x,
+            items[selectNum].transform.localPosition.y + 0.02f,
+            items[selectNum].transform.localPosition.z
+            );
         selects[playerNum].transform.localPosition = selectPos;
         selects[playerNum].gameObject.SetActive(true);
     }
@@ -106,7 +121,7 @@ public class SelectContentScript : MonoBehaviour
             //アイテムを取得
             var item = items[selectNum].GetComponent<ItemScript>();
             item.GetItem(playerCons[playerNum]);
-            items[selectNum].color = new Color(120, 120, 120, 255);
+            items[selectNum].SetActive(false);
 
             //次のプレイヤーへ
             playerNum++;

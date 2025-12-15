@@ -17,6 +17,10 @@ public class CellScript : MonoBehaviour
         dead,//死体
     }
 
+    //勝手に書き換え
+    //ダメージマス判定
+    public bool haveDamage = false;
+
     /// <summary>
     /// TryEnter関数呼びだしの結果用
     /// </summary>
@@ -130,12 +134,22 @@ public class CellScript : MonoBehaviour
         //マスに他ユニットがいない場合
         else if (UnitCount <= 0)
         {
-            result.canMove = true;
+            result.canMove = true;   
         }
 
         if (result.canMove)
         {
             ChangeState(newState, unitSC);
+
+            //勝手に書き換え
+            if (newState == CellState.player)
+            {
+                //ダメージマスなら被弾
+                if (haveDamage)
+                {
+                    ReciveAttack(1, true, Vector2Int.zero);
+                }
+            }
         }
 
         return result;

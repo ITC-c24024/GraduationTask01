@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,30 +8,79 @@ using UnityEngine.UIElements;
 public class ItemScript : MonoBehaviour
 {
     PlayerController playerCon;
-
-    public enum ItemType
+    [SerializeField] MoneyScript moneyScript;
+    
+    enum ItemType
     {
-        hpUp,//体力アップ
-        damageUp,//ダメージアップ
-        criticalRateUp//クリティカル率アップ
+        hpUp,//体力+1
+        damageUp,//ダメージ+1
+        actionLimitUp,//行動回数+1
+        moneyUp//獲得金+n% 
     }
 
-    public ItemType itemType;
+    ItemType[] itemType = new ItemType[]
+    {
+        ItemType.hpUp,
+        ItemType.damageUp,
+        ItemType.actionLimitUp,
+        ItemType.moneyUp
+    };
+
+    [SerializeField,Header("現在のアイテム")] ItemType nowItem;
 
     //このアイテムがすでに選ばれたかどうかの判定
     public bool isSellect = false;
 
     //アイテムごとの実行関数
-    Dictionary<ItemType, Action> itemEffectDict;
-    
+    Dictionary<ItemType, Action> itemEffect;
+    //アイテムごとの値段
+    Dictionary<ItemType, int> itemPrice;
+
     void Start()
     {
-        itemEffectDict = new Dictionary<ItemType, Action>()
+        itemEffect = new Dictionary<ItemType, Action>()
         {
             {ItemType.hpUp,HpUp},
-            {ItemType.damageUp,DamageUp },
-            {ItemType.criticalRateUp,CriticalRateUp }
+            {ItemType.damageUp,DamageUp},
+            {ItemType.actionLimitUp, ActionLimitUp},
+            {ItemType.moneyUp,MoneyUp }
         };
+        itemPrice = new Dictionary<ItemType, int>()
+        {
+            {ItemType.hpUp,500},
+            {ItemType.damageUp,500},
+            {ItemType.actionLimitUp, 500},
+            {ItemType.moneyUp,500}
+        };
+    }
+
+    /// <summary>
+    /// アイテムの総数を取得
+    /// </summary>
+    /// <returns></returns>
+    public int GetItemCount()
+    {
+        int count = itemType.Length;
+        return count;
+    }
+
+    /// <summary>
+    /// アイテムのタイプを決める
+    /// </summary>
+    /// <param name="itemNum">ランダムなアイテム番号</param>
+    public void SetItemType(int itemNum)
+    {
+        nowItem = itemType[itemNum];
+    }
+
+    /// <summary>
+    /// アイテムの値段を取得
+    /// </summary>
+    /// <returns></returns>
+    public int GetItemPrice()
+    {
+        int price = itemPrice[nowItem];
+        return price;
     }
 
     /// <summary>
@@ -41,22 +91,23 @@ public class ItemScript : MonoBehaviour
     {
         playerCon = player;
         isSellect = true;
-        itemEffectDict[itemType]();
+        itemEffect[nowItem]();
     }
 
     void HpUp()
     {
-        int amount = playerCon.hp / 10;
-        playerCon.SetHP(amount);
+        playerCon.SetHP(1);
     }
     void DamageUp()
     {
-        int amount = playerCon.damage / 10;
-        playerCon.SetDamage(amount);
+        playerCon.SetDamage(1);
     }
-    void CriticalRateUp()
+    void ActionLimitUp()
+    {       
+        playerCon.SetActionLimit(1);
+    }
+    void MoneyUp()
     {
-        float amount = playerCon.criticalRate / 10;
-        playerCon.SetCriticalRate(amount);
+        moneyScript.SetRate(0.5f);
     }
 }

@@ -7,6 +7,8 @@ public class SelectContentScript : MonoBehaviour
 {
     WaveManager waveManager;
     [SerializeField] PlayerController[] playerCons;
+    ItemScript[] itemScripts=new ItemScript[3];
+    MoneyScript moneyScript;
 
     [SerializeField, Header("強化内容選択画面")]
     Image selectImage;
@@ -23,11 +25,11 @@ public class SelectContentScript : MonoBehaviour
     void Start()
     {
         waveManager = GetComponent<WaveManager>();
-    }
-
-    void Update()
-    {
-        
+        for(int i = 0; i < items.Length; i++)
+        {
+            itemScripts[i] = items[i].gameObject.GetComponent<ItemScript>();
+        }
+        moneyScript = GetComponent<MoneyScript>();
     }
 
     public IEnumerator SelectContent()
@@ -46,6 +48,7 @@ public class SelectContentScript : MonoBehaviour
             isRun = true;
 
             while (isRun) yield return null;
+            selects[playerNum-1].gameObject.SetActive(false);
         }
         playerNum = 0;
 
@@ -59,28 +62,91 @@ public class SelectContentScript : MonoBehaviour
 
     void SetItem()
     {
-        
+        //すでに選ばれた番号
+        List<int> selectList = new List<int>();
+
+        for(int i = 0; i < itemScripts.Length; i++)
+        {
+            //アイテム番号が重複しないようにする
+            int itemNum;
+            while (true)
+            {
+                itemNum = Random.Range(0, itemScripts[0].GetItemCount());
+                if (!selectList.Contains(itemNum)) break;
+            }
+            selectList.Add(itemNum);
+
+            itemScripts[i].SetItemType(itemNum);   
+        }
     }
 
+    /// <summary>
+    /// 選択中Imageを動かす
+    /// </summary>
+    /// <param name="selectNum">選択する内容のImage要素数</param>
     public void SelectItem(int selectNum)
     {
-        //選べるかどうかのboolを返したい(範囲外か、すでに選択されてるかを判定)
-
-
         Vector2 selectPos = new Vector2(items[selectNum].transform.localPosition.x, items[selectNum].transform.localPosition.y + 165);
         selects[playerNum].transform.localPosition = selectPos;
         selects[playerNum].gameObject.SetActive(true);
     }
 
-    public void DecisionItem(int selectNum)
+    /// <summary>
+    /// 選択を決定
+    /// </summary>
+    /// <param name="selectNum">決定する内容のImage要素数</param>
+    /// <returns>アイテムを変えたかの判定</returns>
+    public bool DecisionItem(int selectNum)
     {
-        selects[playerNum].gameObject.SetActive(false);
+        if (CanDecision(selectNum))
+        {
+            selects[playerNum].gameObject.SetActive(false);
 
-        //アイテムを取得
-        var item = items[selectNum].GetComponent<ItemScript>();
-        item.GetItem(playerCons[playerNum]);
-        items[selectNum].color = new Color(120, 120, 120, 255);
+            moneyScript.UseMoney(itemScripts[selectNum].GetItemPrice());
+            //アイテムを取得
+            var item = items[selectNum].GetComponent<ItemScript>();
+            item.GetItem(playerCons[playerNum]);
+            items[selectNum].color = new Color(120, 120, 120, 255);
 
+            //次のプレイヤーへ
+            playerNum++;
+            isRun = false;
+
+            return true;
+        }
+        else
+        {
+            Debug.Log("※買えません");
+
+            //演出案
+            //金額テキスト揺らす
+
+            return false;
+        }
+        
+    }
+    /// <summary>
+    /// 決定できるかを判定
+    /// </summary>
+    /// <param name="selectNum">決定する内容のImage要素数</param>
+    /// <returns>判定結果</returns>
+    bool CanDecision(int selectNum)
+    {
+        int price = itemScripts[selectNum].GetItemPrice();
+        int money = moneyScript.money;
+
+        if (money >= price)
+        {
+            return true;
+        }
+        else return false;
+    }
+
+    /// <summary>
+    /// 購入をスキップ
+    /// </summary>
+    public void Skip()
+    {
         //次のプレイヤーへ
         playerNum++;
         isRun = false;

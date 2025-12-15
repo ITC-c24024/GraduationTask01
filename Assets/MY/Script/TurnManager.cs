@@ -6,11 +6,12 @@ using UnityEngine.UI;
 
 public class TurnManager : MonoBehaviour
 {
-    [SerializeField] WaveManager waveManager;
+    WaveManager waveManager;
     [SerializeField] PlayerController[] playerCon;
     GridManager gridManager;   
     [SerializeField] CellScript cellScript;
     StartUIScript startUIScript;
+    MoneyScript moneyScript;
 
     [SerializeField, Header("ワールドカメラ")]
     Camera worldCamera;
@@ -35,6 +36,8 @@ public class TurnManager : MonoBehaviour
         Application.targetFrameRate = 30;
         gridManager = gameObject.GetComponent<GridManager>();
         startUIScript = gameObject.GetComponent<StartUIScript>();
+        waveManager = gameObject.GetComponent<WaveManager>();
+        moneyScript = gameObject.GetComponent<MoneyScript>();
     }
 
     void Start()
@@ -60,21 +63,15 @@ public class TurnManager : MonoBehaviour
             enemyPrefab[enemyNum].transform.rotation
             );
 
-        //HPスライダーアタッチ
-        Slider slider = Instantiate(hpPrefab);
-        slider.transform.SetParent(canvas.transform);
-
         //必要なコンポーネントを取得
         CharaScript enemySC = enemy.GetComponent<CharaScript>();
         enemySC.waveManager = waveManager;
         enemySC.turnManager = this;
         enemySC.gridManager = gridManager;
         enemySC.cellScript = cellScript;
-        enemySC.hpSlider = slider;
         enemySC.worldCamera = worldCamera;
         enemySC.canvas = canvas;
-        enemySC.attackImage = Instantiate(attackImage);
-        enemySC.arrowPrefab = Instantiate(arrowPrefab);
+        enemySC.moneyScript = moneyScript;
 
         //Listに追加
         enemyList.Add(enemySC);
@@ -121,8 +118,10 @@ public class TurnManager : MonoBehaviour
         //敵の行動予定地を設定
         for (int n = 0; n < enemyList.Count; n++)
         {
-            enemyList[n].SetTargetPos();
-            enemyList[n].AttackState();
+            enemyList[n].SetAction();
+            
+            //enemyList[n].SetTargetPos();
+            //enemyList[n].AttackState();
         }
 
         //プレイヤーの行動選択

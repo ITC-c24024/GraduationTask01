@@ -22,9 +22,6 @@ public class PlayerController : CharaScript
     [SerializeField, Header("プレイヤーの初期配置")]
     Vector3 initialPos;
 
-    //クリティカル率
-    public float criticalRate = 0;
-
     //プレイヤーの位置
     public Vector3 playerPos;
     //生存判定
@@ -62,11 +59,10 @@ public class PlayerController : CharaScript
 
         charaState = CharaState.player;
 
-        hpSlider.gameObject.SetActive(true);
-        hpSlider.maxValue = hp;
-        hpSlider.value = hp;
-    } 
+        hpObj.SetActive(true);
+    }
 
+    #region アイテム効果関数
     /// <summary>
     /// HPを設定
     /// </summary>
@@ -84,13 +80,14 @@ public class PlayerController : CharaScript
         damage += amount;
     }
     /// <summary>
-    /// クリティカル率を設定
+    /// 行動回数を設定
     /// </summary>
     /// <param name="amount">変化量</param>
-    public void SetCriticalRate(float amount)
+    public void SetActionLimit(int amount)
     {
-        criticalRate += amount;
+        actionLimit += amount;
     }
+    #endregion
 
     /// <summary>
     /// プレイヤーの移動
@@ -167,8 +164,7 @@ public class PlayerController : CharaScript
     public override void ReciveDamage(int amount, Vector2 kbDir)
     {
         hp -= amount;
-        hpSlider.value = hp;
-        
+        hpBar[hp].gameObject.SetActive(false);
         
         //ノックバックできる場合
         if (kbDir != Vector2.zero) StartCoroutine(KnockBack(kbDir));
@@ -188,6 +184,7 @@ public class PlayerController : CharaScript
         {
             alive = false;
             StartCoroutine(Dead());
+            gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.dead, this, default);
         }
         else
         {
@@ -227,9 +224,6 @@ public class PlayerController : CharaScript
         transform.position = targetPos;
         playerPos = targetPos;
         curPos = playerPos;
-
-        
-        
     }
 
     /// <summary>
@@ -334,11 +328,16 @@ public class PlayerController : CharaScript
                 yield return null;
             }
             squareSC.DeleteSquare();
-        }        
+            yield return new WaitForSeconds(0.5f);
+            
+            StartCoroutine(SurrundAttack());
+        }
+        /*
         yield return new WaitForSeconds(0.5f);
         squareSC.DeleteSquare();
 
         StartCoroutine(SurrundAttack());   
+        */
     }
     
     /// <summary>
@@ -347,12 +346,14 @@ public class PlayerController : CharaScript
     public IEnumerator SelectContent()
     {
         bool isSelect = false;
-        int selectNum = 0;
+        int selectNum = 1;
 
         while (!isSelect)
         {
             Vector2 stick = stickAction.ReadValue<Vector2>();
             bool decision = selectAttack.triggered;
+            bool skip = selectMove.triggered;
+            //選択
             if (0.5 < stick.x)
             {
                 if (selectNum != 2)
@@ -371,11 +372,16 @@ public class PlayerController : CharaScript
                     yield return new WaitForSeconds(0.2f);
                 }
             }
-
+            //決定
             if (decision)
             {
-                isSelect = true;
-                SelectContentSC.DecisionItem(selectNum);
+                 isSelect = SelectContentSC.DecisionItem(selectNum);
+            }
+            //スキップ
+            if (skip)
+            {
+                SelectContentSC.Skip();
+                break;
             }
 
             yield return null;

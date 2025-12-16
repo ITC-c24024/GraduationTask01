@@ -63,7 +63,6 @@ public class Enemy_BScript : CharaScript
                     if (!result.canMove)
                     {
                         attackOnly = true;
-                        Debug.Log("attackOnly");
                     }
                 }
 
@@ -86,7 +85,7 @@ public class Enemy_BScript : CharaScript
 
                 if (goBack)
                 {
-                    StartCoroutine(Back(originPos));
+                    yield return StartCoroutine(Back(originPos));
                     goBack = false;
 
                     break;
@@ -99,7 +98,7 @@ public class Enemy_BScript : CharaScript
                     //プレイヤーに攻撃
                     gridManager.SendDamage((int)curPos.z, (int)curPos.x, damage, true);
 
-                    StartCoroutine(Back(originPos));
+                    yield return StartCoroutine(Back(originPos));
 
                     break;
                 }
@@ -115,6 +114,48 @@ public class Enemy_BScript : CharaScript
                         );
                 }
 
+                //敵がいないマスに進んだ場合
+                if(gridManager.CheckCellState((int)curPos.z, (int)curPos.x) != CellScript.CellState.player)
+                {
+                    //進行軸じゃない軸がプレイヤーと重なったら移動終了
+                    if (targetDir.x != 0)
+                    {
+                        if(curPos.x == targetPlayer.transform.position.x)
+                        {
+                            //マスの状態を敵自身にする
+                            gridManager.ChangeCellState(
+                                (int)curPos.z,
+                                (int)curPos.x,
+                                CellScript.CellState.enemy,
+                                this,
+                                new Vector2Int((int)targetDir.x, (int)targetDir.y)
+                                );
+                            //ひとつ前のマスを空にする
+                            gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);
+
+                            break;
+                        }
+                    }
+                    else if (targetDir.y != 0)
+                    {
+                        if (curPos.z == targetPlayer.transform.position.z)
+                        {
+                            //マスの状態を敵自身にする
+                            gridManager.ChangeCellState(
+                                (int)curPos.z,
+                                (int)curPos.x,
+                                CellScript.CellState.enemy,
+                                this,
+                                new Vector2Int((int)targetDir.x, (int)targetDir.y)
+                                );
+                            //ひとつ前のマスを空にする
+                            gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);
+
+                            break;
+                        }
+                    }
+                }
+
                 //マスの状態を敵自身にする
                 gridManager.ChangeCellState(
                     (int)curPos.z,
@@ -124,12 +165,11 @@ public class Enemy_BScript : CharaScript
                     new Vector2Int((int)targetDir.x, (int)targetDir.y)
                     );
                 //ひとつ前のマスを空にする
-                gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);               
-            }
-            
+                gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);              
+            }           
         }
         
-        turnManager.FinCoroutine();
+        //turnManager.FinCoroutine();
     }
 
     public override void AttackState()

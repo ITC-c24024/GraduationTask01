@@ -54,6 +54,16 @@ public class GridManager : MonoBehaviour
     }
 
     /// <summary>
+    /// マスがダメージマスかどうか確認
+    /// </summary>
+    /// <param name="y">y座標(縦の列)</param>
+    /// <param name="x">x座標(横の列)</param>
+    public bool CheckHaveDamage(int y, int x)
+    {
+        return cellSC[y, x].haveDamage;
+    }
+
+    /// <summary>
     /// 指定したマスから離れる
     /// </summary>
     /// <param name="y">y座標</param>

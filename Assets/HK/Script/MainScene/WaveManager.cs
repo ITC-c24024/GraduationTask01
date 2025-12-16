@@ -11,6 +11,7 @@ public class WaveManager : MonoBehaviour
     SelectContentScript selectContentSC;
     //勝手に書き換え
     MoneyScript moneyScript;
+    [SerializeField] PlayerController[] playerCon;
     
     [SerializeField, Header("ウェーブ数")]
     int waveCount = 1;
@@ -127,17 +128,23 @@ public class WaveManager : MonoBehaviour
     IEnumerator WaveClear()
     {
         //仮
-        StartCoroutine(startUISC.SetUI(3));
+        yield return StartCoroutine(startUISC.SetUI(3));
+
+        //プレイヤー蘇生
+        for(int i = 0; i < playerCon.Length; i++)
+        {
+            if (!playerCon[i].alive) yield return StartCoroutine(playerCon[i].Resurrection());
+        }
 
         isClear = true;
         waveCount++;
-
+        /*
         //勝手に書き換え
         //結果を評価してお金を与える
         //与える金額=1ウェーブに出てきた敵の数÷ウェーブクリアにかかったターン数*金額倍率+最低保証
         float money = totalEnemyCount / turnCount * 10000 + 100;
         moneyScript.GetMoney((int)money, Vector3.zero);
-
+        */
         //仮
         turnCount = 0;
 

@@ -18,6 +18,11 @@ public class GameController : MonoBehaviour
 
     public bool isStart = false;
 
+    void Awake()
+    {
+        Application.targetFrameRate = 30;
+    }
+
     void Start()
     {
         waveManager = gameObject.GetComponent<WaveManager>();
@@ -32,7 +37,7 @@ public class GameController : MonoBehaviour
 
     public IEnumerator GameStart()
     {
-        waitImage.gameObject.SetActive(false); ;
+        waitImage.gameObject.SetActive(false);
 
         //プレイヤーを初期位置に移動
         for (int i = 0; i < playerObj.Length; i++)

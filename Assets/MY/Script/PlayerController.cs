@@ -11,6 +11,8 @@ public class PlayerController : CharaScript
     [SerializeField] SquareScript squareSC;
     [SerializeField] SelectContentScript SelectContentSC;
 
+    [SerializeField, Header("味方プレイヤー")] PlayerController playerCon;
+
     //ノックバック方向
     Vector2 kbDirection;
 
@@ -164,12 +166,17 @@ public class PlayerController : CharaScript
     public override void ReciveDamage(int amount, Vector2 kbDir)
     {
         hp -= amount;
-        hpBar[hp].gameObject.SetActive(false);
-        
+        if (hp < 0) hp = 0;
+
+        for (int i = hp; i < hpBar.Length; i++)
+        {
+            hpBar[i].gameObject.SetActive(false);
+        }
+
         //ノックバックできる場合
         if (kbDir != Vector2.zero) StartCoroutine(KnockBack(kbDir));
         //HPが0なら死亡
-        else if (hp <= 0)
+        else if(hp <= 0)
         {
             alive = false;
             StartCoroutine(Dead());
@@ -179,19 +186,6 @@ public class PlayerController : CharaScript
 
     IEnumerator KnockBack(Vector2 kbDir)
     {
-        //HPが0なら死亡
-        if (hp <= 0)
-        {
-            alive = false;
-            StartCoroutine(Dead());
-            gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.dead, this, default);
-        }
-        else
-        {
-            animator.SetTrigger("IsKB");
-            shadowAnim.SetTrigger("IsKB");
-        }     
-
         //元の位置
         Vector3 originPos = playerPos;
         //移動先の位置
@@ -201,11 +195,24 @@ public class PlayerController : CharaScript
             playerPos.z + kbDir.y
             );
 
+        //HPが0なら死亡
+        if (hp <= 0)
+        {
+            alive = false;
+            StartCoroutine(Dead());
+            //gridManager.ChangeCellState((int)targetPos.z, (int)targetPos.x, CellScript.CellState.dead, this, default);
+        }
+        else
+        {
+            animator.SetTrigger("IsKB");
+            shadowAnim.SetTrigger("IsKB");
+        }
+
         //マス更新(KBが確定しているので、ここで更新)
         gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);
 
         if (alive) gridManager.ChangeCellState((int)targetPos.z, (int)targetPos.x, CellScript.CellState.player, this, default);
-        else gridManager.ChangeCellState((int)originPos.z, (int)originPos.x, CellScript.CellState.dead, this, default);
+        else gridManager.ChangeCellState((int)targetPos.z, (int)targetPos.x, CellScript.CellState.dead, this, default);
 
         float time = 0;
         float required = 0.1f;
@@ -259,11 +266,56 @@ public class PlayerController : CharaScript
         for (int i = 0; i < enemyPos.Count; i++)
         {   
             //敵にダメージを与える
-            StartCoroutine(Attack((int)enemyPos[i].x, (int)enemyPos[i].y, combo));
-            yield return new WaitForSeconds(1.0f);
+            yield return StartCoroutine(Attack((int)enemyPos[i].x, (int)enemyPos[i].y, combo));
+            //yield return new WaitForSeconds(1.0f);
+        }
+    }
+
+    /// <summary>
+    /// 蘇生できる味方がいるか確認
+    /// </summary>
+    public IEnumerator ResurrectionCheck()
+    {
+        //四方にを確認
+        for (int i = -1; i <= 1; i++)
+        {
+            Vector2 checkPos = new Vector2(playerPos.x + i, playerPos.z);
+            if (checkPos.x < 0 || 7 < checkPos.x || i == 0) continue;
+            if (gridManager.CheckCellState((int)checkPos.y, (int)checkPos.x) == CellScript.CellState.dead)
+            {
+                yield return StartCoroutine(playerCon.Resurrection());
+            }
+        }
+        for (int i = -1; i <= 1; i++)
+        {
+            Vector2 checkPos = new Vector2(playerPos.x, playerPos.z + i);
+            if (checkPos.y < 0 || 7 < checkPos.y || i == 0) continue;
+            if (gridManager.CheckCellState((int)checkPos.y, (int)checkPos.x) == CellScript.CellState.enemy)
+            {
+                yield return StartCoroutine(playerCon.Resurrection());
+            }
+        }       
+    }
+
+    /// <summary>
+    /// 蘇生する
+    /// </summary>
+    public IEnumerator Resurrection()
+    {
+        hp = 2;
+        hpObj.SetActive(true);
+        for (int i = 0; i < hp; i++)
+        {
+            hpBar[i].SetActive(true);
         }
 
-        turnManager.FinCoroutine();
+        alive = true;
+        gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.player, this, default);
+
+        animator.SetBool("IsDead", false);
+        shadowAnim.SetBool("IsDead", false);
+
+        yield return null;
     }
 
     /// <summary>
@@ -328,16 +380,9 @@ public class PlayerController : CharaScript
                 yield return null;
             }
             squareSC.DeleteSquare();
-            yield return new WaitForSeconds(0.5f);
-            
-            StartCoroutine(SurrundAttack());
+            yield return new WaitForSeconds(0.5f);    
         }
-        /*
-        yield return new WaitForSeconds(0.5f);
-        squareSC.DeleteSquare();
-
-        StartCoroutine(SurrundAttack());   
-        */
+        yield return StartCoroutine(SurrundAttack());
     }
     
     /// <summary>

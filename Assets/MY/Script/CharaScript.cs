@@ -20,6 +20,8 @@ public class CharaScript : MonoBehaviour
     public Camera worldCamera;
     public Canvas canvas;
 
+    public GameObject targetPlayer;
+
     public List<GameObject> arrowList = new List<GameObject>();
 
     //hpBarをまとめてるオブジェクト
@@ -187,7 +189,12 @@ public class CharaScript : MonoBehaviour
     public Vector3 SelectPlayer()
     {
         //プレイヤーの位置を取得
-        Vector3[] playerPos = turnManager.GetPlayerPos();
+        GameObject[] player = turnManager.GetPlayerObj();
+        Vector3[] playerPos = new Vector3[]
+        {
+            player[0].transform.position,
+            player[1].transform.position
+        };
         //プレイヤーの生存判定を取得
         bool[] alive = turnManager.GetPlayerAlive();
  
@@ -202,10 +209,12 @@ public class CharaScript : MonoBehaviour
         if (diff_A <= diff_B)
         {
             targetPos = playerPos[0];
+            targetPlayer = player[0];
         }
         else
         {
             targetPos = playerPos[1];
+            targetPlayer = player[1];
         }
 
         return targetPos;

@@ -29,7 +29,7 @@ public class TurnManager : MonoBehaviour
     [SerializeField] Canvas canvas;
 
     //実行中コルーチンの数
-    int runnning = 0;
+    //public int runnning = 0;
 
     void Awake()
     {
@@ -81,7 +81,7 @@ public class TurnManager : MonoBehaviour
 
         return true;
     }
-
+    /*
     /// <summary>
     /// コルーチン終了
     /// </summary>
@@ -89,7 +89,7 @@ public class TurnManager : MonoBehaviour
     {
         runnning--;
     }
-
+    */
     /// <summary>
     /// 敵をプレイヤーとの距離が近い順に並べ替え
     /// </summary>
@@ -112,31 +112,45 @@ public class TurnManager : MonoBehaviour
     /// <returns></returns>
     public IEnumerator TurnStart()
     {
-        StartCoroutine(startUIScript.SetUI(1));
-        yield return new WaitForSeconds(1.5f);
+        Debug.Log("start");
+        yield return StartCoroutine(startUIScript.SetUI(1));
+        //yield return new WaitForSeconds(1.5f);
 
+        Debug.Log("敵の行動予定地を設定");
         //敵の行動予定地を設定
         for (int n = 0; n < enemyList.Count; n++)
         {
             enemyList[n].SetAction();
-            
-            //enemyList[n].SetTargetPos();
-            //enemyList[n].AttackState();
         }
 
+        Debug.Log("プレイヤーの行動選択");
         //プレイヤーの行動選択
         for (int i = 0; i < playerCon.Length; i++)
         {
             if (playerCon[i].alive)
             {
-                StartCoroutine(playerCon[i].SelectAction());
-                runnning++;
+                yield return StartCoroutine(playerCon[i].SelectAction());
+                //runnning++;
 
-                while (runnning != 0) yield return null;
+                //while (runnning != 0) yield return null;
             }
         }      
 
-        yield return new WaitForSeconds(0.5f);
+        //yield return new WaitForSeconds(0.5f);
+        Debug.Log("蘇生できるか確認");
+        //蘇生できるか確認
+        for (int i = 0; i < playerCon.Length; i++)
+        {
+            if (playerCon[i].alive)
+            {
+                yield return StartCoroutine(playerCon[i].ResurrectionCheck());
+                //runnning++;
+
+                //while (runnning != 0) yield return null;
+            }
+        }
+
+        //yield return new WaitForSeconds(0.5f);
 
         //敵がいたら
         if (enemyList.Count != 0)
@@ -144,38 +158,48 @@ public class TurnManager : MonoBehaviour
             //距離順並べ替え
             SortEnemy();
 
-            StartCoroutine(startUIScript.SetUI(2));
-            yield return new WaitForSeconds(1.5f);
+            yield return StartCoroutine(startUIScript.SetUI(2));
+            //yield return new WaitForSeconds(1.5f);
 
             //敵の行動
             for (int n = 0; n < enemyList.Count; n++)
             {
-                StartCoroutine(enemyList[n].Move());
-                runnning++;
+                yield return StartCoroutine(enemyList[n].Move());
+                //runnning++;
 
-                while (runnning != 0) yield return null;
+                //while (runnning != 0) yield return null;
             }
 
             //ノックバックの分ディレイ
-            yield return new WaitForSeconds(0.1f);
+            //yield return new WaitForSeconds(0.1f);
 
             //プレイヤーの攻撃
             for (int i = 0; i < playerCon.Length; i++)
             {
                 if (playerCon[i].alive)
                 {
-                    StartCoroutine(playerCon[i].SurrundAttack());
-                    runnning++;
+                    yield return StartCoroutine(playerCon[i].SurrundAttack());
+                    //runnning++;
                 }
             }
 
-            while (runnning != 0) yield return null;
+            //while (runnning != 0) yield return null;
         }     
 
         yield return new WaitForSeconds(1.0f);
 
         //ターン終了
         waveManager.FinishTurn();
+    }
+
+    public GameObject[] GetPlayerObj()
+    {
+        GameObject[] player = new GameObject[]
+        {
+            playerCon[0].gameObject,
+            playerCon[1].gameObject
+        };
+        return player;
     }
 
     public Vector3[] GetPlayerPos()

@@ -130,6 +130,10 @@ public class CellScript : MonoBehaviour
                     }
                 } 
             }
+            else if (newState == CellState.dead)
+            {
+                state = CellState.dead;
+            }
         }
         //マスに他ユニットがいない場合
         else if (UnitCount <= 0)

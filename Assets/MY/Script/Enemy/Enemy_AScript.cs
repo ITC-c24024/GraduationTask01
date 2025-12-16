@@ -59,11 +59,9 @@ public class Enemy_AScript : CharaScript
 
                 Vector3 targetPos = movePos;
 
-                //範囲外の時、敵がいるとき
-                if (!CanMove(targetPos))
-                {
-                    goBack = true;
-                }
+                if (!InStage(targetPos)) break;
+
+                if (!CanMove(targetPos)) goBack = true;
 
                 //プレイヤーがいる場合
                 if (gridManager.CheckCellState((int)targetPos.z, (int)targetPos.x) == CellScript.CellState.player)
@@ -100,7 +98,7 @@ public class Enemy_AScript : CharaScript
                 curPos = targetPos;
                 if (goBack)
                 {
-                    StartCoroutine(Back(originPos));
+                    yield return StartCoroutine(Back(originPos));
                     goBack = false;
 
                     continue;
@@ -113,7 +111,7 @@ public class Enemy_AScript : CharaScript
                     //プレイヤーに攻撃
                     gridManager.SendDamage((int)curPos.z, (int)curPos.x, damage, true);
 
-                    StartCoroutine(Back(originPos));
+                    yield return StartCoroutine(Back(originPos));
                     
                     continue;
                 }
@@ -144,7 +142,7 @@ public class Enemy_AScript : CharaScript
             yield return new WaitForSeconds(0.2f);
         }
       　
-        turnManager.FinCoroutine();
+        //turnManager.FinCoroutine();
     }
 
     public override void AttackState()

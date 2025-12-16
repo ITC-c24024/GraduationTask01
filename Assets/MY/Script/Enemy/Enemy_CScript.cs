@@ -28,7 +28,7 @@ public class Enemy_CScript : CharaScript
             int x = Random.Range(0, 8);
             int z = Random.Range(0, 8);
 
-            if (gridManager.CheckCellState(z, x) == CellScript.CellState.empty)
+            if (gridManager.CheckCellState(z, x) == CellScript.CellState.empty && gridManager.CheckHaveDamage(z, x))
             {
                 //çUåÇó\íËà íu
                 movePos = new Vector3(x, transform.position.y, z);
@@ -60,7 +60,7 @@ public class Enemy_CScript : CharaScript
 
         DeleteImage();
 
-        turnManager.FinCoroutine();
+        //turnManager.FinCoroutine();
     }
 
     public override void AttackState()

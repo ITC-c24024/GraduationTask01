@@ -52,10 +52,10 @@ public class SelectContentScript : MonoBehaviour
         for (int i = 0; i < playerCons.Length; i++)
         {
             selects[playerNum].gameObject.SetActive(true);
-            StartCoroutine(playerCons[i].SelectContent());
-            isRun = true;
+            yield return StartCoroutine(playerCons[i].SelectContent());
+            //isRun = true;
 
-            while (isRun) yield return null;
+            //while (isRun) yield return null;
             selects[playerNum-1].gameObject.SetActive(false);
         }
         playerNum = 0;

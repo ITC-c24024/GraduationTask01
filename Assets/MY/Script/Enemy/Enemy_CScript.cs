@@ -4,10 +4,32 @@ using UnityEngine;
 
 public class Enemy_CScript : CharaScript
 {
-    [SerializeField, Header("ツタオブジェクト")]
-    GameObject ivyObj;
+    [SerializeField, Header("ツタPrefab")]
+    GameObject ivyPrefab;
 
-    List<GameObject> ivyList = new List<GameObject>();
+    public struct Ivy
+    {
+        GameObject ivyObj;
+        Vector2 ivyPos;
+
+        public Ivy(GameObject ivyObj,Vector2 ivyPos)
+        {
+            this.ivyObj = ivyObj;
+            this.ivyPos = ivyPos;
+        }
+
+        public void DestroySelf()
+        {
+            Destroy(this.ivyObj); 
+        }
+
+        public Vector2 GetPos()
+        {
+            return this.ivyPos;
+        }
+    }
+    
+    List<Ivy> ivyList = new List<Ivy>();
 
     void Start()
     {
@@ -28,7 +50,7 @@ public class Enemy_CScript : CharaScript
             int x = Random.Range(0, 8);
             int z = Random.Range(0, 8);
 
-            if (gridManager.CheckCellState(z, x) == CellScript.CellState.empty && gridManager.CheckHaveDamage(z, x))
+            if (gridManager.CheckCellState(z, x) == CellScript.CellState.empty && !gridManager.CheckHaveDamage(z, x))
             {
                 //攻撃予定位置
                 movePos = new Vector3(x, transform.position.y, z);
@@ -50,17 +72,17 @@ public class Enemy_CScript : CharaScript
         animator.SetTrigger("IsAttack");
         shadowAnim.SetTrigger("IsAttack");
 
-        Vector3 instPos = new Vector3(movePos.x, ivyObj.transform.position.y, movePos.z);
-        var ivy= Instantiate(ivyObj, instPos, ivyObj.transform.rotation);
-        ivyList.Add(ivy);
-        
-        gridManager.SetDamageState((int)movePos.z, (int)movePos.x);
+        Vector3 instPos = new Vector3(movePos.x, ivyPrefab.transform.position.y, movePos.z);
+        var ivy= Instantiate(ivyPrefab, instPos, ivyPrefab.transform.rotation);
+
+        Ivy newIvy = new Ivy(ivy, new Vector2((int)movePos.x, (int)movePos.z));
+        ivyList.Add(newIvy);
+
+        gridManager.SetDamageState((int)movePos.z, (int)movePos.x, ivy);
 
         yield return null;
 
         DeleteImage();
-
-        //turnManager.FinCoroutine();
     }
 
     public override void AttackState()
@@ -85,9 +107,11 @@ public class Enemy_CScript : CharaScript
             StartCoroutine(Dead());
             turnManager.enemyList.Remove(this);
 
-            for(int i = 0; i < ivyList.Count; i++)
+            foreach(var ivy in ivyList)
             {
-                Destroy(ivyList[i]);
+                ivy.DestroySelf();
+                Vector2 ivyPos = ivy.GetPos();
+                gridManager.DeleteDamageState((int)ivyPos.y, (int)ivyPos.x);
             }
         }
     }

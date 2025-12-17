@@ -20,6 +20,8 @@ public class CellScript : MonoBehaviour
     //勝手に書き換え
     //ダメージマス判定
     public bool haveDamage = false;
+    //ツタオブジェクト
+    public GameObject ivyObj;
 
     /// <summary>
     /// TryEnter関数呼びだしの結果用
@@ -152,6 +154,8 @@ public class CellScript : MonoBehaviour
                 if (haveDamage)
                 {
                     ReciveAttack(1, true, Vector2Int.zero);
+                    haveDamage = false;
+                    Destroy(ivyObj);
                 }
             }
         }

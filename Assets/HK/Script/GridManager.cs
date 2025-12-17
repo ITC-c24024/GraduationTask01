@@ -91,9 +91,20 @@ public class GridManager : MonoBehaviour
     /// </summary>
     /// <param name="y">y座標</param>
     /// <param name="x">x座標</param>
-    public void SetDamageState(int y,int x)
+    ///  <param name="ivyObj">ツタオブジェクト</param>
+    public void SetDamageState(int y,int x,GameObject ivyObj)
     {
         cellSC[y, x].haveDamage = true;
+        cellSC[y, x].ivyObj = ivyObj;
+    }
+    /// <summary>
+    /// 指定したマスのダメージマス状態を解除する
+    /// </summary>
+    /// <param name="y">y座標</param>
+    /// <param name="x">x座標</param>
+    public void DeleteDamageState(int y, int x)
+    {
+        cellSC[y, x].haveDamage = false;
     }
 
     /// <summary>

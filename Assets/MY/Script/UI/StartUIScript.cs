@@ -18,6 +18,8 @@ public class StartUIScript : MonoBehaviour
     [SerializeField, Header("ウェーブText")]
     Text waveCountText;
 
+    bool isRun = false;
+
     void Start()
     {
         
@@ -28,7 +30,7 @@ public class StartUIScript : MonoBehaviour
     /// </summary>
     /// <returns></returns>
     public IEnumerator SetUI(int i)
-    {        
+    {
         startImage.gameObject.SetActive(true);
         startText[i].gameObject.SetActive(true);
 
@@ -71,6 +73,8 @@ public class StartUIScript : MonoBehaviour
 
         startImage.gameObject.SetActive(false);
         startText[i].gameObject.SetActive(false);
+
+        isRun = false;
     }
 
     /// <summary>

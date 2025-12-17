@@ -51,7 +51,7 @@ public class GameController : MonoBehaviour
         isStart = true;
 
         //ウェーブスタート
-        waveManager.StartWave();
+        StartCoroutine(waveManager.StartWave());
     }
 
     /// <summary>

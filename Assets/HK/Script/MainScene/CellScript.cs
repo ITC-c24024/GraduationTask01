@@ -153,7 +153,11 @@ public class CellScript : MonoBehaviour
                 //ダメージマスなら被弾
                 if (haveDamage)
                 {
-                    ReciveAttack(1, true, Vector2Int.zero);
+                    var player= unitSC.gameObject.GetComponent<PlayerController>();
+                    if (player.haveItem != ItemScript.ItemType.invalidDmage)
+                    {
+                        ReciveAttack(1, true, Vector2Int.zero);                     
+                    }
                     haveDamage = false;
                     Destroy(ivyObj);
                 }

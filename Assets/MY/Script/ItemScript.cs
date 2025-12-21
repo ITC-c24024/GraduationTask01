@@ -9,13 +9,36 @@ public class ItemScript : MonoBehaviour
 {
     PlayerController playerCon;
     [SerializeField] MoneyScript moneyScript;
-    
-    enum ItemType
+
+    [SerializeField, Header("アイテムイメージ")]
+    GameObject[] itemImage;
+
+    public enum ItemType
     {
-        hpUp,//体力+1
-        damageUp,//ダメージ+1
-        actionLimitUp,//行動回数+1
-        moneyUp//獲得金+n% 
+        /// <summary>
+        /// 体力+1
+        /// </summary>
+        hpUp,
+        /// <summary>
+        /// ダメージ+1
+        /// </summary>
+        damageUp,
+        /// <summary>
+        /// 行動回数+1
+        /// </summary>
+        actionLimitUp,
+        /// <summary>
+        /// 獲得金+n% 
+        /// </summary>
+        moneyUp,
+        /// <summary>
+        /// 最大HP+1
+        /// </summary>
+        maxHpUp,
+        /// <summary>
+        /// ダメージマス無効
+        /// </summary>
+        invalidDmage
     }
 
     ItemType[] itemType = new ItemType[]
@@ -23,7 +46,9 @@ public class ItemScript : MonoBehaviour
         ItemType.hpUp,
         ItemType.damageUp,
         ItemType.actionLimitUp,
-        ItemType.moneyUp
+        ItemType.moneyUp,
+        ItemType.maxHpUp,
+        ItemType.invalidDmage
     };
 
     [SerializeField,Header("現在のアイテム")] ItemType nowItem;
@@ -31,26 +56,19 @@ public class ItemScript : MonoBehaviour
     //このアイテムがすでに選ばれたかどうかの判定
     public bool isSellect = false;
 
-    //アイテムごとの実行関数
-    Dictionary<ItemType, Action> itemEffect;
     //アイテムごとの値段
     Dictionary<ItemType, int> itemPrice;
 
     void Start()
     {
-        itemEffect = new Dictionary<ItemType, Action>()
-        {
-            {ItemType.hpUp,HpUp},
-            {ItemType.damageUp,DamageUp},
-            {ItemType.actionLimitUp, ActionLimitUp},
-            {ItemType.moneyUp,MoneyUp }
-        };
         itemPrice = new Dictionary<ItemType, int>()
         {
-            {ItemType.hpUp,500},
-            {ItemType.damageUp,500},
-            {ItemType.actionLimitUp, 500},
-            {ItemType.moneyUp,500}
+            {ItemType.hpUp,100},
+            {ItemType.damageUp,600},
+            {ItemType.actionLimitUp, 800},
+            {ItemType.moneyUp,400},
+            {ItemType.maxHpUp,400 },
+            {ItemType.invalidDmage ,600}
         };
     }
 
@@ -70,7 +88,15 @@ public class ItemScript : MonoBehaviour
     /// <param name="itemNum">ランダムなアイテム番号</param>
     public void SetItemType(int itemNum)
     {
+        isSellect = false;
+        
         nowItem = itemType[itemNum];
+
+        for (int i = 0; i < itemImage.Length; i++)
+        {
+            itemImage[i].SetActive(false);
+        }       
+        itemImage[itemNum].SetActive(true);
     }
 
     /// <summary>
@@ -90,24 +116,9 @@ public class ItemScript : MonoBehaviour
     public void GetItem(PlayerController player)
     {
         playerCon = player;
-        isSellect = true;
-        itemEffect[nowItem]();
-    }
+        player.GetItem(nowItem);
 
-    void HpUp()
-    {
-        playerCon.SetHP(1);
-    }
-    void DamageUp()
-    {
-        playerCon.SetDamage(1);
-    }
-    void ActionLimitUp()
-    {       
-        playerCon.SetActionLimit(1);
-    }
-    void MoneyUp()
-    {
-        moneyScript.SetRate(0.5f);
+        itemImage[(int)nowItem].SetActive(false);
+        isSellect = true;
     }
 }

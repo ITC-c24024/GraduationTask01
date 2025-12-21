@@ -27,7 +27,7 @@ public class CharaScript : MonoBehaviour
     //hpBarをまとめてるオブジェクト
     public GameObject hpObj;
     [Tooltip("右側のFillオブジェクトから順に格納")]
-    public GameObject[] hpBar;
+    public List<GameObject> hpBar = new List<GameObject>();
 
     public enum CharaState
     {
@@ -68,28 +68,6 @@ public class CharaScript : MonoBehaviour
 
     public Animator animator;
     public Animator shadowAnim;
-
-    void Update()
-    {
-        /*
-        //HPバー追従
-        Vector2 viewPos = worldCamera.WorldToViewportPoint(transform.position);
-        RectTransform canvasRect = canvas.GetComponent<RectTransform>();
-        Vector2 charaScreenPos = new Vector2(
-            canvasRect.sizeDelta.x * viewPos.x - (canvasRect.sizeDelta.x * 0.5f),
-            canvasRect.sizeDelta.y * viewPos.y - (canvasRect.sizeDelta.y * 0.5f)
-            );
-        
-        if (hpBar != null)
-        {
-            SetHpPos(charaScreenPos);
-            for(int i = 0; i < hpBar.Length; i++)
-            {
-                hpBar[i].SetActive(true);
-            }
-        }
-        */
-    }
 
     /// <summary>
     /// HPバーの位置を設定

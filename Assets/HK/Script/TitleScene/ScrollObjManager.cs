@@ -10,9 +10,18 @@ public class ScrollObjManager : BackGroundScript
     int objNum = 0;
     void Start()
     {
+        foreach(var obj in objList)
+        {
+            obj.SetActive(false);
+        }
+
         StartCoroutine(ScrollObj());
         objNum = Random.Range(0, objList.Count);
         objList[objNum].SetActive(true);
+
+        var posZ = transform.position.z;
+        startPos += new Vector3(0, 0, posZ);
+        endPos += new Vector3(0, 0, posZ);
     }
 
     void Update()

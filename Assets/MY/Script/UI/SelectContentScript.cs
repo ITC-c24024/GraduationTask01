@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,6 +17,8 @@ public class SelectContentScript : MonoBehaviour
     GameObject[] selects;
     [SerializeField, Header("強化内容Image")]
     GameObject[] items;
+    [SerializeField, Header("スキップImage")]
+    Image skipImage;
 
     [SerializeField, Header("メインカメラ")]
     Camera mainCamera;
@@ -41,21 +44,28 @@ public class SelectContentScript : MonoBehaviour
     {
         shopCamera.gameObject.SetActive(true);
         mainCamera.gameObject.SetActive(false);
+        skipImage.gameObject.SetActive(true);
         
         //選択アイテムをセット
-        SetItem();
-        
-        //選択画面表示
-        //selectImage.gameObject.SetActive(true);     
+        SetItem();    
 
         //プレイヤーが交互に選択する
         for (int i = 0; i < playerCons.Length; i++)
         {
-            selects[playerNum].gameObject.SetActive(true);
-            yield return StartCoroutine(playerCons[i].SelectContent());
-            //isRun = true;
+            int originNum = 1;
+            if (itemScripts[1].isSellect)
+            {
+                selects[playerNum].transform.position = new Vector3(
+                    items[0].transform.localPosition.x,
+                    selects[playerNum].transform.localPosition.y, 
+                    items[0].transform.localPosition.z
+                    );
 
-            //while (isRun) yield return null;
+                originNum = 0;
+            }
+            selects[playerNum].gameObject.SetActive(true);
+            yield return StartCoroutine(playerCons[i].SelectContent(originNum));
+
             selects[playerNum-1].gameObject.SetActive(false);
         }
         playerNum = 0;
@@ -64,6 +74,7 @@ public class SelectContentScript : MonoBehaviour
 
         yield return new WaitForSeconds(0.5f);
 
+        skipImage.gameObject.SetActive(false);
         mainCamera.gameObject.SetActive(true);
         shopCamera.gameObject.SetActive(false);
 
@@ -82,13 +93,44 @@ public class SelectContentScript : MonoBehaviour
             int itemNum;
             while (true)
             {
-                itemNum = Random.Range(0, itemScripts[0].GetItemCount());
+                itemNum = SelectItemNum();
                 if (!selectList.Contains(itemNum)) break;
             }
             selectList.Add(itemNum);
 
             itemScripts[i].SetItemType(itemNum);   
         }
+    }
+
+    int SelectItemNum()
+    {
+        int i= Random.Range(0, 100);
+        if (i < 50) i = 0;
+        else if (i < 60) i = 1;
+        else if (i < 70) i = 2;
+        else if (i < 80) i = 3;
+        else if (i < 90) i = 4;
+        else i = 5;
+
+        return i;
+    }
+
+    /// <summary>
+    /// アイテムを選択できるか判定
+    /// </summary>
+    /// <param name="selectNum">選択したい番号</param>
+    /// /// <param name="dir">選択する方向</param>
+    /// <returns></returns>
+    public bool CanSelect(int selectNum, int dir)
+    {
+        //無限再帰しないように
+        if (dir == 0) return false;
+        //範囲外なら終了
+        if (selectNum < 0 || selectNum >= items.Length) return false;
+        //未獲得なら選択可能
+        if (!itemScripts[selectNum].isSellect) return true;
+        //獲得済みなら次を調べる
+        return CanSelect(selectNum + dir, dir);
     }
 
     /// <summary>
@@ -99,7 +141,7 @@ public class SelectContentScript : MonoBehaviour
     {
         Vector3 selectPos = new Vector3(
             items[selectNum].transform.localPosition.x,
-            items[selectNum].transform.localPosition.y + 0.02f,
+            selects[playerNum].transform.localPosition.y,
             items[selectNum].transform.localPosition.z
             );
         selects[playerNum].transform.localPosition = selectPos;
@@ -121,7 +163,7 @@ public class SelectContentScript : MonoBehaviour
             //アイテムを取得
             var item = items[selectNum].GetComponent<ItemScript>();
             item.GetItem(playerCons[playerNum]);
-            items[selectNum].SetActive(false);
+            //items[selectNum].SetActive(false);
 
             //次のプレイヤーへ
             playerNum++;

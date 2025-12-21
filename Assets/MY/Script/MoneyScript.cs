@@ -64,7 +64,7 @@ public class MoneyScript : MonoBehaviour
     /// <returns></returns>
     IEnumerator MoveMoney(Vector2 startPos)
     {
-        for(int i = 0; i < 7; i++)
+        for(int i = 0; i < 6; i++)
         {
             var coin = Instantiate(moneyImage);
             coin.transform.SetParent(canvas.transform);

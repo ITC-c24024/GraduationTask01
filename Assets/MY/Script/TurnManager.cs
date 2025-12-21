@@ -112,7 +112,7 @@ public class TurnManager : MonoBehaviour
     /// <returns></returns>
     public IEnumerator TurnStart()
     {
-        Debug.Log("start");
+        Debug.Log("ターン開始");
         yield return StartCoroutine(startUIScript.SetUI(1));
         //yield return new WaitForSeconds(1.5f);
 
@@ -144,14 +144,10 @@ public class TurnManager : MonoBehaviour
             if (playerCon[i].alive)
             {
                 yield return StartCoroutine(playerCon[i].ResurrectionCheck());
-                //runnning++;
-
-                //while (runnning != 0) yield return null;
             }
         }
 
-        //yield return new WaitForSeconds(0.5f);
-
+        Debug.Log("敵の行動");
         //敵がいたら
         if (enemyList.Count != 0)
         {
@@ -159,19 +155,12 @@ public class TurnManager : MonoBehaviour
             SortEnemy();
 
             yield return StartCoroutine(startUIScript.SetUI(2));
-            //yield return new WaitForSeconds(1.5f);
 
             //敵の行動
             for (int n = 0; n < enemyList.Count; n++)
             {
                 yield return StartCoroutine(enemyList[n].Move());
-                //runnning++;
-
-                //while (runnning != 0) yield return null;
             }
-
-            //ノックバックの分ディレイ
-            //yield return new WaitForSeconds(0.1f);
 
             //プレイヤーの攻撃
             for (int i = 0; i < playerCon.Length; i++)
@@ -184,10 +173,11 @@ public class TurnManager : MonoBehaviour
             }
 
             //while (runnning != 0) yield return null;
-        }     
+        }
 
         yield return new WaitForSeconds(1.0f);
 
+        Debug.Log("ターン終了");
         //ターン終了
         waveManager.FinishTurn();
     }

@@ -68,7 +68,7 @@ public class SelectContentScript : MonoBehaviour
         shopCamera.gameObject.SetActive(false);
 
         //次のウェーブへ
-        waveManager.StartWave();
+        StartCoroutine(waveManager.StartWave());
     }
 
     void SetItem()

@@ -165,6 +165,7 @@ MonoBehaviour:
   arrowPrefab: {fileID: 0}
   worldCamera: {fileID: 0}
   canvas: {fileID: 0}
+  targetPlayer: {fileID: 0}
   arrowList: []
   hpObj: {fileID: 6144569871656368158}
   hpBar:
@@ -187,7 +188,7 @@ MonoBehaviour:
   movePos: {x: 0, y: 0, z: 0}
   animator: {fileID: 8265614465209262376}
   shadowAnim: {fileID: 3757074604457976750}
-  ivyObj: {fileID: 8255223427682891224, guid: e8b12739b03a5944f81597db7bfcba68, type: 3}
+  ivyPrefab: {fileID: 8255223427682891224, guid: e8b12739b03a5944f81597db7bfcba68, type: 3}
 --- !u!1 &5649160074311771487
 GameObject:
   m_ObjectHideFlags: 0

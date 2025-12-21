@@ -62,17 +62,15 @@ public class WaveManager : MonoBehaviour
 
     }
 
-    public void StartWave()
+    public IEnumerator StartWave()
     {
         //仮
-        StartCoroutine(startUISC.SetUI(0));
+        yield return StartCoroutine(startUISC.SetUI(0));
         //仮
         startUISC.SetWaveCount(waveCount);
         //仮
         startUISC.SetEnemyCount(allEnemyCount);
-
-        //仮
-        Invoke("StartTurn", 3.0f);
+        StartTurn();
     }
 
     public void StartTurn()
@@ -114,6 +112,10 @@ public class WaveManager : MonoBehaviour
     {
         playerCount--;
     }
+    public void PlayerResurrection()
+    {
+        playerCount++;
+    }
 
     public void EnemyDead()
     {
@@ -138,24 +140,17 @@ public class WaveManager : MonoBehaviour
 
         isClear = true;
         waveCount++;
-        /*
-        //勝手に書き換え
-        //結果を評価してお金を与える
-        //与える金額=1ウェーブに出てきた敵の数÷ウェーブクリアにかかったターン数*金額倍率+最低保証
-        float money = totalEnemyCount / turnCount * 10000 + 100;
-        moneyScript.GetMoney((int)money, Vector3.zero);
-        */
+        
         //仮
         turnCount = 0;
 
         spawnEnemyCount++;
-        allEnemyCount = 3 + 2 * waveCount;
+        allEnemyCount = waveCount + (waveCount - 1) * 2;
         //勝手に
         //総数を保存
         totalEnemyCount = allEnemyCount;
 
         //仮(強化内容選択)
-        yield return new WaitForSeconds(3.0f);
         StartCoroutine(selectContentSC.SelectContent());
     }
 

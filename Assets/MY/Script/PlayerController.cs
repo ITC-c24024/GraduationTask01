@@ -200,19 +200,17 @@ public class PlayerController : CharaScript
         {
             alive = false;
             StartCoroutine(Dead());
-            //gridManager.ChangeCellState((int)targetPos.z, (int)targetPos.x, CellScript.CellState.dead, this, default);
+            gridManager.ChangeCellState((int)targetPos.z, (int)targetPos.x, CellScript.CellState.dead, this, default);
         }
         else
         {
+            gridManager.ChangeCellState((int)targetPos.z, (int)targetPos.x, CellScript.CellState.player, this, default);
             animator.SetTrigger("IsKB");
             shadowAnim.SetTrigger("IsKB");
         }
 
         //マス更新(KBが確定しているので、ここで更新)
         gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);
-
-        if (alive) gridManager.ChangeCellState((int)targetPos.z, (int)targetPos.x, CellScript.CellState.player, this, default);
-        else gridManager.ChangeCellState((int)targetPos.z, (int)targetPos.x, CellScript.CellState.dead, this, default);
 
         float time = 0;
         float required = 0.1f;
@@ -314,6 +312,8 @@ public class PlayerController : CharaScript
 
         animator.SetBool("IsDead", false);
         shadowAnim.SetBool("IsDead", false);
+
+        waveManager.PlayerResurrection();
 
         yield return null;
     }

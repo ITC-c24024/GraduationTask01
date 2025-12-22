@@ -86,6 +86,11 @@ public class SelectContentScript : MonoBehaviour
             yield return StartCoroutine(playerCons[i].SelectContent(originNum));
 
             selects[playerNum-1].gameObject.SetActive(false);
+            selects[playerNum-1].transform.localPosition= new Vector3(
+            items[1].transform.localPosition.x,
+            selects[1].transform.localPosition.y,
+            items[1].transform.localPosition.z
+            );
         }
         playerNum = 0;
 
@@ -182,17 +187,18 @@ public class SelectContentScript : MonoBehaviour
     /// </summary>
     /// <param name="selectNum">選択したい番号</param>
     /// /// <param name="dir">選択する方向</param>
-    /// <returns></returns>
-    public bool CanSelect(int selectNum, int dir)
+    /// <returns>0:選択できる 1:選択できない 2:さらに次のアイテムを選択できる </returns>
+    public int CanSelect(int selectNum, int dir)
     {
         //無限再帰しないように
-        if (dir == 0) return false;
+        if (dir == 0) return 1;
         //範囲外なら終了
-        if (selectNum < 0 || selectNum >= items.Length) return false;
+        if (selectNum < 0 || selectNum >= items.Length) return 1;
         //未獲得なら選択可能
-        if (!itemScripts[selectNum].isSellect) return true;
+        if (!itemScripts[selectNum].isSellect) return 0;
         //獲得済みなら次を調べる
-        return CanSelect(selectNum + dir, dir);
+        if (CanSelect(selectNum + dir, dir) == 1) return 1;
+        else return 2;
     }
 
     /// <summary>

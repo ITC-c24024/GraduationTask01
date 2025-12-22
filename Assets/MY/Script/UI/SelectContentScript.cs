@@ -32,6 +32,9 @@ public class SelectContentScript : MonoBehaviour
     [SerializeField, Header("ショップカメラ")]
     Camera shopCamera;
 
+    [SerializeField]
+    Vector2[] infoPos;
+
     int playerNum = 0;
 
     //選択中判定
@@ -78,6 +81,7 @@ public class SelectContentScript : MonoBehaviour
                 originNum = 0;
             }
             if (pastInfo != null) pastInfo.SetActive(false);
+            itemInfoBG.gameObject.transform.localPosition = infoPos[originNum];
             itemInfoBG.gameObject.SetActive(true);
             itemInfo[originNum].SetActive(true);
             pastInfo = itemInfo[originNum];
@@ -208,7 +212,8 @@ public class SelectContentScript : MonoBehaviour
     public void SelectItem(int selectNum)
     {
         soundManager.Select();
-        
+
+        itemInfoBG.gameObject.transform.localPosition = infoPos[selectNum];
         itemInfoBG.gameObject.SetActive(true);
         
         Vector3 selectPos = new Vector3(

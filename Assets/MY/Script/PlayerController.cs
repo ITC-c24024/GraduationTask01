@@ -87,7 +87,7 @@ public class PlayerController : CharaScript
 
         //新しくアイテムを得る
         haveItem = itemType;
-        if(haveItem! != ItemScript.ItemType.hpUp)
+        if(haveItem != ItemScript.ItemType.hpUp)
         {
             itemIcon[(int)haveItem - 1].gameObject.SetActive(true);
         }

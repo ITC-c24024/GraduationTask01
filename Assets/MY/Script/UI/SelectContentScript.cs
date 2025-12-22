@@ -24,6 +24,8 @@ public class SelectContentScript : MonoBehaviour
     GameObject[] itemInfo;
     //ひとつ前の説明Image
     GameObject pastInfo;
+    [SerializeField, Header("フェードオブジェクト")]
+    GameObject fadeObj;
 
     [SerializeField, Header("メインカメラ")]
     Camera mainCamera;
@@ -48,12 +50,16 @@ public class SelectContentScript : MonoBehaviour
 
     public IEnumerator SelectContent()
     {
-        soundManager.Shop();
+        StartCoroutine(FadeInOut());
+
+        yield return new WaitForSeconds(1.0f);
 
         shopCamera.gameObject.SetActive(true);
         mainCamera.gameObject.SetActive(false);
-        skipImage.gameObject.SetActive(true);
-        
+        skipImage.gameObject.SetActive(true);   
+
+        soundManager.Shop();
+
         //選択アイテムをセット
         SetItem();    
 
@@ -87,12 +93,15 @@ public class SelectContentScript : MonoBehaviour
 
         yield return new WaitForSeconds(0.5f);
 
+        StartCoroutine(FadeInOut());
+        yield return new WaitForSeconds(1.0f);
+
         skipImage.gameObject.SetActive(false);
         mainCamera.gameObject.SetActive(true);
         shopCamera.gameObject.SetActive(false);
 
-
         soundManager.StopShop();
+        yield return new WaitForSeconds(2.0f);
         //次のウェーブへ
         StartCoroutine(waveManager.StartWave());
     }
@@ -132,6 +141,40 @@ public class SelectContentScript : MonoBehaviour
         else i = 5;
 
         return i;
+    }
+
+    IEnumerator FadeInOut()
+    {
+        Vector2 startPos = new Vector2(-2560, fadeObj.transform.localPosition.y);
+        Vector2 targetPos = new Vector2(0,fadeObj.transform.localPosition.y);
+
+        float time = 0;
+        float reqired = 1.0f;
+        while (time < reqired)
+        {
+            time += Time.deltaTime;
+
+            Vector2 currentPos = Vector2.Lerp(startPos, targetPos, time / reqired);
+            fadeObj.transform.localPosition = currentPos;
+
+            yield return null;
+        }
+
+        yield return new WaitForSeconds(1.0f);
+
+        startPos = targetPos;
+        targetPos = new Vector2(2560, fadeObj.transform.localPosition.y);
+
+        time = 0;
+        while (time < reqired)
+        {
+            time += Time.deltaTime;
+
+            Vector2 currentPos = Vector2.Lerp(startPos, targetPos,time / reqired);
+            fadeObj.transform.localPosition = currentPos;
+
+            yield return null;
+        }
     }
 
     /// <summary>

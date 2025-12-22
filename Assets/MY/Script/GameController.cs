@@ -8,6 +8,8 @@ public class GameController : MonoBehaviour
     WaveManager waveManager;
     SoundManager soundManager;
 
+    [SerializeField, Header("フェードインImage")]
+    Image fadeImage;
     [SerializeField, Header("プレイヤー待機UI")]
     Image waitImage;
 
@@ -17,11 +19,13 @@ public class GameController : MonoBehaviour
     [SerializeField, Header("プレイヤーオブジェクト")]
     GameObject[] playerObj;
 
+    public bool isOpen = false;
     public bool isStart = false;
 
     void Awake()
     {
         Application.targetFrameRate = 30;
+        Cursor.visible = false;
     }
 
     void Start()
@@ -29,6 +33,27 @@ public class GameController : MonoBehaviour
         waveManager = gameObject.GetComponent<WaveManager>();
         soundManager = gameObject.GetComponent<SoundManager>();
         waitImage.gameObject.SetActive(true);
+
+        StartCoroutine(FadeIn());
+    }
+
+    IEnumerator FadeIn()
+    {
+        yield return new WaitForSecondsRealtime(1.0f);
+
+        float time = 0;
+        float reqired = 1.0f;
+        while (time < reqired)
+        {
+            time += Time.deltaTime;
+
+            float alpha = Mathf.Lerp(1, 0, time / reqired);
+            fadeImage.color = new Color(0, 0, 0, alpha);
+
+            yield return null;
+        }
+
+        //isOpen = true;
     }
 
     public IEnumerator GameStart()

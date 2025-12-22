@@ -57,13 +57,12 @@ public class TurnManager : MonoBehaviour
         Vector2Int spownPos = gridManager.EnemySpawnCheck(GetPlayerPos());
         if (spownPos == -Vector2.one) return false;
 
-        int enemyNum = Random.Range(0, enemyPrefab.Length);
-
+        GameObject enemyObj = SelectEnemy();
         //敵スポーン
         GameObject enemy = Instantiate(
-            enemyPrefab[enemyNum],
-            new Vector3(spownPos.y, enemyPrefab[enemyNum].transform.position.y, spownPos.x),
-            enemyPrefab[enemyNum].transform.rotation
+            enemyObj,
+            new Vector3(spownPos.y, enemyObj.transform.position.y, spownPos.x),
+            enemyObj.transform.rotation
             );
 
         //必要なコンポーネントを取得
@@ -85,15 +84,29 @@ public class TurnManager : MonoBehaviour
 
         return true;
     }
-    /*
+
     /// <summary>
-    /// コルーチン終了
+    /// 召喚する敵を選ぶ
     /// </summary>
-    public void FinCoroutine()
+    GameObject SelectEnemy()
     {
-        runnning--;
+        int wave = waveManager.GetNowWave();
+        if (wave <= 2)
+        {
+            return enemyPrefab[0];
+        }
+        else if(wave<=4)
+        {
+            int enemyNum = Random.Range(0, enemyPrefab.Length - 1);
+            return enemyPrefab[enemyNum];
+        }
+        else
+        {
+            int enemyNum = Random.Range(0, enemyPrefab.Length);
+            return enemyPrefab[enemyNum];
+        }
     }
-    */
+
     /// <summary>
     /// 敵をプレイヤーとの距離が近い順に並べ替え
     /// </summary>

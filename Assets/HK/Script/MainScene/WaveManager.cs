@@ -111,6 +111,10 @@ public class WaveManager : MonoBehaviour
         }
     }
 
+    public int GetNowWave()
+    {
+        return waveCount;
+    }
 
     public void PlayerDead()
     {

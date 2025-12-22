@@ -202,7 +202,7 @@ public class Enemy_BScript : CharaScript
         hp -= amount;
         if (hp < 0) hp = 0;
 
-        for (int i = hp; i < hpBar.Length; i++)
+        for (int i = hp; i < hpBar.Count; i++)
         {
             hpBar[i].gameObject.SetActive(false);
         }

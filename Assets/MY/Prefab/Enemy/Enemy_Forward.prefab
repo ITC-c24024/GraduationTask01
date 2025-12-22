@@ -153,7 +153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14bd71740040e21429a58946139e46a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  charaName: 
+  charaName: "\u30BE\u30F3\u30D3"
   moneyScript: {fileID: 0}
   waveManager: {fileID: 0}
   turnManager: {fileID: 0}
@@ -165,6 +165,7 @@ MonoBehaviour:
   arrowPrefab: {fileID: 7525773185347868891, guid: e624bb52002c3a049a7c5df1d7337907, type: 3}
   worldCamera: {fileID: 0}
   canvas: {fileID: 0}
+  targetPlayer: {fileID: 0}
   arrowList: []
   hpObj: {fileID: 5321457291989428371}
   hpBar:

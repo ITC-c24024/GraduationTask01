@@ -1,7 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
+using UnityEngine.Video;
 
 [RequireComponent(typeof(PlayerInput))]
 
@@ -10,8 +14,13 @@ public class PlayerController : CharaScript
     [SerializeField] GameController gameCon;
     [SerializeField] SquareScript squareSC;
     [SerializeField] SelectContentScript SelectContentSC;
-
     [SerializeField, Header("味方プレイヤー")] PlayerController playerCon;
+
+    [SerializeField, Header("HPバーの中央Prefab")]
+    GameObject midBar;
+
+    [SerializeField, Header("アイテムアイコン")]
+    Image[] itemIcon;
 
     //ノックバック方向
     Vector2 kbDirection;
@@ -31,6 +40,10 @@ public class PlayerController : CharaScript
     //移動中判定
     bool isMove = false;
 
+    public int maxHP;
+
+    public ItemScript.ItemType haveItem;
+
     void Awake()
     {
         var actionMap = GetComponent<PlayerInput>().currentActionMap;
@@ -42,7 +55,7 @@ public class PlayerController : CharaScript
     
     void Start()
     {
-        
+        hp = maxHP;
     }
 
     void Update()
@@ -64,32 +77,117 @@ public class PlayerController : CharaScript
         hpObj.SetActive(true);
     }
 
-    #region アイテム効果関数
-    /// <summary>
-    /// HPを設定
-    /// </summary>
-    /// <param name="amount">変化量</param>
-    public void SetHP(int amount)
+    public void GetItem(ItemScript.ItemType itemType)
     {
-        hp += amount;
+        if (itemType != ItemScript.ItemType.hpUp && haveItem != ItemScript.ItemType.hpUp) 
+        {
+            //持っていたアイテムを失う
+            LoseItem(haveItem);                  
+        }
+
+        //新しくアイテムを得る
+        haveItem = itemType;
+        if(haveItem! != ItemScript.ItemType.hpUp)
+        {
+            itemIcon[(int)haveItem - 1].gameObject.SetActive(true);
+        }
+
+        switch (itemType)
+        {
+            case ItemScript.ItemType.hpUp:
+                if (hp < maxHP)
+                {
+                    hp++;
+                    hpBar[hp - 1].SetActive(true);
+                }              
+                break;
+            case ItemScript.ItemType.damageUp:
+                damage++;
+                break;
+            case ItemScript.ItemType.moneyUp:
+                moneyScript.SetRate(0.5f);
+                break;
+            case ItemScript.ItemType.actionLimitUp:
+                actionLimit++;
+                break;
+            case ItemScript.ItemType.maxHpUp:
+                maxHP++;
+                AddHpBar();
+                break;
+        }
     }
-    /// <summary>
-    /// 攻撃力を設定
-    /// </summary>
-    /// <param name="amount">変化量</param>
-    public void SetDamage(int amount)
+
+    public void LoseItem(ItemScript.ItemType itemType)
     {
-        damage += amount;
+        itemIcon[(int)itemType - 1].gameObject.SetActive(false);
+
+        switch (itemType)
+        {
+            case ItemScript.ItemType.damageUp:
+                damage--;
+                break;
+            case ItemScript.ItemType.moneyUp:
+                moneyScript.SetRate(-0.5f);
+                break;
+            case ItemScript.ItemType.actionLimitUp:
+                actionLimit--;
+                break;
+            case ItemScript.ItemType.maxHpUp:
+                maxHP--;
+                break;
+        }
     }
+
     /// <summary>
-    /// 行動回数を設定
+    /// HPバーの個数を増やす
     /// </summary>
-    /// <param name="amount">変化量</param>
-    public void SetActionLimit(int amount)
+    void AddHpBar()
     {
-        actionLimit += amount;
+        GameObject mid = Instantiate(
+            midBar, 
+            hpBar[hpBar.Count - 1].transform.position, 
+            hpBar[hpBar.Count - 1].transform.rotation
+            );
+        mid.transform.parent = hpObj.transform;
+
+        //右端のバーを一つ右に移動
+        GameObject parent = hpBar[hpBar.Count - 1].transform.parent.gameObject;
+        parent.transform.localPosition = new Vector3(
+            parent.transform.localPosition.x + 0.135f,
+            parent.transform.localPosition.y,
+            parent.transform.localPosition.z
+            );
+
+        //リストの要素を1つ増やす
+        hpBar.Add(null);
+        //右端のバーをリストの一番後ろに移動
+        hpBar[hpBar.Count - 1] = hpBar[hpBar.Count - 2];
+        //新しく追加したバーをリストに追加
+        GameObject fill = mid.transform.GetChild(0).gameObject;
+        hpBar[hpBar.Count - 2] = fill;
+
+        if (hp < maxHP)
+        {
+            hp++;
+            hpBar[hp - 1].SetActive(true);
+        }
+        /*
+        if (hp < hpBar.Count - 2)
+        {
+            fill.SetActive(false);
+        }*/
+
+        //増えたバーの分位置をずらす
+        foreach(var fililObj in hpBar)
+        {
+            GameObject parentObj = fililObj.transform.parent.gameObject;
+            parentObj.transform.localPosition = new Vector3(
+                parentObj.transform.localPosition.x-0.135f/2, 
+                parentObj.transform.localPosition.y, 
+                parentObj.transform.localPosition.z
+                );
+        }
     }
-    #endregion
 
     /// <summary>
     /// プレイヤーの移動
@@ -168,7 +266,7 @@ public class PlayerController : CharaScript
         hp -= amount;
         if (hp < 0) hp = 0;
 
-        for (int i = hp; i < hpBar.Length; i++)
+        for (int i = hp; i < hpBar.Count; i++)
         {
             hpBar[i].gameObject.SetActive(false);
         }
@@ -288,7 +386,7 @@ public class PlayerController : CharaScript
         {
             Vector2 checkPos = new Vector2(playerPos.x, playerPos.z + i);
             if (checkPos.y < 0 || 7 < checkPos.y || i == 0) continue;
-            if (gridManager.CheckCellState((int)checkPos.y, (int)checkPos.x) == CellScript.CellState.enemy)
+            if (gridManager.CheckCellState((int)checkPos.y, (int)checkPos.x) == CellScript.CellState.dead)
             {
                 yield return StartCoroutine(playerCon.Resurrection());
             }
@@ -300,6 +398,7 @@ public class PlayerController : CharaScript
     /// </summary>
     public IEnumerator Resurrection()
     {
+        Debug.Log("復活");
         hp = 2;
         hpObj.SetActive(true);
         for (int i = 0; i < hp; i++)
@@ -388,10 +487,10 @@ public class PlayerController : CharaScript
     /// <summary>
     /// 強化内容を選ぶ
     /// </summary>
-    public IEnumerator SelectContent()
+    public IEnumerator SelectContent(int originNum)
     {
         bool isSelect = false;
-        int selectNum = 1;
+        int selectNum = originNum;
 
         while (!isSelect)
         {
@@ -401,20 +500,20 @@ public class PlayerController : CharaScript
             //選択
             if (0.5 < stick.x)
             {
-                if (selectNum != 2)
+                if (SelectContentSC.CanSelect(selectNum + 1,1)) 
                 {
                     selectNum++;
                     SelectContentSC.SelectItem(selectNum);
-                    yield return new WaitForSeconds(0.2f);
+                    yield return new WaitForSecondsRealtime(0.2f);
                 }
             }
             else if (stick.x < -0.5)
             {
-                if (selectNum != 0)
+                if (SelectContentSC.CanSelect(selectNum - 1,-1))
                 {
                     selectNum--;
                     SelectContentSC.SelectItem(selectNum);
-                    yield return new WaitForSeconds(0.2f);
+                    yield return new WaitForSecondsRealtime(0.2f);
                 }
             }
             //決定

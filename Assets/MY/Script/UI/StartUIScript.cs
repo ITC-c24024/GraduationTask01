@@ -92,6 +92,6 @@ public class StartUIScript : MonoBehaviour
     /// <param name="n">c‚è“G”</param>
     public void SetEnemyCount(int n)
     {
-        enemyCountText.text = $"{n}‘Ì";
+        enemyCountText.text = $"{n}";
     }
 }

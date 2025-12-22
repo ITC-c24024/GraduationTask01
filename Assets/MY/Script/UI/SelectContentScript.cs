@@ -23,6 +23,8 @@ public class SelectContentScript : MonoBehaviour
     Image itemInfoBG;
     [SerializeField, Header("アイテム情報")]
     GameObject[] itemInfo;
+    //ひとつ前の説明Image
+    GameObject pastInfo;
 
     [SerializeField, Header("メインカメラ")]
     Camera mainCamera;
@@ -69,6 +71,7 @@ public class SelectContentScript : MonoBehaviour
             }
             itemInfoBG.gameObject.SetActive(true);
             itemInfo[originNum].SetActive(true);
+            pastInfo = itemInfo[originNum];
 
             selects[playerNum].gameObject.SetActive(true);
             yield return StartCoroutine(playerCons[i].SelectContent(originNum));
@@ -161,8 +164,10 @@ public class SelectContentScript : MonoBehaviour
         selects[playerNum].transform.localPosition = selectPos;
         selects[playerNum].gameObject.SetActive(true);
 
+        pastInfo.SetActive(false);
         ItemScript.ItemType itemType = itemScripts[selectNum].GetNowItem();
         itemInfo[(int)itemType].SetActive(true);
+        pastInfo = itemInfo[(int)itemType];
     }
 
     /// <summary>

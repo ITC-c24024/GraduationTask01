@@ -503,18 +503,30 @@ public class PlayerController : CharaScript
             //選択
             if (0.5 < stick.x)
             {
-                if (SelectContentSC.CanSelect(selectNum + 1,1)) 
+                if (SelectContentSC.CanSelect(selectNum + 1,1)==0) 
                 {
                     selectNum++;
+                    SelectContentSC.SelectItem(selectNum);
+                    yield return new WaitForSecondsRealtime(0.2f);
+                }
+                else if(SelectContentSC.CanSelect(selectNum + 1, 1) == 2)
+                {
+                    selectNum+=2;
                     SelectContentSC.SelectItem(selectNum);
                     yield return new WaitForSecondsRealtime(0.2f);
                 }
             }
             else if (stick.x < -0.5)
             {
-                if (SelectContentSC.CanSelect(selectNum - 1,-1))
+                if (SelectContentSC.CanSelect(selectNum - 1,-1)==0)
                 {
                     selectNum--;
+                    SelectContentSC.SelectItem(selectNum);
+                    yield return new WaitForSecondsRealtime(0.2f);
+                }
+                else if (SelectContentSC.CanSelect(selectNum - 1, -1) == 2)
+                {
+                    selectNum -= 2;
                     SelectContentSC.SelectItem(selectNum);
                     yield return new WaitForSecondsRealtime(0.2f);
                 }
@@ -523,6 +535,7 @@ public class PlayerController : CharaScript
             if (decision)
             {
                  isSelect = SelectContentSC.DecisionItem(selectNum);
+                yield return new WaitForSecondsRealtime(0.2f);
             }
             //スキップ
             if (skip)

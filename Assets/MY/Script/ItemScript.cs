@@ -100,6 +100,15 @@ public class ItemScript : MonoBehaviour
     }
 
     /// <summary>
+    /// 現在のアイテムを取得
+    /// </summary>
+    /// <returns>現在のアイテム</returns>
+    public ItemType GetNowItem()
+    {
+        return nowItem;
+    }
+
+    /// <summary>
     /// アイテムの値段を取得
     /// </summary>
     /// <returns></returns>

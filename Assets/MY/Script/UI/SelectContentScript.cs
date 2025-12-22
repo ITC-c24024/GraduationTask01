@@ -10,15 +10,22 @@ public class SelectContentScript : MonoBehaviour
     [SerializeField] PlayerController[] playerCons;
     ItemScript[] itemScripts=new ItemScript[3];
     MoneyScript moneyScript;
+    SoundManager soundManager;
 
-    [SerializeField, Header("強化内容選択画面")]
-    Image selectImage;
     [SerializeField, Header("選択中Image")]
     GameObject[] selects;
     [SerializeField, Header("強化内容Image")]
     GameObject[] items;
     [SerializeField, Header("スキップImage")]
     Image skipImage;
+    [SerializeField, Header("アイテム情報背景")]
+    Image itemInfoBG;
+    [SerializeField, Header("アイテム情報")]
+    GameObject[] itemInfo;
+    //ひとつ前の説明Image
+    GameObject pastInfo;
+    [SerializeField, Header("フェードオブジェクト")]
+    GameObject fadeObj;
 
     [SerializeField, Header("メインカメラ")]
     Camera mainCamera;
@@ -38,14 +45,21 @@ public class SelectContentScript : MonoBehaviour
             itemScripts[i] = items[i].gameObject.GetComponent<ItemScript>();
         }
         moneyScript = GetComponent<MoneyScript>();
+        soundManager = GetComponent<SoundManager>();
     }
 
     public IEnumerator SelectContent()
     {
+        StartCoroutine(FadeInOut());
+
+        yield return new WaitForSeconds(1.0f);
+
         shopCamera.gameObject.SetActive(true);
         mainCamera.gameObject.SetActive(false);
-        skipImage.gameObject.SetActive(true);
-        
+        skipImage.gameObject.SetActive(true);   
+
+        soundManager.Shop();
+
         //選択アイテムをセット
         SetItem();    
 
@@ -63,6 +77,11 @@ public class SelectContentScript : MonoBehaviour
 
                 originNum = 0;
             }
+            if (pastInfo != null) pastInfo.SetActive(false);
+            itemInfoBG.gameObject.SetActive(true);
+            itemInfo[originNum].SetActive(true);
+            pastInfo = itemInfo[originNum];
+
             selects[playerNum].gameObject.SetActive(true);
             yield return StartCoroutine(playerCons[i].SelectContent(originNum));
 
@@ -70,14 +89,19 @@ public class SelectContentScript : MonoBehaviour
         }
         playerNum = 0;
 
-        selectImage.gameObject.SetActive(false);
+        itemInfoBG.gameObject.SetActive(false);
 
         yield return new WaitForSeconds(0.5f);
+
+        StartCoroutine(FadeInOut());
+        yield return new WaitForSeconds(1.0f);
 
         skipImage.gameObject.SetActive(false);
         mainCamera.gameObject.SetActive(true);
         shopCamera.gameObject.SetActive(false);
 
+        soundManager.StopShop();
+        yield return new WaitForSeconds(2.0f);
         //次のウェーブへ
         StartCoroutine(waveManager.StartWave());
     }
@@ -102,6 +126,10 @@ public class SelectContentScript : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// セットするアイテムをランダムで選ぶ
+    /// </summary>
+    /// <returns>アイテム番号</returns>
     int SelectItemNum()
     {
         int i= Random.Range(0, 100);
@@ -113,6 +141,40 @@ public class SelectContentScript : MonoBehaviour
         else i = 5;
 
         return i;
+    }
+
+    IEnumerator FadeInOut()
+    {
+        Vector2 startPos = new Vector2(-2560, fadeObj.transform.localPosition.y);
+        Vector2 targetPos = new Vector2(0,fadeObj.transform.localPosition.y);
+
+        float time = 0;
+        float reqired = 1.0f;
+        while (time < reqired)
+        {
+            time += Time.deltaTime;
+
+            Vector2 currentPos = Vector2.Lerp(startPos, targetPos, time / reqired);
+            fadeObj.transform.localPosition = currentPos;
+
+            yield return null;
+        }
+
+        yield return new WaitForSeconds(1.0f);
+
+        startPos = targetPos;
+        targetPos = new Vector2(2560, fadeObj.transform.localPosition.y);
+
+        time = 0;
+        while (time < reqired)
+        {
+            time += Time.deltaTime;
+
+            Vector2 currentPos = Vector2.Lerp(startPos, targetPos,time / reqired);
+            fadeObj.transform.localPosition = currentPos;
+
+            yield return null;
+        }
     }
 
     /// <summary>
@@ -139,6 +201,10 @@ public class SelectContentScript : MonoBehaviour
     /// <param name="selectNum">選択する内容のImage要素数</param>
     public void SelectItem(int selectNum)
     {
+        soundManager.Select();
+        
+        itemInfoBG.gameObject.SetActive(true);
+        
         Vector3 selectPos = new Vector3(
             items[selectNum].transform.localPosition.x,
             selects[playerNum].transform.localPosition.y,
@@ -146,6 +212,11 @@ public class SelectContentScript : MonoBehaviour
             );
         selects[playerNum].transform.localPosition = selectPos;
         selects[playerNum].gameObject.SetActive(true);
+
+        pastInfo.SetActive(false);
+        ItemScript.ItemType itemType = itemScripts[selectNum].GetNowItem();
+        itemInfo[(int)itemType].SetActive(true);
+        pastInfo = itemInfo[(int)itemType];
     }
 
     /// <summary>
@@ -157,13 +228,17 @@ public class SelectContentScript : MonoBehaviour
     {
         if (CanDecision(selectNum))
         {
+            soundManager.Buy();
+            
             selects[playerNum].gameObject.SetActive(false);
 
             moneyScript.UseMoney(itemScripts[selectNum].GetItemPrice());
             //アイテムを取得
             var item = items[selectNum].GetComponent<ItemScript>();
             item.GetItem(playerCons[playerNum]);
-            //items[selectNum].SetActive(false);
+
+            ItemScript.ItemType itemType = itemScripts[selectNum].GetNowItem();
+            itemInfo[(int)itemType].SetActive(false);
 
             //次のプレイヤーへ
             playerNum++;
@@ -173,6 +248,8 @@ public class SelectContentScript : MonoBehaviour
         }
         else
         {
+            soundManager.Cant();
+
             Debug.Log("※買えません");
 
             //演出案
@@ -204,6 +281,10 @@ public class SelectContentScript : MonoBehaviour
     /// </summary>
     public void Skip()
     {
+        soundManager.Decision();
+        
+        pastInfo.SetActive(false);
+        
         //次のプレイヤーへ
         playerNum++;
         isRun = false;

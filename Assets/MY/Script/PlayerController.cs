@@ -87,7 +87,7 @@ public class PlayerController : CharaScript
 
         //新しくアイテムを得る
         haveItem = itemType;
-        if(haveItem! != ItemScript.ItemType.hpUp)
+        if(haveItem != ItemScript.ItemType.hpUp)
         {
             itemIcon[(int)haveItem - 1].gameObject.SetActive(true);
         }
@@ -253,6 +253,7 @@ public class PlayerController : CharaScript
 
             yield return new WaitForSeconds(0.8f);
 
+            soundManager.Attack();
             //敵にダメージを与える
             gridManager.SendDamage(z, x, amount, false, default);
 
@@ -263,6 +264,8 @@ public class PlayerController : CharaScript
     //ダメージを受けてノックバックさせる
     public override void ReciveDamage(int amount, Vector2 kbDir)
     {
+        soundManager.Recive();
+        
         hp -= amount;
         if (hp < 0) hp = 0;
 

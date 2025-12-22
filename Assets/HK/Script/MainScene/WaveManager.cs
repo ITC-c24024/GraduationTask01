@@ -12,6 +12,7 @@ public class WaveManager : MonoBehaviour
     //勝手に書き換え
     MoneyScript moneyScript;
     [SerializeField] PlayerController[] playerCon;
+    SoundManager soundManager;
     
     [SerializeField, Header("ウェーブ数")]
     int waveCount = 1;
@@ -53,6 +54,7 @@ public class WaveManager : MonoBehaviour
         startUISC = gameObject.GetComponent<StartUIScript>();
         selectContentSC = GetComponent<SelectContentScript>();
         moneyScript = GetComponent<MoneyScript>();
+        soundManager = GetComponent<SoundManager>();
 
         totalEnemyCount = allEnemyCount;
     }
@@ -64,6 +66,8 @@ public class WaveManager : MonoBehaviour
 
     public IEnumerator StartWave()
     {
+        soundManager.Main();
+
         //仮
         yield return StartCoroutine(startUISC.SetUI(0));
         //仮
@@ -129,6 +133,8 @@ public class WaveManager : MonoBehaviour
     //仮
     IEnumerator WaveClear()
     {
+        soundManager.UI();
+
         //仮
         yield return StartCoroutine(startUISC.SetUI(3));
 
@@ -150,6 +156,7 @@ public class WaveManager : MonoBehaviour
         //総数を保存
         totalEnemyCount = allEnemyCount;
 
+        soundManager.StopMain();
         //仮(強化内容選択)
         StartCoroutine(selectContentSC.SelectContent());
     }

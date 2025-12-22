@@ -72,6 +72,9 @@ public class Enemy_CScript : CharaScript
         animator.SetTrigger("IsAttack");
         shadowAnim.SetTrigger("IsAttack");
 
+        soundManager.Ivy();
+        yield return new WaitForSecondsRealtime(0.2f);
+
         Vector3 instPos = new Vector3(movePos.x, ivyPrefab.transform.position.y, movePos.z);
         var ivy= Instantiate(ivyPrefab, instPos, ivyPrefab.transform.rotation);
 

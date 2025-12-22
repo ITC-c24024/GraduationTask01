@@ -12,6 +12,7 @@ public class TurnManager : MonoBehaviour
     [SerializeField] CellScript cellScript;
     StartUIScript startUIScript;
     MoneyScript moneyScript;
+    SoundManager soundManager;
 
     [SerializeField, Header("ƒ[ƒ‹ƒhƒJƒƒ‰")]
     Camera worldCamera;
@@ -34,10 +35,12 @@ public class TurnManager : MonoBehaviour
     void Awake()
     {
         Application.targetFrameRate = 30;
+
         gridManager = gameObject.GetComponent<GridManager>();
         startUIScript = gameObject.GetComponent<StartUIScript>();
         waveManager = gameObject.GetComponent<WaveManager>();
         moneyScript = gameObject.GetComponent<MoneyScript>();
+        soundManager = gameObject.GetComponent<SoundManager>();
     }
 
     void Start()
@@ -72,6 +75,7 @@ public class TurnManager : MonoBehaviour
         enemySC.worldCamera = worldCamera;
         enemySC.canvas = canvas;
         enemySC.moneyScript = moneyScript;
+        enemySC.soundManager = soundManager;
 
         //List‚É’Ç‰Á
         enemyList.Add(enemySC);

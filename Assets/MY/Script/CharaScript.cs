@@ -12,6 +12,7 @@ public class CharaScript : MonoBehaviour
     public TurnManager turnManager;
     public GridManager gridManager;
     public CellScript cellScript;
+    public SoundManager soundManager;
 
     public GameObject charaImage;
     public GameObject attackImagePrefab;

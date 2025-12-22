@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class GameController : MonoBehaviour
 {
     WaveManager waveManager;
+    SoundManager soundManager;
 
     [SerializeField, Header("プレイヤー待機UI")]
     Image waitImage;
@@ -26,13 +27,8 @@ public class GameController : MonoBehaviour
     void Start()
     {
         waveManager = gameObject.GetComponent<WaveManager>();
-
+        soundManager = gameObject.GetComponent<SoundManager>();
         waitImage.gameObject.SetActive(true);
-    }
-
-    void Update()
-    {
-        
     }
 
     public IEnumerator GameStart()

@@ -10,9 +10,8 @@ public class SelectContentScript : MonoBehaviour
     [SerializeField] PlayerController[] playerCons;
     ItemScript[] itemScripts=new ItemScript[3];
     MoneyScript moneyScript;
+    SoundManager soundManager;
 
-    [SerializeField, Header("強化内容選択画面")]
-    Image selectImage;
     [SerializeField, Header("選択中Image")]
     GameObject[] selects;
     [SerializeField, Header("強化内容Image")]
@@ -44,10 +43,13 @@ public class SelectContentScript : MonoBehaviour
             itemScripts[i] = items[i].gameObject.GetComponent<ItemScript>();
         }
         moneyScript = GetComponent<MoneyScript>();
+        soundManager = GetComponent<SoundManager>();
     }
 
     public IEnumerator SelectContent()
     {
+        soundManager.Shop();
+
         shopCamera.gameObject.SetActive(true);
         mainCamera.gameObject.SetActive(false);
         skipImage.gameObject.SetActive(true);
@@ -69,6 +71,7 @@ public class SelectContentScript : MonoBehaviour
 
                 originNum = 0;
             }
+            if (pastInfo != null) pastInfo.SetActive(false);
             itemInfoBG.gameObject.SetActive(true);
             itemInfo[originNum].SetActive(true);
             pastInfo = itemInfo[originNum];
@@ -80,7 +83,6 @@ public class SelectContentScript : MonoBehaviour
         }
         playerNum = 0;
 
-        selectImage.gameObject.SetActive(false);
         itemInfoBG.gameObject.SetActive(false);
 
         yield return new WaitForSeconds(0.5f);
@@ -89,6 +91,8 @@ public class SelectContentScript : MonoBehaviour
         mainCamera.gameObject.SetActive(true);
         shopCamera.gameObject.SetActive(false);
 
+
+        soundManager.StopShop();
         //次のウェーブへ
         StartCoroutine(waveManager.StartWave());
     }
@@ -154,6 +158,8 @@ public class SelectContentScript : MonoBehaviour
     /// <param name="selectNum">選択する内容のImage要素数</param>
     public void SelectItem(int selectNum)
     {
+        soundManager.Select();
+        
         itemInfoBG.gameObject.SetActive(true);
         
         Vector3 selectPos = new Vector3(
@@ -179,6 +185,8 @@ public class SelectContentScript : MonoBehaviour
     {
         if (CanDecision(selectNum))
         {
+            soundManager.Buy();
+            
             selects[playerNum].gameObject.SetActive(false);
 
             moneyScript.UseMoney(itemScripts[selectNum].GetItemPrice());
@@ -187,7 +195,7 @@ public class SelectContentScript : MonoBehaviour
             item.GetItem(playerCons[playerNum]);
 
             ItemScript.ItemType itemType = itemScripts[selectNum].GetNowItem();
-            itemInfo[(int)itemType].SetActive(true);
+            itemInfo[(int)itemType].SetActive(false);
 
             //次のプレイヤーへ
             playerNum++;
@@ -197,6 +205,8 @@ public class SelectContentScript : MonoBehaviour
         }
         else
         {
+            soundManager.Cant();
+
             Debug.Log("※買えません");
 
             //演出案
@@ -228,6 +238,10 @@ public class SelectContentScript : MonoBehaviour
     /// </summary>
     public void Skip()
     {
+        soundManager.Decision();
+        
+        pastInfo.SetActive(false);
+        
         //次のプレイヤーへ
         playerNum++;
         isRun = false;

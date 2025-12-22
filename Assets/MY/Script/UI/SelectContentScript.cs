@@ -19,6 +19,10 @@ public class SelectContentScript : MonoBehaviour
     GameObject[] items;
     [SerializeField, Header("スキップImage")]
     Image skipImage;
+    [SerializeField, Header("アイテム情報背景")]
+    Image itemInfoBG;
+    [SerializeField, Header("アイテム情報")]
+    GameObject[] itemInfo;
 
     [SerializeField, Header("メインカメラ")]
     Camera mainCamera;
@@ -63,6 +67,9 @@ public class SelectContentScript : MonoBehaviour
 
                 originNum = 0;
             }
+            itemInfoBG.gameObject.SetActive(true);
+            itemInfo[originNum].SetActive(true);
+
             selects[playerNum].gameObject.SetActive(true);
             yield return StartCoroutine(playerCons[i].SelectContent(originNum));
 
@@ -71,6 +78,7 @@ public class SelectContentScript : MonoBehaviour
         playerNum = 0;
 
         selectImage.gameObject.SetActive(false);
+        itemInfoBG.gameObject.SetActive(false);
 
         yield return new WaitForSeconds(0.5f);
 
@@ -102,6 +110,10 @@ public class SelectContentScript : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// セットするアイテムをランダムで選ぶ
+    /// </summary>
+    /// <returns>アイテム番号</returns>
     int SelectItemNum()
     {
         int i= Random.Range(0, 100);
@@ -139,6 +151,8 @@ public class SelectContentScript : MonoBehaviour
     /// <param name="selectNum">選択する内容のImage要素数</param>
     public void SelectItem(int selectNum)
     {
+        itemInfoBG.gameObject.SetActive(true);
+        
         Vector3 selectPos = new Vector3(
             items[selectNum].transform.localPosition.x,
             selects[playerNum].transform.localPosition.y,
@@ -146,6 +160,9 @@ public class SelectContentScript : MonoBehaviour
             );
         selects[playerNum].transform.localPosition = selectPos;
         selects[playerNum].gameObject.SetActive(true);
+
+        ItemScript.ItemType itemType = itemScripts[selectNum].GetNowItem();
+        itemInfo[(int)itemType].SetActive(true);
     }
 
     /// <summary>
@@ -163,7 +180,9 @@ public class SelectContentScript : MonoBehaviour
             //アイテムを取得
             var item = items[selectNum].GetComponent<ItemScript>();
             item.GetItem(playerCons[playerNum]);
-            //items[selectNum].SetActive(false);
+
+            ItemScript.ItemType itemType = itemScripts[selectNum].GetNowItem();
+            itemInfo[(int)itemType].SetActive(true);
 
             //次のプレイヤーへ
             playerNum++;

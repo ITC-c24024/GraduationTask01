@@ -83,7 +83,7 @@ public class StartUIScript : MonoBehaviour
     /// <param name="i">現在のウェーブ数</param>
     public void SetWaveCount(int i)
     {
-        waveCountText.text = $"ウェーブ{i}";
+        waveCountText.text = $"Wave {i}";
     }
 
     /// <summary>
@@ -92,6 +92,6 @@ public class StartUIScript : MonoBehaviour
     /// <param name="n">残り敵数</param>
     public void SetEnemyCount(int n)
     {
-        enemyCountText.text = $"残り {n}体";
+        enemyCountText.text = $"{n}体";
     }
 }

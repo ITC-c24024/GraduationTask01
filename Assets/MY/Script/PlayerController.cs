@@ -107,9 +107,6 @@ public class PlayerController : CharaScript
             case ItemScript.ItemType.moneyUp:
                 moneyScript.SetRate(0.5f);
                 break;
-            case ItemScript.ItemType.actionLimitUp:
-                actionLimit++;
-                break;
             case ItemScript.ItemType.maxHpUp:
                 maxHP++;
                 AddHpBar();
@@ -129,11 +126,9 @@ public class PlayerController : CharaScript
             case ItemScript.ItemType.moneyUp:
                 moneyScript.SetRate(-0.5f);
                 break;
-            case ItemScript.ItemType.actionLimitUp:
-                actionLimit--;
-                break;
             case ItemScript.ItemType.maxHpUp:
                 maxHP--;
+                ReduceHpBar();
                 break;
         }
     }
@@ -166,16 +161,11 @@ public class PlayerController : CharaScript
         GameObject fill = mid.transform.GetChild(0).gameObject;
         hpBar[hpBar.Count - 2] = fill;
 
-        if (hp < maxHP)
+        hp = maxHP;
+        foreach(var bar in hpBar)
         {
-            hp++;
-            hpBar[hp - 1].SetActive(true);
+            bar.SetActive(true);
         }
-        /*
-        if (hp < hpBar.Count - 2)
-        {
-            fill.SetActive(false);
-        }*/
 
         //増えたバーの分位置をずらす
         foreach(var fililObj in hpBar)
@@ -184,6 +174,42 @@ public class PlayerController : CharaScript
             parentObj.transform.localPosition = new Vector3(
                 parentObj.transform.localPosition.x-0.135f/2, 
                 parentObj.transform.localPosition.y, 
+                parentObj.transform.localPosition.z
+                );
+        }
+    }
+    /// <summary>
+    /// HPバーの個数を減らす
+    /// </summary>
+    void ReduceHpBar()
+    {
+        if (hp == 5) hp = 4;
+
+        //右から2番目のバーを消す       
+        GameObject delete = hpBar[hpBar.Count - 2];
+        hpBar.Remove(delete);
+        Destroy(delete);
+
+        if (hp == 4)
+        {
+            hpBar[hpBar.Count - 1].SetActive(true);
+        }
+
+        //右端のバーの位置を調整
+        GameObject parent = hpBar[hpBar.Count - 1].transform.parent.gameObject;
+        parent.transform.localPosition = new Vector3(
+            parent.transform.localPosition.x - 0.135f,
+            parent.transform.localPosition.y,
+            parent.transform.localPosition.z
+            );
+
+        //HPバーの位置を調整
+        foreach (var fililObj in hpBar)
+        {
+            GameObject parentObj = fililObj.transform.parent.gameObject;
+            parentObj.transform.localPosition = new Vector3(
+                parentObj.transform.localPosition.x + 0.135f / 2,
+                parentObj.transform.localPosition.y,
                 parentObj.transform.localPosition.z
                 );
         }
@@ -421,6 +447,34 @@ public class PlayerController : CharaScript
     }
 
     /// <summary>
+    /// 四方に敵がいるか確認
+    /// </summary>
+    bool IsEmpty()
+    {
+        //四方にを確認
+        for (int i = -1; i <= 1; i++)
+        {
+            Vector2 checkPos = new Vector2(playerPos.x + i, playerPos.z);
+            if (checkPos.x < 0 || 7 < checkPos.x || i == 0) continue;
+            if (gridManager.CheckCellState((int)checkPos.y, (int)checkPos.x) == CellScript.CellState.empty)
+            {
+                return true;
+            }
+        }
+        for (int i = -1; i <= 1; i++)
+        {
+            Vector2 checkPos = new Vector2(playerPos.x, playerPos.z + i);
+            if (checkPos.y < 0 || 7 < checkPos.y || i == 0) continue;
+            if (gridManager.CheckCellState((int)checkPos.y, (int)checkPos.x) == CellScript.CellState.empty)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
     /// 行動選択フェーズ
     /// </summary>
     /// <returns></returns>
@@ -428,7 +482,9 @@ public class PlayerController : CharaScript
     {
         //行動回数分
         for (int i = 0; i < actionLimit; i++)
-        {        
+        {
+            if (!IsEmpty()) yield break;
+
             yield return new WaitForSeconds(0.5f);
             squareSC.SetImage(playerPos);
 
@@ -438,6 +494,8 @@ public class PlayerController : CharaScript
             bool isInput = false;
             while (!isInput)
             {
+                while (Time.timeScale == 0) yield return null;
+
                 Vector2 stick = stickAction.ReadValue<Vector2>();//スティックで移動方向指定
                 bool move = selectAttack.triggered;//Aボタンで移動
 

@@ -13,8 +13,8 @@ public class TitleManagerScript : MonoBehaviour
 
     [SerializeField, Header("矢印Image")]
     Image[] arrowImage;
-    [SerializeField, Header("フェードImage")]
-    Image fadeImage;
+    [SerializeField, Header("フェードオブジェクト")]
+    GameObject fadeObj;
 
     //選択している番号
     int selectNum = 0;
@@ -55,7 +55,7 @@ public class TitleManagerScript : MonoBehaviour
         bool decision = descisionAction.triggered;
         if (decision)
         {
-            StartCoroutine(SwitchScene(selectNum));
+            StartCoroutine(SwitchScene());
         }
     }
 
@@ -64,6 +64,24 @@ public class TitleManagerScript : MonoBehaviour
         canInput = false;
         yield return new WaitForSeconds(0.2f);
         canInput = true;
+    }
+
+    IEnumerator FadeOut()
+    {
+        Vector2 startPos = new Vector2(2560, fadeObj.transform.localPosition.y);
+        Vector2 targetPos = new Vector2(0, fadeObj.transform.localPosition.y);
+
+        float time = 0;
+        float reqired = 1.0f;
+        while (time < reqired)
+        {
+            time += Time.deltaTime;
+
+            Vector2 currentPos = Vector2.Lerp(startPos, targetPos, time / reqired);
+            fadeObj.transform.localPosition = currentPos;
+
+            yield return null;
+        }
     }
 
     /// <summary>
@@ -82,7 +100,7 @@ public class TitleManagerScript : MonoBehaviour
         }
     }
 
-    IEnumerator SwitchScene(int i)
+    IEnumerator SwitchScene()
     {
         soundManager.Decision();
 
@@ -96,21 +114,6 @@ public class TitleManagerScript : MonoBehaviour
             case 1:
                 Application.Quit();
                 break;
-        }
-    }
-
-    IEnumerator FadeOut()
-    {
-        float time = 0;
-        float reqired = 1.0f;
-        while (time < reqired)
-        {
-            time += Time.deltaTime;
-
-            float alpha = Mathf.Lerp(0, 1, time / reqired);
-            fadeImage.color = new Color(0, 0, 0, alpha);
-
-            yield return null;
         }
     }
 }

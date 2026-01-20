@@ -2,10 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class PoseScript : MonoBehaviour
 {
+    SoundManager soundManager;
+
+    [SerializeField, Header("矢印Image")]
+    Image[] arrowImage;
     [SerializeField, Header("ポーズImage")]
     Image poseImage;
 
@@ -13,6 +18,12 @@ public class PoseScript : MonoBehaviour
     InputAction[] poseAction = new InputAction[2];
     InputAction[] selectAction = new InputAction[2];
     InputAction[] decisionAction = new InputAction[2];
+
+    //選択している番号
+    int selectNum = 0;
+
+    //入力可能判定
+    bool canInput = true;
 
     void Start()
     {
@@ -24,7 +35,9 @@ public class PoseScript : MonoBehaviour
             poseAction[i] = map["Pose"];
             selectAction[i] = map["Move"];
             decisionAction[i] = map["SelectAttack"];
-        }    
+        }
+
+        soundManager = GetComponent<SoundManager>();
     }
 
     void Update()
@@ -49,13 +62,22 @@ public class PoseScript : MonoBehaviour
             //スティック入力
             Vector2 stick1 = selectAction[0].ReadValue<Vector2>();
             Vector2 stick2 = selectAction[1].ReadValue<Vector2>();
+            if (canInput && (stick1.y < -0.5 || stick2.y < -0.5))
+            {
+                StartCoroutine(InputDelay());
+                SelectUI(1);
+            }
+            else if (canInput && (stick1.y > 0.5 || stick2.y > 0.5))
+            {
+                StartCoroutine(InputDelay());
+                SelectUI(-1);
+            }
 
             //決定入力
-            bool decision = decisionAction[0].triggered || decisionAction[1].triggered; ;
-
+            bool decision = decisionAction[0].triggered || decisionAction[1].triggered;
             if (decision)
             {
-                Debug.Log("決定");
+                StartCoroutine(SwitchScene());
             }
         }     
     }
@@ -66,6 +88,46 @@ public class PoseScript : MonoBehaviour
     /// <returns></returns>
     IEnumerator InputDelay()
     {
+        canInput = false;
         yield return new WaitForSecondsRealtime(0.2f);
+        canInput = true;
+    }
+
+    /// <summary>
+    /// UIを選択
+    /// </summary>
+    /// <param name="i">選択したい方向</param>
+    void SelectUI(int i)
+    {
+        if (selectNum + i >= 0 && selectNum + i < arrowImage.Length)
+        {
+            soundManager.Select();
+
+            arrowImage[selectNum].gameObject.SetActive(false);
+            selectNum += i;
+            arrowImage[selectNum].gameObject.SetActive(true);
+        }
+    }
+
+    IEnumerator SwitchScene()
+    {
+        soundManager.Decision();
+
+        yield return new WaitForSecondsRealtime(0.1f);
+
+        Time.timeScale = 1;
+
+        switch (selectNum)
+        {
+            case 0:               
+                poseImage.gameObject.SetActive(false);
+                break;
+            case 1:
+                SceneManager.LoadScene("MainScene");
+                break;
+            case 2:
+                SceneManager.LoadScene("TitleScene");
+                break;
+        }
     }
 }

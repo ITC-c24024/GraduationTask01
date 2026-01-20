@@ -159,6 +159,7 @@ MonoBehaviour:
   turnManager: {fileID: 0}
   gridManager: {fileID: 0}
   cellScript: {fileID: 0}
+  soundManager: {fileID: 0}
   charaImage: {fileID: 0}
   attackImagePrefab: {fileID: 6790218346866554214, guid: 68d112e4a6097044fbe0d538cd3d14e6, type: 3}
   attackImage: {fileID: 0}
@@ -177,7 +178,7 @@ MonoBehaviour:
   hp: 4
   damage: 1
   recieveDamage: 0
-  dropMoney: 300
+  dropMoney: 30
   actionLimit: 1
   shortDir: 0
   moveRule: []

@@ -7,15 +7,27 @@ public class Enemy_CScript : CharaScript
     [SerializeField, Header("ツタPrefab")]
     GameObject ivyPrefab;
 
-    public struct Ivy
+    public class Ivy
     {
         GameObject ivyObj;
         Vector2 ivyPos;
+        int turn; //出現後経過ターン数
 
-        public Ivy(GameObject ivyObj,Vector2 ivyPos)
+        public Ivy(GameObject ivyObj, Vector2 ivyPos, int turn)
         {
             this.ivyObj = ivyObj;
             this.ivyPos = ivyPos;
+            this.turn = turn;
+        }
+
+        public void ProceedTurn()
+        {
+            turn++;
+        }
+
+        public int GetTurn()
+        {
+            return turn;
         }
 
         public void DestroySelf()
@@ -45,8 +57,11 @@ public class Enemy_CScript : CharaScript
     /// </summary>
     public override void SetAction()
     {
+        int i = 0;
         while (true)
         {
+            if (i >= 64) break;
+            i++;
             int x = Random.Range(0, 8);
             int z = Random.Range(0, 8);
 
@@ -54,12 +69,10 @@ public class Enemy_CScript : CharaScript
             {
                 //攻撃予定位置
                 movePos = new Vector3(x, transform.position.y, z);
-                
+                AttackState();
                 break;
             }
-        }        
-
-        AttackState();
+        } 
     }
 
     /// <summary>
@@ -69,29 +82,68 @@ public class Enemy_CScript : CharaScript
     /// <returns></returns>
     public override IEnumerator Move()
     {
-        animator.SetTrigger("IsAttack");
-        shadowAnim.SetTrigger("IsAttack");
+        CheckDestroyIvy();
 
-        soundManager.Ivy();
-        yield return new WaitForSecondsRealtime(0.2f);
+        //ツタ上限3つ
+        if (ivyList.Count < 3)
+        {
+            animator.SetTrigger("IsAttack");
+            shadowAnim.SetTrigger("IsAttack");
 
-        Vector3 instPos = new Vector3(movePos.x, ivyPrefab.transform.position.y, movePos.z);
-        var ivy= Instantiate(ivyPrefab, instPos, ivyPrefab.transform.rotation);
+            soundManager.Ivy();
+            yield return new WaitForSecondsRealtime(0.2f);
 
-        Ivy newIvy = new Ivy(ivy, new Vector2((int)movePos.x, (int)movePos.z));
-        ivyList.Add(newIvy);
+            Vector3 instPos = new Vector3(movePos.x, ivyPrefab.transform.position.y, movePos.z);
+            var ivy = Instantiate(ivyPrefab, instPos, ivyPrefab.transform.rotation);
 
-        gridManager.SetDamageState((int)movePos.z, (int)movePos.x, ivy);
+            Ivy newIvy = new Ivy(ivy, new Vector2((int)movePos.x, (int)movePos.z), 0);
+            ivyList.Add(newIvy);
 
-        yield return null;
+            gridManager.SetDamageState((int)movePos.z, (int)movePos.x, ivy);
 
-        DeleteImage();
+            yield return null;
+
+            DeleteImage();
+        }
     }
 
     public override void AttackState()
     {
-        attackImage.transform.position= new Vector3(movePos.x, attackImage.transform.position.y, movePos.z);
-        attackImage.SetActive(true);      
+        //ツタ上限3つ
+
+        attackImage.transform.position = new Vector3(movePos.x, attackImage.transform.position.y, movePos.z);
+        attackImage.SetActive(true);
+
+    }
+
+    /// <summary>
+    /// ツタの時間経過での消滅ロジック
+    /// </summary>
+    void CheckDestroyIvy()
+    {
+        List<Ivy> remove = new List<Ivy>();
+
+        //1ターン経過
+        foreach (var ivy in ivyList)
+        {
+            ivy.ProceedTurn();
+
+            //3ターン経過済みのツタを削除予定リストに追加
+            if (ivy.GetTurn() >= 3)
+            {
+                remove.Add(ivy);    
+            }
+        }
+        
+        //ツタ削除
+        foreach(var ivy in remove)
+        {
+            ivyList.Remove(ivy);
+
+            ivy.DestroySelf();
+            Vector2 ivyPos = ivy.GetPos();
+            gridManager.DeleteDamageState((int)ivyPos.y, (int)ivyPos.x);
+        }
     }
 
     public override void ReciveDamage(int amount, Vector2 kbDir)

@@ -159,12 +159,14 @@ MonoBehaviour:
   turnManager: {fileID: 0}
   gridManager: {fileID: 0}
   cellScript: {fileID: 0}
+  soundManager: {fileID: 0}
   charaImage: {fileID: 5649160074311771487}
   attackImagePrefab: {fileID: 6790218346866554214, guid: e9f7d1778838c7c478d65b9df5f082f1, type: 3}
   attackImage: {fileID: 0}
   arrowPrefab: {fileID: 7525773185347868891, guid: e624bb52002c3a049a7c5df1d7337907, type: 3}
   worldCamera: {fileID: 0}
   canvas: {fileID: 0}
+  targetPlayer: {fileID: 0}
   arrowList: []
   hpObj: {fileID: 6200977342884012052}
   hpBar:
@@ -174,7 +176,7 @@ MonoBehaviour:
   hp: 2
   damage: 1
   recieveDamage: 0
-  dropMoney: 100
+  dropMoney: 10
   actionLimit: 1
   shortDir: 0
   moveRule:

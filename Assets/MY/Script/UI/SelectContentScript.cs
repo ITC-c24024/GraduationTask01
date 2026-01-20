@@ -32,6 +32,9 @@ public class SelectContentScript : MonoBehaviour
     [SerializeField, Header("ショップカメラ")]
     Camera shopCamera;
 
+    [SerializeField]
+    Vector2[] infoPos;
+
     int playerNum = 0;
 
     //選択中判定
@@ -69,7 +72,7 @@ public class SelectContentScript : MonoBehaviour
             int originNum = 1;
             if (itemScripts[1].isSellect)
             {
-                selects[playerNum].transform.position = new Vector3(
+                selects[playerNum].transform.localPosition = new Vector3(
                     items[0].transform.localPosition.x,
                     selects[playerNum].transform.localPosition.y, 
                     items[0].transform.localPosition.z
@@ -78,9 +81,11 @@ public class SelectContentScript : MonoBehaviour
                 originNum = 0;
             }
             if (pastInfo != null) pastInfo.SetActive(false);
+            itemInfoBG.gameObject.transform.localPosition = infoPos[originNum];
             itemInfoBG.gameObject.SetActive(true);
-            itemInfo[originNum].SetActive(true);
-            pastInfo = itemInfo[originNum];
+            GameObject info = itemInfo[(int)itemScripts[originNum].GetNowItem()];
+            info.SetActive(true);
+            pastInfo = info;
 
             selects[playerNum].gameObject.SetActive(true);
             yield return StartCoroutine(playerCons[i].SelectContent(originNum));
@@ -141,16 +146,15 @@ public class SelectContentScript : MonoBehaviour
         if (i < 50) i = 0;
         else if (i < 60) i = 1;
         else if (i < 70) i = 2;
-        else if (i < 80) i = 3;
-        else if (i < 90) i = 4;
-        else i = 5;
+        else if (i < 90) i = 3;
+        else i = 4;
 
         return i;
     }
 
     IEnumerator FadeInOut()
     {
-        Vector2 startPos = new Vector2(-2560, fadeObj.transform.localPosition.y);
+        Vector2 startPos = new Vector2(2560, fadeObj.transform.localPosition.y);
         Vector2 targetPos = new Vector2(0,fadeObj.transform.localPosition.y);
 
         float time = 0;
@@ -168,7 +172,7 @@ public class SelectContentScript : MonoBehaviour
         yield return new WaitForSeconds(1.0f);
 
         startPos = targetPos;
-        targetPos = new Vector2(2560, fadeObj.transform.localPosition.y);
+        targetPos = new Vector2(-2560, fadeObj.transform.localPosition.y);
 
         time = 0;
         while (time < reqired)
@@ -208,7 +212,13 @@ public class SelectContentScript : MonoBehaviour
     public void SelectItem(int selectNum)
     {
         soundManager.Select();
-        
+
+        pastInfo.SetActive(false);
+        ItemScript.ItemType itemType = itemScripts[selectNum].GetNowItem();
+        itemInfo[(int)itemType].SetActive(true);
+        pastInfo = itemInfo[(int)itemType];
+
+        itemInfoBG.gameObject.transform.localPosition = infoPos[selectNum];
         itemInfoBG.gameObject.SetActive(true);
         
         Vector3 selectPos = new Vector3(
@@ -217,12 +227,7 @@ public class SelectContentScript : MonoBehaviour
             items[selectNum].transform.localPosition.z
             );
         selects[playerNum].transform.localPosition = selectPos;
-        selects[playerNum].gameObject.SetActive(true);
-
-        pastInfo.SetActive(false);
-        ItemScript.ItemType itemType = itemScripts[selectNum].GetNowItem();
-        itemInfo[(int)itemType].SetActive(true);
-        pastInfo = itemInfo[(int)itemType];
+        selects[playerNum].gameObject.SetActive(true);   
     }
 
     /// <summary>

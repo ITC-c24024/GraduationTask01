@@ -13,6 +13,7 @@ public class TurnManager : MonoBehaviour
     StartUIScript startUIScript;
     MoneyScript moneyScript;
     SoundManager soundManager;
+    SpownEnemyScript spownEnemySC;
 
     [SerializeField, Header("ワールドカメラ")]
     Camera worldCamera;
@@ -23,14 +24,9 @@ public class TurnManager : MonoBehaviour
     GameObject attackImage;
     [SerializeField, Header("敵の攻撃方向イメージPrefab")]
     GameObject arrowPrefab;
-    [SerializeField, Header("敵Prefab")]
-    GameObject[] enemyPrefab;
     [SerializeField, Header("敵のHPバー")]
     Slider hpPrefab;
     [SerializeField] Canvas canvas;
-
-    //実行中コルーチンの数
-    //public int runnning = 0;
 
     void Awake()
     {
@@ -41,6 +37,7 @@ public class TurnManager : MonoBehaviour
         waveManager = gameObject.GetComponent<WaveManager>();
         moneyScript = gameObject.GetComponent<MoneyScript>();
         soundManager = gameObject.GetComponent<SoundManager>();
+        spownEnemySC = GetComponent<SpownEnemyScript>();
     }
 
     void Start()
@@ -57,7 +54,7 @@ public class TurnManager : MonoBehaviour
         Vector2Int spownPos = gridManager.EnemySpawnCheck(GetPlayerPos());
         if (spownPos == -Vector2.one) return false;
 
-        GameObject enemyObj = SelectEnemy();
+        GameObject enemyObj = spownEnemySC.SelectEnemy();
         //敵スポーン
         GameObject enemy = Instantiate(
             enemyObj,
@@ -83,28 +80,6 @@ public class TurnManager : MonoBehaviour
         gridManager.ChangeCellState(spownPos.x, spownPos.y, CellScript.CellState.enemy, enemySC, Vector2Int.zero);
 
         return true;
-    }
-
-    /// <summary>
-    /// 召喚する敵を選ぶ
-    /// </summary>
-    GameObject SelectEnemy()
-    {
-        int wave = waveManager.GetNowWave();
-        if (wave <= 2)
-        {
-            return enemyPrefab[0];
-        }
-        else if(wave<=4)
-        {
-            int enemyNum = Random.Range(0, enemyPrefab.Length - 1);
-            return enemyPrefab[enemyNum];
-        }
-        else
-        {
-            int enemyNum = Random.Range(0, enemyPrefab.Length);
-            return enemyPrefab[enemyNum];
-        }
     }
 
     /// <summary>

@@ -2,50 +2,62 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ScrollObjManager : BackGroundScript
+public class ScrollObjManager : MonoBehaviour
 {
+    [SerializeField, Header("プレハブオブジェクト")]
+    GameObject prefabObj;
+
     [SerializeField, Header("オブジェクトリスト")]
     List<GameObject> objList;
 
     int objNum = 0;
+
+    bool isMove = true;
     void Start()
     {
+        for(int i = 0; i < 10; i++)
+        {
+            objList.Add(Instantiate(prefabObj, gameObject.transform.position, gameObject.transform.rotation));
+        }
+
         foreach(var obj in objList)
         {
             obj.SetActive(false);
         }
 
-        StartCoroutine(ScrollObj());
-        objNum = Random.Range(0, objList.Count);
-        objList[objNum].SetActive(true);
-
-        var posZ = transform.position.z;
-        startPos += new Vector3(0, 0, posZ);
-        endPos += new Vector3(0, 0, posZ);
+        SpawnFirstObj();
+        StartCoroutine(SelectObj());
     }
 
-    void Update()
+    void SpawnFirstObj()
     {
+        var posX = -15f;
         
+        while(posX < 34)
+        {
+            objList.Add(Instantiate(prefabObj, new Vector3(posX, 0, Random.Range(-1f, 18f)), Quaternion.identity));
+            posX += Random.Range(3.5f, 7f);
+        }
     }
 
-    IEnumerator ScrollObj()
+    IEnumerator SelectObj()
     {
-        while (isScroll)
+        while (isMove)
         {
-            float step = scrollSpeed * Time.deltaTime;
-            transform.position = Vector3.MoveTowards(transform.position, endPos, step);
+            var obj = objList[objNum];
+            obj.transform.position = new Vector3(35, 0, Random.Range(-1f, 18f));
+            obj.SetActive(true);
 
-            // 距離で判定する
-            if (transform.position == endPos)
+            if (objNum < objList.Count - 1)
             {
-                transform.position = startPos;
-                transform.position = startPos;
-                objList[objNum].SetActive(false);
-                objNum = Random.Range(0, objList.Count);
-                objList[objNum].SetActive(true);
+                objNum++;
             }
-            yield return null;
+            else
+            {
+                objNum = 0;
+            }
+
+            yield return new WaitForSeconds(Random.Range(0.5f, 1f));
         }
     }
 }

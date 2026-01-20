@@ -24,15 +24,11 @@ public class ItemScript : MonoBehaviour
         /// </summary>
         damageUp,
         /// <summary>
-        /// çsìÆâÒêî+1
-        /// </summary>
-        actionLimitUp,
-        /// <summary>
         /// älìæã‡+n% 
         /// </summary>
         moneyUp,
         /// <summary>
-        /// ç≈ëÂHP+1
+        /// ç≈ëÂHP+1,HPëSâÒïú
         /// </summary>
         maxHpUp,
         /// <summary>
@@ -45,7 +41,6 @@ public class ItemScript : MonoBehaviour
     {
         ItemType.hpUp,
         ItemType.damageUp,
-        ItemType.actionLimitUp,
         ItemType.moneyUp,
         ItemType.maxHpUp,
         ItemType.invalidDmage
@@ -65,7 +60,6 @@ public class ItemScript : MonoBehaviour
         {
             {ItemType.hpUp,100},
             {ItemType.damageUp,600},
-            {ItemType.actionLimitUp, 800},
             {ItemType.moneyUp,400},
             {ItemType.maxHpUp,400 },
             {ItemType.invalidDmage ,600}

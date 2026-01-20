@@ -13,7 +13,8 @@ public class WaveManager : MonoBehaviour
     MoneyScript moneyScript;
     [SerializeField] PlayerController[] playerCon;
     SoundManager soundManager;
-    
+    SpownEnemyScript spownEnemySC;
+
     [SerializeField, Header("ウェーブ数")]
     int waveCount = 1;
 
@@ -55,6 +56,7 @@ public class WaveManager : MonoBehaviour
         selectContentSC = GetComponent<SelectContentScript>();
         moneyScript = GetComponent<MoneyScript>();
         soundManager = GetComponent<SoundManager>();
+        spownEnemySC = GetComponent<SpownEnemyScript>();
 
         totalEnemyCount = allEnemyCount;
     }
@@ -83,7 +85,7 @@ public class WaveManager : MonoBehaviour
 
         for (int i = 0; i < spawnEnemyCount + (int)waveCount / 5; i++)
         {
-            if (allEnemyCount-nowEnemyCount > 0 && nowEnemyCount < 20)
+            if (allEnemyCount-nowEnemyCount > 0 && nowEnemyCount < 10)
             {
                 if (turnManagerSC.EnemySpown()) nowEnemyCount++;
             }
@@ -139,6 +141,9 @@ public class WaveManager : MonoBehaviour
     {
         soundManager.UI();
 
+        //ウェーブクリア報酬
+        moneyScript.GetMoney(100, Vector2.zero);
+
         //仮
         yield return StartCoroutine(startUISC.SetUI(3));
 
@@ -155,7 +160,7 @@ public class WaveManager : MonoBehaviour
         turnCount = 0;
 
         spawnEnemyCount++;
-        allEnemyCount = waveCount + (waveCount - 1) * 2;
+        allEnemyCount = spownEnemySC.GetSpownCount(waveCount);
         //勝手に
         //総数を保存
         totalEnemyCount = allEnemyCount;

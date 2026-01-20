@@ -8,6 +8,8 @@ public class ControllerBindScript : MonoBehaviour
     GameController gameController;
     PoseScript poseScript;
 
+    [SerializeField, Header("PlayerInputPrefab")]
+    GameObject bindObj;
     [SerializeField, Header("プレイヤーオブジェクト")]
     GameObject[] playerObj;
 

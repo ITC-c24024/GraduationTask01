@@ -66,6 +66,8 @@ public class Enemy_BScript : CharaScript
                     }
                 }
 
+                soundManager.Move();
+
                 animator.SetBool("IsAttack", true);
                 shadowAnim.SetBool("IsAttack", true);
                 float time = 0;
@@ -173,6 +175,8 @@ public class Enemy_BScript : CharaScript
 
         animator.SetBool("IsAttack", false);
         shadowAnim.SetBool("IsAttack", false);
+
+        soundManager.StopMove();
     }
 
     public override void AttackState()

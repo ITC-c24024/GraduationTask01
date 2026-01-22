@@ -234,6 +234,8 @@ public class PlayerController : CharaScript
             playerPos.z + z
             );
 
+        soundManager.Move();
+
         animator.SetBool("IsWalk", true);
         shadowAnim.SetBool("IsWalk", true);
         float time = 0;
@@ -257,6 +259,8 @@ public class PlayerController : CharaScript
         curPos = playerPos;
         animator.SetBool("IsWalk", false);
         shadowAnim.SetBool("IsWalk", false);
+
+        soundManager.StopMove();
 
         gridManager.ChangeCellState((int)curPos.z, (int)curPos.x, CellScript.CellState.player, this, default);
 
@@ -432,6 +436,8 @@ public class PlayerController : CharaScript
     public IEnumerator Resurrection()
     {
         Debug.Log("•œŠˆ");
+        soundManager.Resurrection();
+
         hp = 2;
         hpObj.SetActive(true);
         for (int i = 0; i < hp; i++)

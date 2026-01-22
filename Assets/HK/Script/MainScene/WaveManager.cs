@@ -160,7 +160,7 @@ public class WaveManager : MonoBehaviour
         turnCount = 0;
 
         spawnEnemyCount++;
-        allEnemyCount = spownEnemySC.GetSpownCount(waveCount);
+        allEnemyCount = spownEnemySC.GetSpownCount();
         //Ÿè‚É
         //‘”‚ğ•Û‘¶
         totalEnemyCount = allEnemyCount;

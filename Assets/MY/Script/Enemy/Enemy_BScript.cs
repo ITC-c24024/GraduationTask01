@@ -66,6 +66,8 @@ public class Enemy_BScript : CharaScript
                     }
                 }
 
+                animator.SetBool("IsAttack", true);
+                shadowAnim.SetBool("IsAttack", true);
                 float time = 0;
                 float required = 0.3f;
                 while (time < required)
@@ -168,8 +170,9 @@ public class Enemy_BScript : CharaScript
                 gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);              
             }           
         }
-        
-        //turnManager.FinCoroutine();
+
+        animator.SetBool("IsAttack", false);
+        shadowAnim.SetBool("IsAttack", false);
     }
 
     public override void AttackState()

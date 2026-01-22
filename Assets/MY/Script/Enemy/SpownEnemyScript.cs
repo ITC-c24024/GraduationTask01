@@ -21,9 +21,9 @@ public class SpownEnemyScript : MonoBehaviour
     {
         int nowWave = waveManager.GetNowWave();
 
-        if (nowWave< waveDatalist.Count)
+        if (nowWave < waveDatalist.Count) 
         {
-            return waveDatalist[nowWave];
+            return waveDatalist[nowWave - 1];
         }
 
         return waveDatalist[waveDatalist.Count - 1];
@@ -32,74 +32,37 @@ public class SpownEnemyScript : MonoBehaviour
     /// <summary>
     /// 1waveでスポーンする敵の数を決める
     /// </summary>
-    /// <param name="wave">現在のウェーブ数</param>
     /// <returns>スポーンする数</returns>
-    public int GetSpownCount(int wave)
+    public int GetSpownCount()
     {
         int count = GetNowWaveData().spownCount;
         return count;
     }
 
     /// <summary>
-    /// スポーンする敵の種類を選ぶ
+    /// スポーンする敵の種類を選ぶ(重み付き抽選)
     /// </summary>
     /// <returns>スポーンする敵</returns>
     public GameObject SelectEnemy()
     {
         int wave = waveManager.GetNowWave();
+        WaveData data = waveDatalist[wave - 1];
 
-        if (wave <= 2)
+        float total = 0;
+        foreach(var enemy in data.enemies)
         {
-            return enemyPrefab[0];
-        }
-        else if (wave <= 4)
-        {
-            return enemyPrefab[1]; 
-        }
-        else if (wave <= 5)
-        {
-            if (Probability(50))
-            {
-                return enemyPrefab[0];
-            }
-            else
-            {
-                return enemyPrefab[1];
-            }
-        }
-        else if (wave == 6)
-        {
-            return enemyPrefab[2];
-        }
-        else if (wave == 7)
-        {
-            if (Probability(50))
-            {
-                return enemyPrefab[0];
-            }
-            else
-            {
-                return enemyPrefab[2];
-            }
-        }
-        else
-        {
-            if (Probability(33.3f))
-            {
-                return enemyPrefab[0];
-            }
-            else if (Probability(33.3f))
-            {
-                return enemyPrefab[1];
-            }
-            else
-            {
-                return enemyPrefab[2];
-            }
+            total += enemy.percent;
         }
 
-        //エラー
-        //return null;
+        float rand = Random.Range(0, total);
+        foreach(var enemy in data.enemies)
+        {
+            if(rand< enemy.percent)
+                return enemy.enemy;
+
+            rand -= enemy.percent;
+        }
+        return data.enemies[0].enemy;
     }
 
     /// <summary>

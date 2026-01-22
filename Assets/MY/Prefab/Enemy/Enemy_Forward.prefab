@@ -95,7 +95,7 @@ Animator:
   m_GameObject: {fileID: 4126690742764375670}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: f2e2a711419507b46acaa4d71b79ccf0, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -188,8 +188,8 @@ MonoBehaviour:
   targetDir: {x: 0, y: 0}
   curPos: {x: 0, y: 0, z: 0}
   movePos: {x: 0, y: 0, z: 0}
-  animator: {fileID: 0}
-  shadowAnim: {fileID: 0}
+  animator: {fileID: 8265614465209262376}
+  shadowAnim: {fileID: 3757074604457976750}
 --- !u!1 &5321457291989428371
 GameObject:
   m_ObjectHideFlags: 0
@@ -319,7 +319,7 @@ Animator:
   m_GameObject: {fileID: 5649160074311771487}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: f2e2a711419507b46acaa4d71b79ccf0, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

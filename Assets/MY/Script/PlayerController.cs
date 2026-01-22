@@ -16,9 +16,10 @@ public class PlayerController : CharaScript
     [SerializeField] SelectContentScript SelectContentSC;
     [SerializeField, Header("味方プレイヤー")] PlayerController playerCon;
 
+    //[SerializeField, Header("エフェクトオブジェクト")]
+    //GameObject effectObj;
     [SerializeField, Header("HPバーの中央Prefab")]
     GameObject midBar;
-
     [SerializeField, Header("アイテムアイコン")]
     Image[] itemIcon;
 
@@ -291,7 +292,9 @@ public class PlayerController : CharaScript
     public override void ReciveDamage(int amount, Vector2 kbDir)
     {
         soundManager.Recive();
-        
+
+        StartCoroutine(ReciveDamageEffect());
+
         hp -= amount;
         if (hp < 0) hp = 0;
 
@@ -334,6 +337,7 @@ public class PlayerController : CharaScript
             gridManager.ChangeCellState((int)targetPos.z, (int)targetPos.x, CellScript.CellState.player, this, default);
             animator.SetTrigger("IsKB");
             shadowAnim.SetTrigger("IsKB");
+            effectAnim.SetTrigger("IsKB");
         }
 
         //マス更新(KBが確定しているので、ここで更新)

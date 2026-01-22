@@ -15,6 +15,7 @@ public class CharaScript : MonoBehaviour
     public SoundManager soundManager;
 
     public GameObject charaImage;
+    public GameObject effectObj;
     public GameObject attackImagePrefab;
     public GameObject attackImage;
     public GameObject arrowPrefab;
@@ -69,6 +70,7 @@ public class CharaScript : MonoBehaviour
 
     public Animator animator;
     public Animator shadowAnim;
+    public Animator effectAnim;
 
     /// <summary>
     /// HPバーの位置を設定
@@ -330,6 +332,17 @@ public class CharaScript : MonoBehaviour
     public virtual void ReciveDamage(int amount, Vector2 kbDir)
     {
 
+    }
+
+    /// <summary>
+    /// 被弾演出
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerator ReciveDamageEffect()
+    {
+        effectObj.SetActive(true);
+        yield return new WaitForSeconds(0.2f);
+        effectObj.SetActive(false);
     }
 
     /// <summary>

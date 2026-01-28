@@ -66,6 +66,10 @@ public class Enemy_BScript : CharaScript
                     }
                 }
 
+                soundManager.Move();
+
+                animator.SetBool("IsAttack", true);
+                shadowAnim.SetBool("IsAttack", true);
                 float time = 0;
                 float required = 0.3f;
                 while (time < required)
@@ -168,8 +172,11 @@ public class Enemy_BScript : CharaScript
                 gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);              
             }           
         }
-        
-        //turnManager.FinCoroutine();
+
+        animator.SetBool("IsAttack", false);
+        shadowAnim.SetBool("IsAttack", false);
+
+        soundManager.StopMove();
     }
 
     public override void AttackState()
@@ -212,6 +219,7 @@ public class Enemy_BScript : CharaScript
         {
             StartCoroutine(Dead());
             turnManager.enemyList.Remove(this);
+            spownEnemySC.DeadZombi();
         }
     }
 }

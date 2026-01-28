@@ -12,6 +12,9 @@ public class SpownEnemyScript : MonoBehaviour
     [SerializeField, Header("ウェーブデータ")]
     List<WaveData> waveDatalist;
 
+    //現在出現しているゾンビの数
+    [SerializeField] int zombieCount = 0;
+
     void Start()
     {
         waveManager = GetComponent<WaveManager>();
@@ -21,9 +24,9 @@ public class SpownEnemyScript : MonoBehaviour
     {
         int nowWave = waveManager.GetNowWave();
 
-        if (nowWave< waveDatalist.Count)
+        if (nowWave < waveDatalist.Count) 
         {
-            return waveDatalist[nowWave];
+            return waveDatalist[nowWave - 1];
         }
 
         return waveDatalist[waveDatalist.Count - 1];
@@ -32,87 +35,84 @@ public class SpownEnemyScript : MonoBehaviour
     /// <summary>
     /// 1waveでスポーンする敵の数を決める
     /// </summary>
-    /// <param name="wave">現在のウェーブ数</param>
     /// <returns>スポーンする数</returns>
-    public int GetSpownCount(int wave)
+    public int GetSpownCount()
     {
-        int count = GetNowWaveData().spownCount;
+        int nowWave = waveManager.GetNowWave();
+        int count;
+        if (nowWave < waveDatalist.Count)
+        {
+            count = GetNowWaveData().spownCount;
+        }
+        else
+        {
+            count = nowWave - 3;
+        }
+         
         return count;
     }
 
     /// <summary>
-    /// スポーンする敵の種類を選ぶ
+    /// スポーンする敵の種類を選ぶ(重み付き抽選)
     /// </summary>
     /// <returns>スポーンする敵</returns>
     public GameObject SelectEnemy()
     {
         int wave = waveManager.GetNowWave();
-
-        if (wave <= 2)
+        WaveData data;
+        if (wave < waveDatalist.Count)
         {
-            return enemyPrefab[0];
-        }
-        else if (wave <= 4)
-        {
-            return enemyPrefab[1]; 
-        }
-        else if (wave <= 5)
-        {
-            if (Probability(50))
-            {
-                return enemyPrefab[0];
-            }
-            else
-            {
-                return enemyPrefab[1];
-            }
-        }
-        else if (wave == 6)
-        {
-            return enemyPrefab[2];
-        }
-        else if (wave == 7)
-        {
-            if (Probability(50))
-            {
-                return enemyPrefab[0];
-            }
-            else
-            {
-                return enemyPrefab[2];
-            }
+            data = waveDatalist[wave - 1];
         }
         else
         {
-            if (Probability(33.3f))
+            data = waveDatalist[waveDatalist.Count - 1];
+        }
+
+        GameObject spown = null;
+
+        float total = 0;
+        foreach(var enemy in data.enemies)
+        {
+            total += enemy.percent;
+        }
+        
+        float rand = Random.Range(0, total);
+        foreach(var enemy in data.enemies)
+        {
+            if(rand< enemy.percent)
             {
-                return enemyPrefab[0];
-            }
-            else if (Probability(33.3f))
+                spown = enemy.enemy;
+                break;
+            }            
+
+            rand -= enemy.percent;
+        }
+
+        if (spown == null) spown = data.enemies[0].enemy;
+
+        if (spown == enemyPrefab[1])
+        {            
+            if(zombieCount >= 2)
             {
-                return enemyPrefab[1];
+                //ゾンビが重複しないようにする
+                spown = enemyPrefab[0];
             }
             else
             {
-                return enemyPrefab[2];
-            }
+                SpownZombie();
+            }       
         }
 
-        //エラー
-        //return null;
+        return spown;
     }
 
-    /// <summary>
-    /// 確率計算
-    /// </summary>
-    /// <param name="percent">確率</param>
-    /// <returns></returns>
-    bool Probability(float percent)
+    public void SpownZombie()
     {
-        float rate = Random.value * 100;
-
-        if (percent == 100 && percent == rate) return true;
-        else if (rate < percent) return true;
-        else return false;
+        zombieCount++;
+    }
+    public void DeadZombi()
+    {
+        zombieCount--;
     }
 }

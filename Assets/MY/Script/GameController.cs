@@ -1,7 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+
+#if UNITY_EDITOR
+
+[InitializeOnLoad]
+public static class NativeLeakSetup
+{
+    static NativeLeakSetup()
+    {
+        NativeLeakDetection.Mode =
+            NativeLeakDetectionMode.EnabledWithStackTrace;
+    }
+}
+#endif
 
 public class GameController : MonoBehaviour
 {
@@ -22,6 +38,10 @@ public class GameController : MonoBehaviour
     public bool isOpen = false;
     public bool isStart = false;
 
+    [SerializeField, Header("î{ë¨íiäK")]
+    int[] gameSpeed;
+    int num = 0;//óvëfêî
+
     void Awake()
     {
         Application.targetFrameRate = 30;
@@ -33,7 +53,7 @@ public class GameController : MonoBehaviour
         waveManager = gameObject.GetComponent<WaveManager>();
         soundManager = gameObject.GetComponent<SoundManager>();
         waitImage.gameObject.SetActive(true);
-
+        
         StartCoroutine(FadeIn());
     }
 
@@ -45,6 +65,23 @@ public class GameController : MonoBehaviour
 
         Vector2 startPos = new Vector2(0, fadeObj.transform.localPosition.y); ;
         Vector2 targetPos = new Vector2(-2560, fadeObj.transform.localPosition.y);
+
+        float time = 0;
+        float reqired = 1.0f;
+        while (time < reqired)
+        {
+            time += Time.deltaTime;
+
+            Vector2 currentPos = Vector2.Lerp(startPos, targetPos, time / reqired);
+            fadeObj.transform.localPosition = currentPos;
+
+            yield return null;
+        }
+    }
+    IEnumerator FadeOut()
+    {
+        Vector2 startPos = new Vector2(2560, fadeObj.transform.localPosition.y);
+        Vector2 targetPos = new Vector2(0, fadeObj.transform.localPosition.y);
 
         float time = 0;
         float reqired = 1.0f;
@@ -78,17 +115,21 @@ public class GameController : MonoBehaviour
         StartCoroutine(waveManager.StartWave());
     }
 
+    public IEnumerator FinishGame()
+    {
+        yield return FadeOut();
+        SceneManager.LoadScene("ResultScene");
+    }
+
     /// <summary>
     /// ÉQÅ[ÉÄë¨ìxÉAÉbÉv
     /// </summary>
     public void SpeedUp()
     {
-        Time.timeScale += 1;
-        //è„å¿3î{
-        if (Time.timeScale > 3)
-        {
-            Time.timeScale = 1;
-        }
+        num++;
+        if (num > gameSpeed.Length - 1) num = 0;
+
+        Time.timeScale = gameSpeed[num];
 
         SetSpeedUI(Time.timeScale);
     }
@@ -99,7 +140,7 @@ public class GameController : MonoBehaviour
     public void SetSpeedUI(float nowSpeed)
     {
         //ï\é¶Ç∑ÇÈImageÇÃêî
-        int count = (int)nowSpeed - 1;
+        int count = num;
 
         for (int i = 0; i < arrowImage.Length; i++)
         {

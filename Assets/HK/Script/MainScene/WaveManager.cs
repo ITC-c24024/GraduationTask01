@@ -34,6 +34,9 @@ public class WaveManager : MonoBehaviour
     [SerializeField, Header("ターンごとの出現敵数")]
     int spawnEnemyCount = 1;
 
+    [SerializeField, Header("同時出現可能数")]
+    int sameTimeCount = 1;
+
     [SerializeField, Header("プレイヤー数")]
     int playerCount = 0;
 
@@ -57,6 +60,7 @@ public class WaveManager : MonoBehaviour
         moneyScript = GetComponent<MoneyScript>();
         soundManager = GetComponent<SoundManager>();
         spownEnemySC = GetComponent<SpownEnemyScript>();
+        gameCon = GetComponent<GameController>();
 
         totalEnemyCount = allEnemyCount;
     }
@@ -85,7 +89,7 @@ public class WaveManager : MonoBehaviour
 
         for (int i = 0; i < spawnEnemyCount + (int)waveCount / 5; i++)
         {
-            if (allEnemyCount-nowEnemyCount > 0 && nowEnemyCount < 10)
+            if (allEnemyCount-nowEnemyCount > 0 && nowEnemyCount < sameTimeCount)
             {
                 if (turnManagerSC.EnemySpown()) nowEnemyCount++;
             }
@@ -159,8 +163,11 @@ public class WaveManager : MonoBehaviour
         //仮
         turnCount = 0;
 
+        //3ウェーブ毎に+1
+        if (waveCount % 3 == 0) sameTimeCount++;
+
         spawnEnemyCount++;
-        allEnemyCount = spownEnemySC.GetSpownCount(waveCount);
+        allEnemyCount = spownEnemySC.GetSpownCount();
         //勝手に
         //総数を保存
         totalEnemyCount = allEnemyCount;
@@ -173,8 +180,10 @@ public class WaveManager : MonoBehaviour
     void GameOver()
     {
         //仮
-        StartCoroutine(startUISC.SetUI(4));
+        //StartCoroutine(startUISC.SetUI(4));
 
         isGameOver = true;
+
+        StartCoroutine(gameCon.FinishGame());
     }
 }

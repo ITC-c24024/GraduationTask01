@@ -10,10 +10,16 @@ public class SoundManager : MonoBehaviour
     AudioSource mainSource;
     [SerializeField, Header("ショップBGM")]
     AudioSource shopSource;
+    [SerializeField, Header("移動SE")]
+    AudioSource moveSource;
+    [SerializeField, Header("スライムSE")]
+    AudioSource slimeSource;
     [SerializeField, Header("攻撃SE")]
     AudioSource attackSource;
     [SerializeField, Header("被弾SE")]
     AudioSource reciveSource;
+    [SerializeField, Header("蘇生SE")]
+    AudioSource resurrectionSource;
     [SerializeField, Header("ツタが生える音")]
     AudioSource ivySource;
     [SerializeField, Header("UI表示音")]
@@ -33,10 +39,16 @@ public class SoundManager : MonoBehaviour
     AudioClip mainClip;
     [SerializeField, Header("ショップBGM")]
     AudioClip shopClip;
+    [SerializeField, Header("移動SE")]
+    AudioClip moveClip;
+    [SerializeField, Header("スライムSE")]
+    AudioClip slimeClip;
     [SerializeField, Header("攻撃SE")]
     AudioClip attackClip;
     [SerializeField, Header("被弾SE")]
     AudioClip reciveClip;
+    [SerializeField, Header("蘇生SE")]
+    AudioClip resurrectionClip;
     [SerializeField, Header("ツタが生える音")]
     AudioClip ivyClip;
     [SerializeField, Header("UI表示音")]
@@ -79,6 +91,18 @@ public class SoundManager : MonoBehaviour
     {
         shopSource.Stop();
     }
+    public void Move()
+    {
+        moveSource.PlayOneShot(moveClip);
+    }
+    public void StopMove()
+    {
+        moveSource.Stop();
+    }
+    public void Slime()
+    {
+        slimeSource.PlayOneShot(slimeClip);
+    }
     public void Attack()
     {
         attackSource.PlayOneShot(attackClip);
@@ -86,6 +110,10 @@ public class SoundManager : MonoBehaviour
     public void Recive()
     {
         reciveSource.PlayOneShot(reciveClip);
+    }
+    public void Resurrection()
+    {
+        resurrectionSource.PlayOneShot(resurrectionClip);
     }
     public void Ivy()
     {

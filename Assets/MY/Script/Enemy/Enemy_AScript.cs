@@ -76,7 +76,7 @@ public class Enemy_AScript : CharaScript
                           );
                     if (!result.canMove) attackOnly = true;
                 }
-
+                
                 //通常移動
                 animator.SetTrigger("IsAttack");
                 shadowAnim.SetTrigger("IsAttack");
@@ -138,11 +138,11 @@ public class Enemy_AScript : CharaScript
                 //ひとつ前のマスを空にする
                 gridManager.LeaveCell((int)originPos.z, (int)originPos.x, this);
             }
+            soundManager.Slime();
+
             DeleteImage();
             yield return new WaitForSeconds(0.2f);
         }
-      　
-        //turnManager.FinCoroutine();
     }
 
     public override void AttackState()

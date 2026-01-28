@@ -13,8 +13,10 @@ public class CharaScript : MonoBehaviour
     public GridManager gridManager;
     public CellScript cellScript;
     public SoundManager soundManager;
+    public SpownEnemyScript spownEnemySC;
 
     public GameObject charaImage;
+    public GameObject effectObj;
     public GameObject attackImagePrefab;
     public GameObject attackImage;
     public GameObject arrowPrefab;
@@ -69,6 +71,7 @@ public class CharaScript : MonoBehaviour
 
     public Animator animator;
     public Animator shadowAnim;
+    public Animator effectAnim;
 
     /// <summary>
     /// HPバーの位置を設定
@@ -185,15 +188,21 @@ public class CharaScript : MonoBehaviour
 
         //近い方を追う位置とする
         Vector3 targetPos;
-        if (diff_A <= diff_B)
+        if (diff_A < diff_B)
         {
             targetPos = playerPos[0];
             targetPlayer = player[0];
         }
-        else
+        else if(diff_A > diff_B)
         {
             targetPos = playerPos[1];
             targetPlayer = player[1];
+        }
+        else //同じ場合、ランダム
+        {
+            int i = UnityEngine.Random.Range(0, 2);
+            targetPos = playerPos[i];
+            targetPlayer = player[i];
         }
 
         return targetPos;
@@ -330,6 +339,17 @@ public class CharaScript : MonoBehaviour
     public virtual void ReciveDamage(int amount, Vector2 kbDir)
     {
 
+    }
+
+    /// <summary>
+    /// 被弾演出
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerator ReciveDamageEffect()
+    {
+        effectObj.SetActive(true);
+        yield return new WaitForSeconds(0.2f);
+        effectObj.SetActive(false);
     }
 
     /// <summary>

@@ -8,7 +8,7 @@ public class RuleScript : MonoBehaviour
     [SerializeField, Header("入力用")]
     InputActionAsset inputAsset;
 
-    //バインドされたアクション
+    //選択アクション
     InputAction selectAct;
 
     [SerializeField, Header("ルールのページUI")]

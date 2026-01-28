@@ -12,6 +12,9 @@ public class SpownEnemyScript : MonoBehaviour
     [SerializeField, Header("ウェーブデータ")]
     List<WaveData> waveDatalist;
 
+    //現在出現しているゾンビの数
+    [SerializeField] int zombieCount = 0;
+
     void Start()
     {
         waveManager = GetComponent<WaveManager>();
@@ -35,7 +38,17 @@ public class SpownEnemyScript : MonoBehaviour
     /// <returns>スポーンする数</returns>
     public int GetSpownCount()
     {
-        int count = GetNowWaveData().spownCount;
+        int nowWave = waveManager.GetNowWave();
+        int count;
+        if (nowWave < waveDatalist.Count)
+        {
+            count = GetNowWaveData().spownCount;
+        }
+        else
+        {
+            count = nowWave - 3;
+        }
+         
         return count;
     }
 
@@ -46,36 +59,60 @@ public class SpownEnemyScript : MonoBehaviour
     public GameObject SelectEnemy()
     {
         int wave = waveManager.GetNowWave();
-        WaveData data = waveDatalist[wave - 1];
+        WaveData data;
+        if (wave < waveDatalist.Count)
+        {
+            data = waveDatalist[wave - 1];
+        }
+        else
+        {
+            data = waveDatalist[waveDatalist.Count - 1];
+        }
+
+        GameObject spown = null;
 
         float total = 0;
         foreach(var enemy in data.enemies)
         {
             total += enemy.percent;
         }
-
+        
         float rand = Random.Range(0, total);
         foreach(var enemy in data.enemies)
         {
             if(rand< enemy.percent)
-                return enemy.enemy;
+            {
+                spown = enemy.enemy;
+                break;
+            }            
 
             rand -= enemy.percent;
         }
-        return data.enemies[0].enemy;
+
+        if (spown == null) spown = data.enemies[0].enemy;
+
+        if (spown == enemyPrefab[1])
+        {            
+            if(zombieCount >= 2)
+            {
+                //ゾンビが重複しないようにする
+                spown = enemyPrefab[0];
+            }
+            else
+            {
+                SpownZombie();
+            }       
+        }
+
+        return spown;
     }
 
-    /// <summary>
-    /// 確率計算
-    /// </summary>
-    /// <param name="percent">確率</param>
-    /// <returns></returns>
-    bool Probability(float percent)
+    public void SpownZombie()
     {
-        float rate = Random.value * 100;
-
-        if (percent == 100 && percent == rate) return true;
-        else if (rate < percent) return true;
-        else return false;
+        zombieCount++;
+    }
+    public void DeadZombi()
+    {
+        zombieCount--;
     }
 }

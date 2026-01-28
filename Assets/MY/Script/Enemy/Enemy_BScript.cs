@@ -219,6 +219,7 @@ public class Enemy_BScript : CharaScript
         {
             StartCoroutine(Dead());
             turnManager.enemyList.Remove(this);
+            spownEnemySC.DeadZombi();
         }
     }
 }

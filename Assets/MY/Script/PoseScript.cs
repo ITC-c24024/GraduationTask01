@@ -22,6 +22,9 @@ public class PoseScript : MonoBehaviour
     //選択している番号
     int selectNum = 0;
 
+    //ポーズする前のゲーム速度
+    float pastSpeed;
+
     //入力可能判定
     bool canInput = true;
 
@@ -45,9 +48,10 @@ public class PoseScript : MonoBehaviour
         //ポーズ切り替え入力
         bool pose = poseAction[0].triggered || poseAction[1].triggered;
         
-        if (pose && Time.timeScale == 1)//ポーズ画面を開いていないとき
+        if (pose && Time.timeScale != 0)//ポーズ画面を開いていないとき
         {
             poseImage.gameObject.SetActive(true);
+            pastSpeed = Time.timeScale;
             Time.timeScale = 0;
         }    
         else if (Time.timeScale == 0)//ポーズ画面が開いていたら
@@ -55,7 +59,7 @@ public class PoseScript : MonoBehaviour
             //ポーズ画面を閉じる
             if (pose)
             {
-                Time.timeScale = 1;
+                Time.timeScale = pastSpeed;
                 poseImage.gameObject.SetActive(false);
             }
 
@@ -115,17 +119,18 @@ public class PoseScript : MonoBehaviour
 
         yield return new WaitForSecondsRealtime(0.1f);
 
-        Time.timeScale = 1;
-
         switch (selectNum)
         {
             case 0:               
                 poseImage.gameObject.SetActive(false);
+                Time.timeScale = pastSpeed;
                 break;
             case 1:
+                Time.timeScale = 1;
                 SceneManager.LoadScene("MainScene");
                 break;
             case 2:
+                Time.timeScale = 1;
                 SceneManager.LoadScene("TitleScene");
                 break;
         }

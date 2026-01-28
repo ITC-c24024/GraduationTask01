@@ -55,6 +55,7 @@ public class TurnManager : MonoBehaviour
         if (spownPos == -Vector2.one) return false;
 
         GameObject enemyObj = spownEnemySC.SelectEnemy();
+            
         //ìGÉXÉ|Å[Éì
         GameObject enemy = Instantiate(
             enemyObj,
@@ -72,6 +73,7 @@ public class TurnManager : MonoBehaviour
         enemySC.canvas = canvas;
         enemySC.moneyScript = moneyScript;
         enemySC.soundManager = soundManager;
+        enemySC.spownEnemySC = spownEnemySC;
 
         //ListÇ…í«â¡
         enemyList.Add(enemySC);

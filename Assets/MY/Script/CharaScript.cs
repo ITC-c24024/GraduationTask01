@@ -13,6 +13,7 @@ public class CharaScript : MonoBehaviour
     public GridManager gridManager;
     public CellScript cellScript;
     public SoundManager soundManager;
+    public SpownEnemyScript spownEnemySC;
 
     public GameObject charaImage;
     public GameObject effectObj;
@@ -187,15 +188,21 @@ public class CharaScript : MonoBehaviour
 
         //‹ß‚¢•û‚ğ’Ç‚¤ˆÊ’u‚Æ‚·‚é
         Vector3 targetPos;
-        if (diff_A <= diff_B)
+        if (diff_A < diff_B)
         {
             targetPos = playerPos[0];
             targetPlayer = player[0];
         }
-        else
+        else if(diff_A > diff_B)
         {
             targetPos = playerPos[1];
             targetPlayer = player[1];
+        }
+        else //“¯‚¶ê‡Aƒ‰ƒ“ƒ_ƒ€
+        {
+            int i = UnityEngine.Random.Range(0, 2);
+            targetPos = playerPos[i];
+            targetPlayer = player[i];
         }
 
         return targetPos;

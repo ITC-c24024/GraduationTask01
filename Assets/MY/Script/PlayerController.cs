@@ -63,7 +63,7 @@ public class PlayerController : CharaScript
     {
         //倍速
         bool speedUpAct = speedUp.triggered;
-        if (speedUpAct) gameCon.SpeedUp();
+        if (speedUpAct && Time.timeScale != 0) gameCon.SpeedUp();
     }
 
     public void SetPlayer()
@@ -565,6 +565,9 @@ public class PlayerController : CharaScript
 
         while (!isSelect)
         {
+            //ポーズ中なら選べないようにする
+            while (Time.timeScale == 0) yield return null;
+
             Vector2 stick = stickAction.ReadValue<Vector2>();
             bool decision = selectAttack.triggered;
             bool skip = selectMove.triggered;
